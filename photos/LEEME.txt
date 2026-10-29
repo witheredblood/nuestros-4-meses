@@ -1,0 +1,2 @@
+Pon aquí tus fotos: foto1.jpg, foto2.jpg, foto3.jpg, foto4.jpg
+(o cambia los nombres en config.js, sección photos)
