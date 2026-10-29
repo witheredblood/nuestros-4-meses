@@ -61,8 +61,8 @@ dialog[open]{animation:pop .45s cubic-bezier(.2,1.3,.4,1)}
 .env.gone{opacity:0;transform:scale(.85);height:0;margin:0;pointer-events:none}
 .paper{background:var(--cream);color:#3a1420;text-shadow:none;max-width:34rem;width:100%;padding:0 1.8rem;text-align:left;box-shadow:0 20px 50px rgba(0,0,0,.5);border-radius:4px;font:400 1rem/1.8 var(--serif);max-height:0;opacity:0;overflow:hidden;transition:max-height 1.8s,opacity 1.2s,padding 1s}
 .paper.show{max-height:2500px;opacity:1;padding-block:2.2rem}
-.paper p{margin-bottom:1rem}
-.paper p:last-child{text-align:right;margin:0}
+.paper p{margin-bottom:1.25rem}
+.paper p:last-child{margin-bottom:0}
 
 .box{min-height:5.5rem;max-width:30rem;font:400 1.15rem/1.55 var(--serif);margin:1rem 0;display:grid;place-items:center}
 .msgtitle{margin-top:2.5rem;margin-bottom:1rem;font-size:1.15rem;color:var(--rose)}

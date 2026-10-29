@@ -21,12 +21,14 @@ window.CONFIG = {
     { src: "photos/foto4.jpg", text: "Cuarto recuerdo: puedes agregar o quitar fotos de esta lista." }
   ],
 
-  // 💌 LA CARTA — cada línea es un párrafo. Texto provisional: reemplázalo por el tuyo.
+  // 💌 LA CARTA — cada bloque es una estrofa de la carta.
   letter: [
-    "Vane:",
-    "Hoy cumplimos cuatro meses y quise escribirte esto yo mismo.",
-    "[Aquí va tu carta, con tus palabras y a tu manera. Escríbela como si se lo dijeras en persona.]",
-    "Con cariño,<br>[tu nombre]"
+    "Eres hermosa, perdona la franqueza,<br>pero es lo primero que viene a mi mente,<br>al contemplar de cerca tu belleza<br>cada vez que la vida te pone enfrente.",
+    "Hoy cumplimos cuatro meses de historia<br>y sigo pensando que no tengo remedio;<br>tu amor se ha quedado grabado en mi memoria,<br>alejando del mundo cualquier intermedio.",
+    "Cada vez que te veo me vuelvo a enamorar,<br>entre más pasa el tiempo, más te adoro;<br>en este viaje que apenas va a comenzar,<br>tú eres el sueño que más añoro.",
+    "No sé qué me hiciste en este cuatrimestre,<br>pero no puedo dejar de pensar en ti;<br>no hay otra estrella que igual que tú brille,<br>te has vuelto lo más importante para mí.",
+    "Soy un caso perdido si de ti me desvío,<br>el solo pensarte me arranca un suspiro;<br>en este amor tan tuyo y tan mío,<br>me pregunto si sabes cuánto te admiro.",
+    "Estoy enamorado y no lo digo a la ligera,<br>estos cuatro meses son solo el inicio;<br>no sé si alguien más con esta fuerza te quiera,<br>pero por tu amor, la vida entera sacrificio."
   ],
 
   // 💗 RAZONES (el botón las muestra al azar sin repetir). Escribe las tuyas.
