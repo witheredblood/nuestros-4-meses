@@ -4,9 +4,8 @@
    ============================================================ */
 window.CONFIG = {
 
-  // 📅 FECHA DE NOVIAZGO — formato AAAA-MM-DD, por ejemplo "2026-06-15".
-  // Mientras esté en null, el contador mostrará un aviso.
-  startDate: null,
+  // 📅 FECHA DE NOVIAZGO — 10 de julio de 2026
+  startDate: "2026-07-10",
 
   // 🎵 Música opcional: pon el archivo en esta carpeta, por ejemplo "cancion.mp3".
   // Si lo dejas vacío no aparece ningún botón. Nunca suena sola: ella la activa.
@@ -22,13 +21,16 @@ window.CONFIG = {
     "Estoy enamorado y no lo digo a la ligera,<br>estos cuatro meses son solo el inicio;<br>no sé si alguien más con esta fuerza te quiera,<br>pero por tu amor, la vida entera sacrificio."
   ],
 
-  // 💗 RAZONES (el botón las muestra al azar sin repetir). Escribe las tuyas.
+  // 💗 RAZONES (el botón las muestra al azar sin repetir).
   reasons: [
-    "[Razón 1: escribe aquí por qué la quieres]",
-    "[Razón 2]",
-    "[Razón 3]",
-    "[Razón 4]",
-    "[Razón 5]"
+    "Porque cada vez que te veo me vuelvo a enamorar como el primer día.",
+    "Porque entre tantas estrellas en el cielo, ninguna brilla tan bonito como tú.",
+    "Porque el solo pensarte me arranca un suspiro y me alegra el corazón.",
+    "Porque en la mirada de tus ojos encontré el lugar donde siempre quiero quedarme.",
+    "Porque desde el 10 de julio te convertiste en lo más importante para mí.",
+    "Porque tu belleza, tu ternura y tu forma de ser me tienen sin remedio.",
+    "Porque contigo cualquier momento se siente como nuestro propio mundo juntos.",
+    "Porque te admiro, te adoro y entre más pasa el tiempo, más te quiero."
   ],
 
   // ✉️ Ocho estrofas que aparecen por separado al tocarlas.
@@ -68,29 +70,35 @@ window.CONFIG = {
   ],
 
   // El corazón dice una de estas frases en cada toque (la última se repite).
-  heartLines: ["Te quiero.", "Otra vez: te quiero.", "Y lo digo en serio.", "Feliz aniversario, Vane."],
+  heartLines: [
+    "Te quiero.",
+    "Otra vez: te quiero.",
+    "Y lo digo muy en serio.",
+    "Eres el sueño que más añoro.",
+    "Felices 4 meses de novios, mi niña bonita ♥"
+  ],
 
   // Textos de la página
   text: {
     welcomeTitle: "Para mi niña bonita",
-    welcomeText: "Hice algo para ti.",
+    welcomeText: "Hice algo especial por nuestros 4 meses de novios.",
     openBtn: "Abrir mi regalito",
 
-    annivKicker: "Nuestro aniversario",
-    annivPhrase: "Cuatro meses a tu lado, y cada uno ha sido importante para mí.",
-    annivNote: "Quizá sean solo cuatro meses, pero lo que siento por ti es muy real y muy importante para mí.",
+    annivKicker: "Desde el 10 de julio de 2026",
+    annivPhrase: "Cuatro meses de novios a tu lado, y cada día contigo me enamora más.",
+    annivNote: "Estos cuatro meses son apenas el comienzo de todo lo que quiero vivir contigo.",
 
     letterTitle: "Una carta para ti",
     letterHint: "Toca el sobre para abrirlo.",
     surpTitle: "Un par de cosas más",
     surpHint: "Toca, que hay sorpresas.",
     reasonBtn: "Una razón por la que te quiero",
-    reasonsDone: "Esas fueron todas, por ahora",
+    reasonsDone: "Y aún me quedan infinitas razones más para quererte ♥",
     msgHint: "Ocho estrofas para ti",
     moreBtn: "Hay algo más para ti",
 
-    finalTitle: "Felices cuatro meses, mi niña bonita",
-    finalText: "Gracias por estos cuatro meses. Quiero que sepas que me importas, y que me hace feliz que seas mi novia.",
-    finalSign: "Tuyo, [tu nombre]"
+    finalTitle: "Felices cuatro meses de novios, mi niña bonita",
+    finalText: "Gracias por estos cuatro meses juntos desde aquel 10 de julio. Quiero que sepas cuánto te adoro y lo feliz que me hace ser tu novio.",
+    finalSign: "Siempre tuyo ♥"
   }
 };
