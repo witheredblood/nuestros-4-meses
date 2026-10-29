@@ -170,34 +170,27 @@ function vwoop() {
 }
 const SND_FILES = {
   idle: [
-    ["sonidos enderman/sonido_neutral.mp3", "sonidos_enderman/sonido_neutral.mp3", "sonidos/sonido_neutral.mp3", "sonido_neutral.mp3", "sonidos enderman/sonido neutral.mp3"],
-    ["sonidos enderman/sonido_neutral_2.mp3", "sonidos_enderman/sonido_neutral_2.mp3", "sonidos/sonido_neutral_2.mp3", "sonido_neutral_2.mp3", "sonidos enderman/sonido neutral 2.mp3"],
-    ["sonidos enderman/sonido_neutral_3.mp3", "sonidos_enderman/sonido_neutral_3.mp3", "sonidos/sonido_neutral_3.mp3", "sonido_neutral_3.mp3", "sonidos enderman/sonido neutral 3.mp3"]
+    "sonidos/sonido_neutral.mp3",
+    "sonidos/sonido_neutral_2.mp3",
+    "sonidos/sonido_neutral_3.mp3"
   ],
   tp: [
-    ["sonidos enderman/teleport.mp3", "sonidos_enderman/teleport.mp3", "sonidos/teleport.mp3", "teleport.mp3"],
-    ["sonidos enderman/teleport_2.mp3", "sonidos_enderman/teleport_2.mp3", "sonidos/teleport_2.mp3", "teleport_2.mp3", "sonidos enderman/teleport 2.mp3"]
+    "sonidos/teleport.mp3",
+    "sonidos/teleport_2.mp3"
   ]
 };
 const SND_BUF = { idle: [], tp: [] };
 let sndLoading = false;
-async function fetchFirstAudio(candidates) {
-  for (const url of candidates) {
-    try {
-      const r = await fetch(encodeURI(url));
-      if (!r.ok) continue;
-      const b = await r.arrayBuffer();
-      return await new Promise((res, rej) => ac.decodeAudioData(b, res, rej));
-    } catch (_) {}
-  }
-  return null;
-}
 function loadSounds() {
   if (sndLoading || !ac) return;
   sndLoading = true;
   for (const k of ["idle", "tp"]) {
-    SND_FILES[k].forEach(candidates => {
-      fetchFirstAudio(candidates).then(buf => { if (buf) SND_BUF[k].push(buf); });
+    SND_FILES[k].forEach(url => {
+      fetch(url)
+        .then(r => r.ok ? r.arrayBuffer() : Promise.reject())
+        .then(b => new Promise((res, rej) => ac.decodeAudioData(b, res, rej)))
+        .then(buf => SND_BUF[k].push(buf))
+        .catch(() => {});
     });
   }
 }

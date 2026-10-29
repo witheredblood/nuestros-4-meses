@@ -1,5 +1,5 @@
 /* 🎨 COLORES Y FUENTE DE MINECRAFT: cámbialos aquí */
-@font-face{font-family:"MinecraftChat";src:url("minecraft.woff") format("woff"),url("https://fonts.cdnfonts.com/s/25041/1_MinecraftRegular1.woff") format("woff");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"MinecraftChat";src:url("assets/minecraft.woff") format("woff"),url("https://fonts.cdnfonts.com/s/25041/1_MinecraftRegular1.woff") format("woff");font-weight:400;font-style:normal;font-display:swap}
 :root{--wine:#2b0813;--wine2:#4d0f25;--red:#8e1d3c;--rose:#f3bccb;--cream:#fbf0e3;
 --mc:"MinecraftChat","Minecraft","Pixelify Sans",monospace;--serif:var(--mc);--sans:var(--mc)}
 *{box-sizing:border-box;margin:0;font-style:normal!important}
@@ -85,8 +85,9 @@ dialog[open]{animation:pop .45s cubic-bezier(.2,1.3,.4,1)}
 .show .sign{animation:in 2.5s 2s both}
 
 #petals{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
-.p{position:absolute;bottom:-2rem;color:var(--rose);opacity:0;animation:float linear infinite}
-@keyframes float{10%{opacity:.35}90%{opacity:.15}to{transform:translateY(-110vh) rotate(40deg);opacity:0}}
+.p{position:absolute;bottom:-3rem;color:var(--rose);opacity:0;animation:float linear infinite}
+.p.flw{width:auto;object-fit:contain;image-rendering:pixelated;filter:drop-shadow(2px 2px 0 rgba(0,0,0,.4))}
+@keyframes float{10%{opacity:.55}85%{opacity:.3}to{transform:translateY(-112vh) rotate(40deg);opacity:0}}
 #prog{position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);z-index:5;font-size:.85rem;color:var(--rose);background:rgba(43,8,19,.85);padding:.4rem 1rem;border-radius:99px;white-space:nowrap;border:1px solid rgba(243,188,203,.25)}
 #prog .btn{padding:.5rem 1.4rem;background:var(--wine2)}
 #music{position:fixed;top:1rem;right:1rem;z-index:6;width:2.8rem;height:2.8rem;padding:0;border-radius:50%;background:rgba(43,8,19,.85)}

@@ -4,11 +4,38 @@
   document.title = C.text.welcomeTitle;
   const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  /* Pétalos suaves de fondo */
-  if (!calm) for (let i = 0; i < 14; i++) {
-    const p = document.createElement("span");
-    p.className = "p"; p.textContent = i % 3 ? "♥" : "✦";
-    p.style.cssText = `left:${Math.random() * 100}%;font-size:${10 + Math.random() * 14}px;animation-duration:${16 + Math.random() * 16}s;animation-delay:${-Math.random() * 30}s`;
+  /* Corazones y flores de Minecraft flotando suaves en el fondo */
+  const FLOWERS = [
+    "assets/flores/BlockSprite_pink-petals.png",
+    "assets/flores/Invicon_Allium.png",
+    "assets/flores/Invicon_Blue_Orchid.png",
+    "assets/flores/Invicon_Closed_Eyeblossom.webp",
+    "assets/flores/Invicon_Cornflower.png",
+    "assets/flores/Invicon_Dandelion.png",
+    "assets/flores/Invicon_Golden_Dandelion.png",
+    "assets/flores/Invicon_Lily_of_the_Valley.png",
+    "assets/flores/Invicon_Open_Eyeblossom.png",
+    "assets/flores/Invicon_Orange_Tulip.png",
+    "assets/flores/Invicon_Oxeye_Daisy.webp",
+    "assets/flores/Invicon_Pink_Tulip.png",
+    "assets/flores/Invicon_Poppy.png",
+    "assets/flores/Invicon_Red_Tulip.png",
+    "assets/flores/Invicon_Sunflower.png",
+    "assets/flores/Invicon_White_Tulip.webp"
+  ];
+  for (let i = 0; i < 24; i++) {
+    const isFlower = i % 3 !== 0; // 16 flores de Minecraft + 8 corazones/destellos
+    const p = document.createElement(isFlower ? "img" : "span");
+    p.className = isFlower ? "p flw" : "p";
+    if (isFlower) {
+      p.src = FLOWERS[i % FLOWERS.length];
+      p.alt = "";
+      const sz = 18 + Math.random() * 14;
+      p.style.cssText = `left:${Math.random() * 100}%;height:${sz}px;animation-duration:${16 + Math.random() * 16}s;animation-delay:${-Math.random() * 30}s`;
+    } else {
+      p.textContent = i % 2 ? "♥" : "✦";
+      p.style.cssText = `left:${Math.random() * 100}%;font-size:${11 + Math.random() * 14}px;animation-duration:${16 + Math.random() * 16}s;animation-delay:${-Math.random() * 30}s`;
+    }
     $("#petals").append(p);
   }
 
