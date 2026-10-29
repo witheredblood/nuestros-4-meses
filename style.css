@@ -5,7 +5,7 @@
 *{box-sizing:border-box;margin:0;font-style:normal!important}
 [hidden]{display:none!important}
 html{scroll-behavior:smooth}
-body{background:radial-gradient(110% 70% at 50% 0,var(--wine2),var(--wine) 75%) fixed;color:var(--cream);font:400 1rem/1.75 var(--sans);text-shadow:2px 2px 0 rgba(0,0,0,.45);-webkit-font-smoothing:none;overflow-x:hidden}
+body{background:linear-gradient(180deg,#080714 0%,#140f2d 32%,#281236 68%,#3b1029 100%) fixed;color:var(--cream);font:400 1rem/1.75 var(--sans);text-shadow:2px 2px 0 rgba(0,0,0,.55);-webkit-font-smoothing:none;overflow-x:hidden}
 h1,h2{font-family:var(--serif);font-weight:400}
 button{font:inherit;color:inherit;cursor:pointer}
 :focus-visible{outline:2px solid var(--rose);outline-offset:4px}
@@ -15,7 +15,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .btn:disabled{opacity:.65;cursor:default}
 .sec,.screen{min-height:100svh;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:12vh 1.2rem;position:relative;z-index:1}
 p,h1,h2{max-width:100%;overflow-wrap:break-word}
-.screen{position:fixed;inset:0;z-index:20;background:radial-gradient(90% 60% at 50% 40%,var(--wine2),var(--wine));transition:opacity 1.1s,transform 1.1s}
+.screen{position:fixed;inset:0;z-index:20;background:linear-gradient(180deg,rgba(8,7,20,.88),rgba(43,8,19,.92));backdrop-filter:blur(2px);transition:opacity 1.1s,transform 1.1s}
 .screen.gone{opacity:0;transform:scale(1.12);pointer-events:none}
 .screen h1{font-size:clamp(1.6rem,6vw,3rem);line-height:1.3;margin-bottom:1rem;animation:in 1.6s both}
 .screen p:not(.mc-title):not(.mc-pct){margin-bottom:2.2rem;opacity:.85;animation:in 1.6s .6s both}
@@ -84,6 +84,16 @@ dialog[open]{animation:pop .45s cubic-bezier(.2,1.3,.4,1)}
 .sign{font:400 1.25rem var(--serif);color:var(--rose);opacity:0}
 .show .sign{animation:in 2.5s 2s both}
 
+/* Cielo nocturno de Minecraft (estrellas cuadradas, luna pixelada y nubes de bloques) */
+#mc-sky{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+#mc-stars{position:absolute;inset:0}
+.mc-star{position:absolute;background:#fff;box-shadow:0 0 4px rgba(255,255,255,.5);animation:twinkle 3.5s ease-in-out infinite alternate}
+@keyframes twinkle{0%{opacity:.2}100%{opacity:.95}}
+#mc-moon{position:absolute;top:calc(5.2rem + env(safe-area-inset-top,0px));right:clamp(1.2rem,6vw,3.8rem);width:48px;height:48px;background:#fff8e7;border:3px solid #d8cfa8;box-shadow:0 0 0 6px rgba(255,245,210,.08),0 0 28px rgba(243,188,203,.38),inset -9px -9px 0 #e5dec0,inset 7px 7px 0 #ffffff;image-rendering:pixelated}
+#mc-moon::before{content:"";position:absolute;left:9px;top:11px;width:9px;height:9px;background:#d8cfa8;box-shadow:14px 16px 0 #d8cfa8,4px 20px 0 #cfc59b}
+#mc-clouds{position:absolute;inset:0}
+.mc-cloud{position:absolute;background:rgba(255,235,245,.11);border-bottom:4px solid rgba(190,150,175,.14);box-shadow:22px -8px 0 rgba(255,235,245,.11),-18px 4px 0 rgba(255,235,245,.09);animation:cloudMove linear infinite}
+@keyframes cloudMove{from{transform:translateX(-180px)}to{transform:translateX(calc(100vw + 220px))}}
 #petals{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
 .p{position:absolute;bottom:-3rem;color:var(--rose);opacity:0;animation:float linear infinite}
 .p.flw{width:auto;object-fit:contain;image-rendering:pixelated;filter:drop-shadow(2px 2px 0 rgba(0,0,0,.4))}

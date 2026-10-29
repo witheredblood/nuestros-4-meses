@@ -4,6 +4,28 @@
   document.title = C.text.welcomeTitle;
   const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  /* Cielo nocturno de Minecraft: estrellas cuadradas y nubes de bloques */
+  const starsBox = $("#mc-stars"), cloudsBox = $("#mc-clouds");
+  if (starsBox) {
+    for (let i = 0; i < 48; i++) {
+      const st = document.createElement("span");
+      st.className = "mc-star";
+      const sz = i % 5 === 0 ? 4 : i % 2 === 0 ? 3 : 2;
+      const col = i % 7 === 0 ? "#f3bccb" : i % 11 === 0 ? "#e0b3ff" : "#ffffff";
+      st.style.cssText = `left:${Math.random() * 100}%;top:${Math.random() * 78}%;width:${sz}px;height:${sz}px;background:${col};animation-duration:${2 + Math.random() * 3.5}s;animation-delay:${-Math.random() * 5}s`;
+      starsBox.append(st);
+    }
+  }
+  if (cloudsBox) {
+    for (let i = 0; i < 5; i++) {
+      const cl = document.createElement("div");
+      cl.className = "mc-cloud";
+      const w = 64 + Math.floor(Math.random() * 4) * 20, h = 14 + (i % 2) * 4;
+      cl.style.cssText = `top:${8 + i * 13 + Math.random() * 5}%;width:${w}px;height:${h}px;animation-duration:${55 + i * 14}s;animation-delay:${-Math.random() * 60}s`;
+      cloudsBox.append(cl);
+    }
+  }
+
   /* Corazones y flores de Minecraft flotando suaves en el fondo */
   const FLOWERS = [
     "assets/flores/BlockSprite_pink-petals.png",
