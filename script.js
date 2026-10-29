@@ -292,6 +292,20 @@
     }
   };
 
+  /* Perrita Luna al final: al tocarla salta feliz y suelta corazoncitos */
+  const lunaBtn = $("#luna-pet");
+  if (lunaBtn) {
+    lunaBtn.onclick = () => {
+      lunaBtn.classList.remove("hop"); void lunaBtn.offsetWidth; lunaBtn.classList.add("hop");
+      const r = lunaBtn.getBoundingClientRect();
+      for (let i = 0; i < 6; i++) {
+        const f = document.createElement("span"); f.className = "fx"; f.textContent = "♥";
+        f.style.cssText = `left:${r.left + r.width / 2 + (Math.random() - .5) * 40}px;top:${r.top + 36}px;--dx:${(Math.random() - .5) * 130}px;font-size:${14 + Math.random() * 14}px;color:#ff5555`;
+        f.onanimationend = () => f.remove(); document.body.append(f);
+      }
+    };
+  }
+
   /* Música opcional: solo suena si ella la activa */
   if (C.music) {
     const a = new Audio(C.music), m = document.createElement("button");

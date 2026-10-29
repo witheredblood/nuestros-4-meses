@@ -85,6 +85,17 @@ dialog[open]{animation:pop .45s cubic-bezier(.2,1.3,.4,1)}
 .sign{font:400 1.25rem var(--serif);color:var(--rose);opacity:0}
 .show .sign{animation:in 2.5s 2s both}
 
+/* Perrita Luna al final de la página */
+.luna-sec{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:3rem 1.2rem 5.5rem;position:relative;z-index:1}
+.luna-card{background:none;border:0;padding:0;display:flex;flex-direction:column;align-items:center;gap:.55rem;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .25s}
+.luna-card:hover{transform:translateY(-4px)}
+.luna-card.hop{animation:lunaHop .45s ease-out}
+@keyframes lunaHop{30%{transform:translateY(-14px) scale(1.05)}65%{transform:translateY(2px) scale(.98)}}
+.mc-nametag{display:inline-flex;align-items:center;gap:6px;background:rgba(0,0,0,.58);border:2px solid rgba(0,0,0,.78);padding:3px 11px;color:#fff;font-size:.9rem;text-shadow:2px 2px 0 #222;box-shadow:0 4px 12px rgba(0,0,0,.45)}
+.nt-heart{color:#ff5555;text-shadow:2px 2px 0 #4a1111}
+.luna-img{width:min(165px,44vw);height:auto;display:block;filter:drop-shadow(0 14px 24px rgba(0,0,0,.6));animation:breathe 4.5s ease-in-out infinite}
+.luna-msg{margin-top:1.1rem;max-width:min(28rem,92vw);font-size:clamp(.92rem,3vw,1.08rem);line-height:1.65;color:var(--rose);background:rgba(16,12,24,.68);border:2px solid #000;box-shadow:inset 0 -2px 0 #555,inset 2px 2px 0 #aaa,0 8px 20px rgba(0,0,0,.45);padding:.85rem 1.2rem}
+
 /* Cielo nocturno de Minecraft (estrellas cuadradas, luna pixelada y nubes de bloques) */
 #mc-sky{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
 #mc-stars{position:absolute;inset:0}
