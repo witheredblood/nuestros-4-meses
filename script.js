@@ -41,10 +41,56 @@
     el.style.backgroundImage = `url(${c.toDataURL()})`;
   }
 
+  /* Audio y cartel de "¡Logro conseguido!" al terminar la pantalla de carga */
+  let achCtx = null, achBuf = null, achAudio = null;
+  function prepAchievementAudio() {
+    try {
+      achCtx = achCtx || new (window.AudioContext || window.webkitAudioContext)();
+      if (achCtx.state === "suspended") achCtx.resume();
+      if (!achBuf) {
+        fetch("sonidos/minecraft-rare-achievement.mp3")
+          .then(r => r.ok ? r.arrayBuffer() : Promise.reject())
+          .then(b => new Promise((res, rej) => achCtx.decodeAudioData(b, res, rej)))
+          .then(decoded => { achBuf = decoded; })
+          .catch(() => {});
+      }
+      if (!achAudio) {
+        achAudio = new Audio("sonidos/minecraft-rare-achievement.mp3");
+        achAudio.preload = "auto";
+        achAudio.load();
+      }
+    } catch (_) {}
+  }
+  function showAchievement() {
+    const toast = $("#mc-toast");
+    if (toast) {
+      toast.hidden = false;
+      void toast.offsetWidth;
+      toast.classList.add("show");
+      setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => { toast.hidden = true; }, 600);
+      }, 6000);
+    }
+    try {
+      if (achCtx && achBuf) {
+        if (achCtx.state === "suspended") achCtx.resume();
+        const src = achCtx.createBufferSource(), g = achCtx.createGain();
+        src.buffer = achBuf; g.gain.value = 0.75;
+        src.connect(g).connect(achCtx.destination);
+        src.start(0);
+        return;
+      }
+    } catch (_) {}
+    if (achAudio) { achAudio.volume = 0.75; achAudio.play().catch(() => {}); }
+  }
+
   $("#open").onclick = () => {
+    prepAchievementAudio();
     const w = $("#welcome"), L = $("#mc-load");
     if (!L) {
       w.classList.add("gone"); $("#app").hidden = false; window.scrollTo(0, 0);
+      showAchievement();
       dispatchEvent(new Event("mc-ready")); setTimeout(() => w.remove(), 1200); return;
     }
     setDirtBg(L);
@@ -87,6 +133,7 @@
       else setTimeout(() => {
         $("#app").hidden = false; window.scrollTo(0, 0); $("#app").focus({ preventScroll: true });
         L.classList.add("gone");
+        setTimeout(showAchievement, 350);
         dispatchEvent(new Event("mc-ready"));
         setTimeout(() => L.remove(), 1100);
       }, 300);
