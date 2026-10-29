@@ -270,11 +270,23 @@
     if (!rest.length) { rbtn.disabled = true; rbtn.textContent = C.text.reasonsDone; }
   };
 
-  /* Mensajitos */
-  C.messages.forEach(m => {
-    const b = document.createElement("button"); b.className = "msg"; b.textContent = "♥";
-    b.setAttribute("aria-label", "Mensaje escondido");
-    b.onclick = () => { b.classList.add("on"); b.textContent = m; b.removeAttribute("aria-label"); mark("sorp"); };
+  /* Ocho estrofas (cada una separada, se revela al tocarla) */
+  const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII"];
+  C.messages.forEach((m, idx) => {
+    const num = typeof m === "object" ? m.num : (ROMAN[idx] || "♥");
+    const txt = typeof m === "object" ? m.verse : m;
+    const b = document.createElement("button");
+    b.className = "msg";
+    b.innerHTML = `<span class="msg-num">${num}</span><span class="msg-hrt" aria-hidden="true">♥</span>`;
+    b.setAttribute("aria-label", `Estrofa ${num}`);
+    b.onclick = () => {
+      if (b.classList.contains("on")) return;
+      b.classList.add("on");
+      b.innerHTML = `<strong class="stanza-num">${num}</strong><span class="stanza-txt"></span>`;
+      b.querySelector(".stanza-txt").textContent = txt;
+      b.removeAttribute("aria-label");
+      mark("sorp");
+    };
     $("#msgs").append(b);
   });
 

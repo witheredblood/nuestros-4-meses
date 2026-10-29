@@ -65,11 +65,15 @@ dialog[open]{animation:pop .45s cubic-bezier(.2,1.3,.4,1)}
 .paper p:last-child{text-align:right;margin:0}
 
 .box{min-height:5.5rem;max-width:30rem;font:400 1.15rem/1.55 var(--serif);margin:1rem 0;display:grid;place-items:center}
-.msgtitle{margin-top:2.5rem;margin-bottom:1rem}
-.msgs{display:flex;flex-wrap:wrap;gap:.7rem;justify-content:center;max-width:36rem;margin-bottom:2.5rem}
-.msg{min-width:5.2rem;min-height:3.2rem;padding:.6rem 1rem;border-radius:14px;border:1px solid rgba(243,188,203,.35);background:rgba(255,255,255,.04);transition:.4s}
-.msg:hover{border-color:var(--rose)}
-.msg.on{background:var(--cream);color:var(--wine);text-shadow:none;font:400 .95rem/1.4 var(--serif);border-color:var(--cream);transform:rotate(-1.5deg)}
+.msgtitle{margin-top:2.5rem;margin-bottom:1rem;font-size:1.15rem;color:var(--rose)}
+.msgs{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.85rem;justify-content:center;width:min(44rem,100%);margin-bottom:2.5rem}
+.msg{min-height:4.2rem;padding:.75rem 1rem;border-radius:14px;border:1px solid rgba(243,188,203,.38);background:rgba(255,255,255,.05);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.25rem;transition:.35s}
+.msg-num{font-size:1.05rem;color:var(--cream)}
+.msg-hrt{font-size:.95rem;color:var(--rose)}
+.msg:hover{border-color:var(--rose);transform:translateY(-2px)}
+.msg.on{grid-column:1/-1;background:var(--cream);color:var(--wine);text-shadow:none;font:400 .92rem/1.65 var(--serif);border-color:var(--cream);padding:1.15rem 1.35rem;transform:rotate(-.4deg);box-shadow:0 10px 26px rgba(0,0,0,.4);cursor:default}
+.stanza-num{display:block;font-size:1.05rem;color:var(--red);margin-bottom:.45rem;letter-spacing:.08em}
+.stanza-txt{display:block;white-space:pre-line;text-align:center}
 .heart{width:110px;height:110px;border:0;background:none;color:var(--red);filter:drop-shadow(0 0 18px rgba(243,106,140,.5));transition:color .3s}
 .heart svg{width:100%;height:100%;fill:currentColor}
 .heart:hover{color:#b3264a}

@@ -38,14 +38,40 @@ window.CONFIG = {
     "[Razón 5]"
   ],
 
-  // ✉️ Mensajitos que aparecen al tocarlos (puedes poner más o menos).
+  // ✉️ Ocho estrofas que aparecen por separado al tocarlas.
   messages: [
-    "Gracias por estar",
-    "Me importas mucho",
-    "Me haces feliz",
-    "Qué bueno es tenerte",
-    "Eres mi niña bonita",
-    "Te quiero, Vane"
+    {
+      num: "I",
+      verse: "A flor del romero\ndecorando pasillos en el cielo,\nguitarra callada que hablas\nde un amor sincero\nque quiere arroparte las mañanas."
+    },
+    {
+      num: "II",
+      verse: "Ay, que mira soñándote la luna,\ny yo te miro en deseo,\nque para mí solo hay una,\ny no es la flor del romero,\neres tú enraizándote en mi cielo."
+    },
+    {
+      num: "III",
+      verse: "Cañí, la copla de un querer,\nde aceituna, piel y vida,\ncolor de romance que inunda\nlos amaneceres\nen la cara oculta de la luna."
+    },
+    {
+      num: "IV",
+      verse: "Porque te vengo rondando\nen sangre y fuego,\ndelirios de boca y beso,\nque acercan mis labios en verso\npara decirte: te quiero."
+    },
+    {
+      num: "V",
+      verse: "Roncan las palmas\ny, en ecos de luceros,\nlos volantes de tu enagua\nme van marcando el camino\nque me lleve hasta tu pecho."
+    },
+    {
+      num: "VI",
+      verse: "Te espero sin vara ni mimbre,\nsabiendo que ha de llegar la dicha,\nen que la lágrima sea fuente\nque moje tus manos,\nhaciéndose río por donde navegue mi nombre."
+    },
+    {
+      num: "VII",
+      verse: "Y al abrigo de tus brazos,\nquedarme prendido a tu pecho,\ny que mi corazón salga al acecho\na recogerte todos los latidos\npara hacerte locura de mis sentidos."
+    },
+    {
+      num: "VIII",
+      verse: "Que se queden mis pestañas\nrondando los portales de tus ojos,\ny que, sin avisar al sereno, me abras\npara dejarte en el buzón de tu iris\nla carta que te diga: «Te amo»."
+    }
   ],
 
   // El corazón dice una de estas frases en cada toque (la última se repite).
@@ -69,7 +95,7 @@ window.CONFIG = {
     surpHint: "Toca, que hay sorpresas.",
     reasonBtn: "Una razón por la que te quiero",
     reasonsDone: "Esas fueron todas, por ahora",
-    msgHint: "Mensajitos para ti",
+    msgHint: "Ocho estrofas para ti",
     moreBtn: "Hay algo más para ti",
 
     finalTitle: "Felices cuatro meses, mi niña bonita",
