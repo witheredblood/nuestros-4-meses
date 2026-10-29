@@ -23,14 +23,14 @@ window.CONFIG = {
 
   // 💗 RAZONES (el botón las muestra al azar sin repetir).
   reasons: [
-    "Porque cada vez que te veo me vuelvo a enamorar como el primer día.",
-    "Porque entre tantas estrellas en el cielo, ninguna brilla tan bonito como tú.",
-    "Porque el solo pensarte me arranca un suspiro y me alegra el corazón.",
-    "Porque en la mirada de tus ojos encontré el lugar donde siempre quiero quedarme.",
-    "Porque desde el 10 de julio te convertiste en lo más importante para mí.",
-    "Porque tu belleza, tu ternura y tu forma de ser me tienen sin remedio.",
-    "Porque contigo cualquier momento se siente como nuestro propio mundo juntos.",
-    "Porque te admiro, te adoro y entre más pasa el tiempo, más te quiero."
+    "Por la paz tan bonita que siento cada vez que estoy contigo.",
+    "Por tu risa, que tiene el poder de arreglarme hasta el día más pesado.",
+    "Porque contigo puedo ser yo mismo sin fingir nada.",
+    "Por la ternura con la que me tratas y los pequeños detalles que tienes conmigo.",
+    "Porque haces que cualquier plan sencillo se vuelva mi momento favorito del día.",
+    "Por tu forma tan linda de ver la vida y el cariño que le pones a todo.",
+    "Porque me escuchas, me entiendes y siempre sabes cómo hacerme sonreír.",
+    "Porque a tu lado me siento en casa, tranquilo y completamente feliz."
   ],
 
   // ✉️ Ocho estrofas que aparecen por separado al tocarlas.
@@ -74,19 +74,19 @@ window.CONFIG = {
     "Te quiero.",
     "Otra vez: te quiero.",
     "Y lo digo muy en serio.",
-    "Eres el sueño que más añoro.",
+    "Me encantas demasiado.",
     "Felices 4 meses de novios, mi niña bonita ♥"
   ],
 
   // Textos de la página
   text: {
     welcomeTitle: "Para mi niña bonita",
-    welcomeText: "Hice algo especial por nuestros 4 meses de novios.",
+    welcomeText: "Hice algo especial para ti.",
     openBtn: "Abrir mi regalito",
 
-    annivKicker: "Desde el 10 de julio de 2026",
-    annivPhrase: "Cuatro meses de novios a tu lado, y cada día contigo me enamora más.",
-    annivNote: "Estos cuatro meses son apenas el comienzo de todo lo que quiero vivir contigo.",
+    annivKicker: "Tú y yo",
+    annivPhrase: "Cada día a tu lado se ha vuelto mi parte favorita de la vida.",
+    annivNote: "Y esto es apenas el comienzo de todo lo bonito que nos falta vivir juntos.",
 
     letterTitle: "Una carta para ti",
     letterHint: "Toca el sobre para abrirlo.",
@@ -98,7 +98,7 @@ window.CONFIG = {
     moreBtn: "Hay algo más para ti",
 
     finalTitle: "Felices cuatro meses de novios, mi niña bonita",
-    finalText: "Gracias por estos cuatro meses juntos desde aquel 10 de julio. Quiero que sepas cuánto te adoro y lo feliz que me hace ser tu novio.",
+    finalText: "Gracias por estos cuatro meses juntos. Quiero que sepas cuánto me importas y lo feliz que me hace ser tu novio.",
     finalSign: "Siempre tuyo ♥"
   }
 };
