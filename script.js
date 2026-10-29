@@ -61,13 +61,13 @@
     $("#petals").append(p);
   }
 
-  /* Progreso: foto + carta + sorpresa desbloquean el cierre */
+  /* Progreso: carta + sorpresa desbloquean el cierre */
   const done = new Set(), prog = $("#prog");
-  prog.textContent = "Descubierto 0 de 3";
+  prog.textContent = "Descubierto 0 de 2";
   function mark(k) {
     if (done.has(k)) return;
     done.add(k);
-    if (done.size < 3) { prog.textContent = `Descubierto ${done.size} de 3`; return; }
+    if (done.size < 2) { prog.textContent = `Descubierto ${done.size} de 2`; return; }
     const b = document.createElement("button");
     b.className = "btn"; b.textContent = C.text.moreBtn;
     b.onclick = () => {
@@ -236,24 +236,6 @@
     };
     tick(); setInterval(tick, 1000);
   }
-
-  /* Galería de recuerdos */
-  const ph = p => {
-    const d = document.createElement("div"); d.className = "ph"; d.innerHTML = "<span>Tu foto aquí</span>";
-    const i = new Image(); i.alt = ""; i.src = p.src; i.onerror = () => i.remove(); d.append(i); return d;
-  };
-  const dlg = $("#dlg");
-  C.photos.forEach((p, i) => {
-    const b = document.createElement("button");
-    b.className = "polaroid"; b.style.setProperty("--r", (i % 2 ? 1 : -1) * (1 + i % 3) + "deg");
-    b.setAttribute("aria-label", `Abrir recuerdo ${i + 1}`);
-    const s = document.createElement("small"); s.textContent = `Recuerdo ${i + 1}`;
-    b.append(ph(p), s);
-    b.onclick = () => { $("#dph").replaceChildren(ph(p)); $("#dcap").textContent = p.text; dlg.showModal(); mark("mem"); };
-    $("#grid").append(b);
-  });
-  $("#dx").onclick = () => dlg.close();
-  dlg.onclick = e => { if (e.target === dlg) dlg.close(); };
 
   /* Carta */
   C.letter.forEach(t => { const p = document.createElement("p"); p.innerHTML = t; $("#paper").append(p); });

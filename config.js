@@ -12,15 +12,6 @@ window.CONFIG = {
   // Si lo dejas vacío no aparece ningún botón. Nunca suena sola: ella la activa.
   music: "",
 
-  // 📸 FOTOS: pon tus imágenes en la carpeta /photos con estos nombres
-  // (o cambia el nombre aquí). Si una foto no existe, se ve un espacio reservado.
-  photos: [
-    { src: "photos/foto1.jpg", text: "Aquí va el texto de este recuerdo. Edítalo en config.js." },
-    { src: "photos/foto2.jpg", text: "Segundo recuerdo: cuéntale qué sentías ese día." },
-    { src: "photos/foto3.jpg", text: "Tercer recuerdo: escribe lo que quieras que lea." },
-    { src: "photos/foto4.jpg", text: "Cuarto recuerdo: puedes agregar o quitar fotos de esta lista." }
-  ],
-
   // 💌 LA CARTA — cada bloque es una estrofa de la carta.
   letter: [
     "Eres hermosa, perdona la franqueza,<br>pero es lo primero que viene a mi mente,<br>al contemplar de cerca tu belleza<br>cada vez que la vida te pone enfrente.",
@@ -89,8 +80,6 @@ window.CONFIG = {
     annivPhrase: "Cuatro meses a tu lado, y cada uno ha sido importante para mí.",
     annivNote: "Quizá sean solo cuatro meses, pero lo que siento por ti es muy real y muy importante para mí.",
 
-    memTitle: "Nuestros recuerdos",
-    memHint: "Toca una foto.",
     letterTitle: "Una carta para ti",
     letterHint: "Toca el sobre para abrirlo.",
     surpTitle: "Un par de cosas más",
