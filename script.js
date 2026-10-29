@@ -90,8 +90,8 @@
     el.style.backgroundImage = `url(${c.toDataURL()})`;
   }
 
-  /* Audio y cartel de "¡Logro conseguido!" (comparte AudioContext con enderman.js) */
-  let achCtx = null, achBuf = null, achAudio = null;
+  /* Audio y cartel de "¡Logro conseguido!" + canción "C418 - Blind Spots" */
+  let achCtx = null, achBuf = null, achAudio = null, bgSong = null;
   function prepAchievementAudio() {
     try {
       achCtx = window.__mcAC = window.__mcAC || achCtx || new (window.AudioContext || window.webkitAudioContext)();
@@ -108,7 +108,35 @@
         achAudio.preload = "auto";
         achAudio.load();
       }
+      if (!bgSong) {
+        bgSong = new Audio("sonidos/blind_spots.mp3");
+        bgSong.loop = true;
+        bgSong.volume = 0.45;
+        bgSong.preload = "auto";
+        // Desbloqueo silencioso en iOS dentro del toque de usuario
+        bgSong.muted = true;
+        const p = bgSong.play();
+        if (p && p.then) p.then(() => { bgSong.pause(); bgSong.currentTime = 0; bgSong.muted = false; }).catch(() => { bgSong.muted = false; });
+        else bgSong.muted = false;
+      }
     } catch (_) {}
+  }
+  function startMusicAfterAchievement() {
+    if (bgSong) {
+      bgSong.muted = false;
+      bgSong.volume = 0.45;
+      bgSong.play().catch(() => {});
+    }
+    const mt = $("#mc-music-toast");
+    if (mt) {
+      mt.hidden = false;
+      void mt.offsetWidth;
+      mt.classList.add("show");
+      setTimeout(() => {
+        mt.classList.remove("show");
+        setTimeout(() => { mt.hidden = true; }, 650);
+      }, 5500);
+    }
   }
   function showAchievement() {
     const toast = $("#mc-toast");
@@ -119,13 +147,15 @@
       setTimeout(() => {
         toast.classList.remove("show");
         setTimeout(() => { toast.hidden = true; }, 600);
-      }, 6000);
+      }, 5500);
     }
+    // Cuando termina de sonar el logro (~5.2s), arranca C418 - Blind Spots y sale el cartel por la derecha
+    setTimeout(startMusicAfterAchievement, 5200);
     try {
       if (achCtx && achBuf) {
         if (achCtx.state === "suspended") achCtx.resume();
-        const src = achCtx.createBufferSource(), g = achCtx.createGain();
-        src.buffer = achBuf; g.gain.value = 0.75;
+        const src = achCtx.createBufferSource(), g = acGain(achCtx, 0.75);
+        src.buffer = achBuf;
         src.connect(g).connect(achCtx.destination);
         src.start(0);
         return;
@@ -133,6 +163,7 @@
     } catch (_) {}
     if (achAudio) { achAudio.volume = 0.75; achAudio.play().catch(() => {}); }
   }
+  function acGain(ctx, v) { const g = ctx.createGain(); g.gain.value = v; return g; }
 
   $("#open").onclick = () => {
     prepAchievementAudio();
