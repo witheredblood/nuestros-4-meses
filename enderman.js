@@ -120,7 +120,7 @@ const CARRY = -1.0;
 let holding = null, holdT = 1, holdFrom = null, placing = null, lastSrc = -1;
 let plan = [], step = null, st = 0, angry = 0, time = 0, hitW = 44, hitH = 44;
 let parts = [], ambient = 0, ac = null;
-let stayLeft = 0, lastTap = -99, idleTimer = 6;  // tiempo paseando / último toque / próximo sonido neutral
+let stayLeft = 0, lastTap = -99, idleTimer = 3.5;  // tiempo paseando / último toque / próximo sonido neutral
 
 /* ---------- AJUSTES (cámbialos a tu gusto) ---------- */
 const AJUSTES = {
@@ -128,8 +128,8 @@ const AJUSTES = {
   ausenteMin: 10, ausenteMax: 40,  // segundos que se ausenta antes de volver
   castigoToque: 300,               // si lo tocas 2 veces seguidas, se va 5 min (300 s)
   dobleToque: 4,                   // segundos entre toques para que cuente como "seguidas"
-  idleMin: 7, idleMax: 16,         // cada cuántos segundos hace un sonido neutral
-  volumen: 0.45                    // volumen de los sonidos del Enderman (0 a 1)
+  idleMin: 5, idleMax: 11,         // cada cuántos segundos hace un sonido neutral
+  volumen: 0.85                    // volumen de los sonidos del Enderman (0 a 1)
 };
 const between = (a, b) => a + Math.random() * (b - a);
 
@@ -180,6 +180,11 @@ const SND_FILES = {
   ]
 };
 const SND_BUF = { idle: [], tp: [] };
+// Respaldo con elementos <audio> pre-cargados (funciona incluso si se abre con file:// o si decodeAudioData tarda)
+const SND_EL = {
+  idle: SND_FILES.idle.map(u => { const a = new Audio(u); a.preload = "auto"; return a; }),
+  tp: SND_FILES.tp.map(u => { const a = new Audio(u); a.preload = "auto"; return a; })
+};
 let sndLoading = false;
 function loadSounds() {
   if (sndLoading || !ac) return;
@@ -196,25 +201,37 @@ function loadSounds() {
 }
 function unlockAudio() {
   try {
-    ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+    ac = window.__mcAC = window.__mcAC || ac || new (window.AudioContext || window.webkitAudioContext)();
     if (ac.state === "suspended") ac.resume();
     loadSounds();
   } catch (_) {}
 }
 addEventListener("touchstart", unlockAudio, { passive: true });
+addEventListener("pointerdown", unlockAudio, { passive: true });
 addEventListener("click", unlockAudio);
 function playSnd(kind, vol = AJUSTES.volumen) {
   unlockAudio();
-  if (!ac || ac.state !== "running") return;
   const list = SND_BUF[kind];
-  if (list && list.length) {
+  if (ac && list && list.length) {
     try {
+      if (ac.state === "suspended") ac.resume();
       const src = ac.createBufferSource(), g = ac.createGain();
       src.buffer = list[Math.floor(Math.random() * list.length)];
       src.playbackRate.value = .94 + Math.random() * .12;
       g.gain.value = vol;
       src.connect(g).connect(ac.destination);
       src.start(0);
+      return;
+    } catch (_) {}
+  }
+  // Si el buffer WebAudio aún no está listo o se abrió sin servidor, usa el MP3 directo
+  const els = SND_EL[kind];
+  if (els && els.length) {
+    try {
+      const base = els[Math.floor(Math.random() * els.length)];
+      const clone = base.cloneNode();
+      clone.volume = Math.min(1, vol);
+      clone.play().catch(() => { if (kind === "tp") vwoop(); });
       return;
     } catch (_) {}
   }

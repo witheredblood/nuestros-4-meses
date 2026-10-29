@@ -90,11 +90,11 @@
     el.style.backgroundImage = `url(${c.toDataURL()})`;
   }
 
-  /* Audio y cartel de "¡Logro conseguido!" al terminar la pantalla de carga */
+  /* Audio y cartel de "¡Logro conseguido!" (comparte AudioContext con enderman.js) */
   let achCtx = null, achBuf = null, achAudio = null;
   function prepAchievementAudio() {
     try {
-      achCtx = achCtx || new (window.AudioContext || window.webkitAudioContext)();
+      achCtx = window.__mcAC = window.__mcAC || achCtx || new (window.AudioContext || window.webkitAudioContext)();
       if (achCtx.state === "suspended") achCtx.resume();
       if (!achBuf) {
         fetch("sonidos/minecraft-rare-achievement.mp3")
