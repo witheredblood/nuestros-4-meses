@@ -94,7 +94,7 @@ dialog[open]{animation:pop .45s cubic-bezier(.2,1.3,.4,1)}
 /* Cartel de "¡Logro conseguido!" estilo Minecraft (arriba al terminar de cargar) */
 .mc-toast{position:fixed;top:calc(.9rem + env(safe-area-inset-top,0px));left:50%;transform:translate(-50%,-150%);z-index:35;display:flex;align-items:center;gap:.85rem;background:#212121;padding:.65rem 1.15rem .65rem .85rem;border:3px solid #000;box-shadow:inset 0 0 0 3px #555,0 8px 24px rgba(0,0,0,.65);pointer-events:none;white-space:nowrap;transition:transform .5s cubic-bezier(.2,1.15,.3,1)}
 .mc-toast.show{transform:translate(-50%,0)}
-.mc-toast-icon{width:34px;height:31px;flex-shrink:0;filter:drop-shadow(2px 2px 0 rgba(0,0,0,.5))}
+.mc-toast-icon{width:36px;height:36px;flex-shrink:0;filter:drop-shadow(2px 2px 0 rgba(0,0,0,.5))}
 .mc-toast-txt{display:flex;flex-direction:column;text-align:left;line-height:1.35}
 .mc-toast-head{color:#a832d6;font-size:clamp(.88rem,3.4vw,1.02rem);text-shadow:2px 2px 0 #240930}
 .mc-toast-sub{color:#fff;font-size:clamp(.85rem,3.2vw,.98rem);text-shadow:2px 2px 0 #2a2a2a}
