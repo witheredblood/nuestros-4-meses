@@ -106,7 +106,7 @@ window.CONFIG = {
 // ✨ MESA DE ENCANTAMIENTOS (los 3 encantamientos que se revelan al tocar la mesa)
 window.ENCHANT_CFG = {
   title: "Mesa de encantamientos",
-  hint: "Acércate… algo se está encantando. Toca la mesa.",
+  hint: "Toca el libro para abrirlo.",
   items: [
     {
       title: "✦ Lealtad III",

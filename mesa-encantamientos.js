@@ -1,9 +1,9 @@
 /* mesa-encantamientos.js — mesa de encantamientos isométrica rodeada de librerías con TUS texturas de Minecraft.
-   Usa los PNG en mc/: enchanting_table_top, enchanting_table_side, bookshelf, oak_planks, enchanting_table_book, ascii_sga */
+   El libro permanece cerrado y girando; al tocarlo se alinea, se abre y muestra los encantamientos. */
 (() => {
 const CFG = Object.assign({
   title: "Mesa de encantamientos",
-  hint: "Acércate… algo se está encantando. Toca la mesa.",
+  hint: "Toca el libro para abrirlo.",
   openLabel: "Abrir la mesa de encantamientos",
   closeLabel: "Cerrar",
   texPath: "mc/",
@@ -140,31 +140,42 @@ function init() {
   }
 }
 
-/* Animación */
-const cv = $("canvas"), g = cv.getContext("2d");
+/* Animación: libro cerrado que gira; al tocarlo se alinea, se abre y se abre el apartado */
+const cv = $("canvas"), g = cv.getContext("2d"), TAU = Math.PI * 2;
 g.imageSmoothingEnabled = false;
 const P = [], [TX, TY] = isoPos(2, 2, 0), BASE_BY = TY - 72;
-let o = calm ? 1 : 0, target = 0, vis = false, ready = false, last = 0, spawn = 0, raf = 0, by = BASE_BY;
+let o = 0, tgt = 0, th = 0, want = false, shown = false, vis = false, ready = false, last = 0, spawn = 0, raf = 0, by = BASE_BY;
 const add = dur => {
   const sp = SHELF_POS[R() * SHELF_POS.length | 0] || [CX, 90];
   const x0 = sp[0] + (R() - .5) * 18, y0 = sp[1] + (R() - .5) * 18;
   P.push({ x0, y0, x1: TX, y1: by + 14, cx: (x0 + TX) / 2, cy: Math.min(y0, by) - 24 - R() * 20, t: 0, sp: 1 / dur, g: G[R() * G.length | 0] });
 };
+const show = () => { dlg.showModal(); document.dispatchEvent(new CustomEvent("mesa-encantamientos:abierta")); };
 function book(t) {
-  const bk = tex("book"), kb = 3, h = 10 * kb, y = by | 0, w = (3 + 15 * o) | 0, pw = (w * 5 / 6) | 0;
-  [-1, 1].forEach(s => {
-    g.drawImage(bk, s < 0 ? 0 : 16, 0, 6, 10, s < 0 ? TX - w : TX, y, w, h);
-    if (o > .15) g.drawImage(bk, s < 0 ? 1 : 13, 11, 5, 8, s < 0 ? TX - 1 - pw : TX + 1, y + kb, pw, 8 * kb);
-  });
-  g.drawImage(bk, 12, 0, 2, 10, TX - 1, y, 2, h);
-  if (o > .5) { const fw = Math.max(1, pw * (.2 + .8 * Math.abs(Math.sin(t * 2.4))) | 0); g.drawImage(bk, 24, 10, 5, 8, TX - 1 - fw, y + kb, fw, 8 * kb); }
+  const bk = tex("book"), kb = 3, h = 30, F = 18, y = by | 0;
+  if (o < .02) { // cerrado y girando
+    const c = Math.cos(th), f = Math.max(1, F * Math.abs(c) | 0), e = Math.max(1, 7 * Math.abs(Math.sin(th)) | 0), x0 = TX - ((f + e) >> 1);
+    if (c >= 0) { g.drawImage(bk, 0, 0, 6, 10, x0, y, f, h); g.drawImage(bk, 1, 11, 5, 8, x0 + f, y + kb, e, 8 * kb); }
+    else { g.drawImage(bk, 1, 11, 5, 8, x0, y + kb, e, 8 * kb); g.drawImage(bk, 16, 0, 6, 10, x0 + e, y, f, h); }
+    return;
+  }
+  const hx = (TX - 9) + 9 * o, wc = Math.max(1, F * Math.abs(Math.cos(Math.PI * o)) | 0), pw = (wc * 5 / 6) | 0;
+  g.drawImage(bk, 16, 0, 6, 10, hx | 0, y, F, h); // mitad trasera
+  if (o > .3) g.drawImage(bk, 13, 11, 5, 8, (hx + 1) | 0, y + kb, 15, 8 * kb);
+  if (o < .5) g.drawImage(bk, 0, 0, 6, 10, hx | 0, y, wc, h); // portada girando por fuera
+  else { g.drawImage(bk, 0, 0, 6, 10, (hx - wc) | 0, y, wc, h); g.drawImage(bk, 1, 11, 5, 8, (hx - 1 - pw) | 0, y + kb, Math.max(1, pw), 8 * kb); } // y por dentro
+  g.drawImage(bk, 12, 0, 2, 10, (hx - 1) | 0, y, 2, h);
+  if (o > .9) { const fw = Math.max(1, 15 * (.2 + .8 * Math.abs(Math.sin(t * 2.4))) | 0); g.drawImage(bk, 24, 10, 5, 8, (hx - 1 - fw) | 0, y + kb, fw, 8 * kb); }
 }
 function frame(ts) {
   const dt = Math.min(.05, (ts - last) / 1000 || .016); last = ts;
-  o = calm ? target : o + (target - o) * (1 - Math.pow(.002, dt));
-  const t = ts / 1000; by = BASE_BY + (calm ? 0 : Math.sin(t * 1.6) * 3);
+  const t = ts / 1000;
+  if (want) { const n = Math.round(th / TAU) * TAU; th += (n - th) * (1 - Math.pow(.003, dt)); if (Math.abs(n - th) < .12) tgt = 1; }
+  else { if (!calm) th += dt * 1.3; tgt = 0; }
+  o += (tgt - o) * (calm ? .12 : 1 - Math.pow(.01, dt));
+  by = BASE_BY + (calm ? 0 : Math.sin(t * 1.6) * 3);
   g.clearRect(0, 0, W, H); g.drawImage(bg, 0, 0);
-  if (o > .6 && !calm) for (spawn -= dt; spawn <= 0; spawn += .055) add(1.5 + R() * .7);
+  if (vis && !calm) for (spawn -= dt; spawn <= 0; spawn += o > .6 ? .055 : .14) add(1.5 + R() * .7);
   book(t);
   for (let i = P.length - 1; i >= 0; i--) {
     const p = P[i], u = (p.t += dt * p.sp);
@@ -174,21 +185,22 @@ function frame(ts) {
     g.drawImage(p.g, (v * v * p.x0 + 2 * v * u * p.cx + u * u * p.x1 - 4) | 0, (v * v * p.y0 + 2 * v * u * p.cy + u * u * p.y1 - 4) | 0);
   }
   g.globalAlpha = 1;
-  raf = vis || o > .01 || P.length ? requestAnimationFrame(frame) : 0;
+  if (want && !shown && o > .95) { shown = true; show(); }
+  raf = vis || want || o > .01 || P.length ? requestAnimationFrame(frame) : 0;
 }
 const kick = () => { if (!raf && ready) raf = requestAnimationFrame(frame); };
 
-/* Se abre al estar en pantalla; se cierra al salir */
-new IntersectionObserver(([e]) => {
-  vis = e.isIntersecting && e.intersectionRatio >= .25; target = vis ? 1 : 0; kick();
-}, { threshold: [0, .25, .5] }).observe($(".mz-stage"));
+/* Las partículas fluyen solo cuando la mesa está en pantalla */
+new IntersectionObserver(([e]) => { vis = e.isIntersecting && e.intersectionRatio >= .2; kick(); }, { threshold: [0, .2] }).observe($(".mz-stage"));
 
-/* Clic: ráfaga de partículas y luego abre el apartado */
-const show = () => { dlg.showModal(); document.dispatchEvent(new CustomEvent("mesa-encantamientos:abierta")); };
+/* Clic: el libro se alinea, se abre (con ráfaga de glifos) y luego aparece el apartado */
 $(".mz-hit").onclick = () => {
-  if (calm) return show();
-  for (let i = 0; i < 36; i++) add(.5 + R() * .3);
-  kick(); setTimeout(show, 650);
+  if (want) return;
+  want = true; shown = false;
+  if (!calm) for (let i = 0; i < 36; i++) add(.5 + R() * .3);
+  kick();
+  setTimeout(() => { if (want && !shown) { shown = true; show(); } }, 2500);
 };
+dlg.addEventListener("close", () => { want = false; shown = false; }); // al cerrar el apartado, el libro se cierra y vuelve a girar
 Promise.all(Object.entries(NAMES).map(load)).then(() => { init(); ready = true; kick(); });
 })();
