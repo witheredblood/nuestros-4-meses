@@ -6,10 +6,14 @@ cv.id = "ender"; cv.setAttribute("aria-hidden", "true");
 const hit = document.createElement("button");
 hit.id = "ender-hit"; hit.hidden = true;
 hit.setAttribute("aria-label", "Enderman: tócalo y se teletransporta");
+const treeHit = document.createElement("button");
+treeHit.id = "tree-hit"; treeHit.hidden = true;
+treeHit.setAttribute("aria-label", "Madera de cerezo: toca 5 veces para talar el árbol");
+treeHit.style.cssText = "position:fixed;z-index:4;border:0;padding:0;background:none;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent";
 const probe = document.createElement("div");
 probe.style.cssText = "position:fixed;top:0;left:0;width:0;height:0;visibility:hidden;pointer-events:none;" +
   "padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)";
-document.body.append(cv, hit, probe);
+document.body.append(cv, treeHit, hit, probe);
 const ctx = cv.getContext("2d");
 
 /* Texturas de bloques (16x16) */
@@ -87,7 +91,7 @@ function layout() {
   W = document.documentElement.clientWidth;
   s = Math.min(2.4, Math.max(1.4, W / 260));
   const B = 16 * s;
-  H = Math.ceil(112 * s);
+  H = Math.ceil(172 * s);
   ground = H - B;
   cv.style.height = (H + inB) + "px";
   cv.width = Math.round(W * dpr); cv.height = Math.round((H + inB) * dpr);
@@ -239,26 +243,87 @@ function playSnd(kind, vol = AJUSTES.volumen) {
 const tpSound = () => playSnd("tp");
 const idleSound = () => playSnd("idle", AJUSTES.volumen * .85);
 
-/* Árbol de cerezo (al darle doble toque al Enderman) */
+/* Árbol grande de cerezo (al darle doble toque al Enderman) y talado en 5 toques */
 let cherryTree = null;
 const TREE_BLOCKS = [
-  { dx: 0, k: 0, t: "cherry_log", d: 0.0 },
-  { dx: 0, k: 1, t: "cherry_log", d: 0.08 },
-  { dx: 0, k: 2, t: "cherry_log", d: 0.16 },
-  { dx: 1, k: 2, t: "cherry_log", d: 0.22 },
-  { dx: -1, k: 2, t: "cherry_leaves", d: 0.28 },
-  { dx: -2, k: 2, t: "cherry_leaves", d: 0.33 },
-  { dx: 2, k: 2, t: "cherry_leaves", d: 0.36 },
-  { dx: -2, k: 3, t: "cherry_leaves", d: 0.40 },
-  { dx: -1, k: 3, t: "cherry_leaves", d: 0.44 },
-  { dx: 0, k: 3, t: "cherry_leaves", d: 0.48 },
-  { dx: 1, k: 3, t: "cherry_leaves", d: 0.52 },
-  { dx: 2, k: 3, t: "cherry_leaves", d: 0.56 },
-  { dx: -1, k: 4, t: "cherry_leaves", d: 0.62 },
-  { dx: 0, k: 4, t: "cherry_leaves", d: 0.66 },
-  { dx: 1, k: 4, t: "cherry_leaves", d: 0.70 }
+  // Tronco principal y raíces
+  { dx: 0, k: 0, t: "cherry_log", d: 0.00 },
+  { dx: 1, k: 0, t: "cherry_log", d: 0.03 },
+  { dx: 0, k: 1, t: "cherry_log", d: 0.06 },
+  { dx: 0, k: 2, t: "cherry_log", d: 0.10 },
+  { dx: 0, k: 3, t: "cherry_log", d: 0.14 },
+  { dx: 0, k: 4, t: "cherry_log", d: 0.18 },
+  // Rama izquierda curvada
+  { dx: -1, k: 3, t: "cherry_log", d: 0.21 },
+  { dx: -2, k: 3, t: "cherry_log", d: 0.24 },
+  { dx: -2, k: 4, t: "cherry_log", d: 0.27 },
+  { dx: -3, k: 4, t: "cherry_log", d: 0.30 },
+  // Rama derecha curvada
+  { dx: 1, k: 2, t: "cherry_log", d: 0.20 },
+  { dx: 1, k: 3, t: "cherry_log", d: 0.23 },
+  { dx: 2, k: 4, t: "cherry_log", d: 0.26 },
+  { dx: 3, k: 4, t: "cherry_log", d: 0.29 },
+  { dx: 3, k: 5, t: "cherry_log", d: 0.32 },
+  // Racimos colgantes de flores de cerezo (k = 3)
+  { dx: -4, k: 3, t: "cherry_leaves", d: 0.35 },
+  { dx: -3, k: 3, t: "cherry_leaves", d: 0.37 },
+  { dx: 4,  k: 3, t: "cherry_leaves", d: 0.39 },
+  // Capa baja de la copa (k = 4)
+  { dx: -5, k: 4, t: "cherry_leaves", d: 0.41 },
+  { dx: -4, k: 4, t: "cherry_leaves", d: 0.43 },
+  { dx: -1, k: 4, t: "cherry_leaves", d: 0.45 },
+  { dx: 1,  k: 4, t: "cherry_leaves", d: 0.47 },
+  { dx: 4,  k: 4, t: "cherry_leaves", d: 0.49 },
+  { dx: 5,  k: 4, t: "cherry_leaves", d: 0.51 },
+  // Capa media frondosa (k = 5, 11 bloques de ancho)
+  { dx: -5, k: 5, t: "cherry_leaves", d: 0.53 },
+  { dx: -4, k: 5, t: "cherry_leaves", d: 0.55 },
+  { dx: -3, k: 5, t: "cherry_leaves", d: 0.57 },
+  { dx: -2, k: 5, t: "cherry_leaves", d: 0.59 },
+  { dx: -1, k: 5, t: "cherry_leaves", d: 0.61 },
+  { dx: 0,  k: 5, t: "cherry_leaves", d: 0.63 },
+  { dx: 1,  k: 5, t: "cherry_leaves", d: 0.65 },
+  { dx: 2,  k: 5, t: "cherry_leaves", d: 0.67 },
+  { dx: 4,  k: 5, t: "cherry_leaves", d: 0.69 },
+  { dx: 5,  k: 5, t: "cherry_leaves", d: 0.71 },
+  // Capa alta frondosa (k = 6, 9 bloques de ancho)
+  { dx: -4, k: 6, t: "cherry_leaves", d: 0.73 },
+  { dx: -3, k: 6, t: "cherry_leaves", d: 0.75 },
+  { dx: -2, k: 6, t: "cherry_leaves", d: 0.77 },
+  { dx: -1, k: 6, t: "cherry_leaves", d: 0.79 },
+  { dx: 0,  k: 6, t: "cherry_leaves", d: 0.81 },
+  { dx: 1,  k: 6, t: "cherry_leaves", d: 0.83 },
+  { dx: 2,  k: 6, t: "cherry_leaves", d: 0.85 },
+  { dx: 3,  k: 6, t: "cherry_leaves", d: 0.87 },
+  { dx: 4,  k: 6, t: "cherry_leaves", d: 0.89 },
+  // Corona superior (k = 7 y k = 8)
+  { dx: -3, k: 7, t: "cherry_leaves", d: 0.91 },
+  { dx: -2, k: 7, t: "cherry_leaves", d: 0.92 },
+  { dx: -1, k: 7, t: "cherry_leaves", d: 0.93 },
+  { dx: 0,  k: 7, t: "cherry_leaves", d: 0.94 },
+  { dx: 1,  k: 7, t: "cherry_leaves", d: 0.95 },
+  { dx: 2,  k: 7, t: "cherry_leaves", d: 0.96 },
+  { dx: 3,  k: 7, t: "cherry_leaves", d: 0.97 },
+  { dx: -1, k: 8, t: "cherry_leaves", d: 0.98 },
+  { dx: 0,  k: 8, t: "cherry_leaves", d: 0.99 },
+  { dx: 1,  k: 8, t: "cherry_leaves", d: 1.00 }
 ];
-const isProtectedSlot = i => cherryTree && Math.abs(i - cherryTree.slot) <= 2;
+const isProtectedSlot = i => cherryTree && Math.abs(i - cherryTree.slot) <= 4;
+
+function woodSound(finalBreak) {
+  unlockAudio();
+  if (!ac || ac.state !== "running") return;
+  try {
+    const t = ac.currentTime, o = ac.createOscillator(), g = ac.createGain();
+    o.type = "square";
+    o.frequency.setValueAtTime(finalBreak ? 145 : 210, t);
+    o.frequency.exponentialRampToValueAtTime(finalBreak ? 55 : 95, t + (finalBreak ? .22 : .09));
+    g.gain.setValueAtTime(.14, t);
+    g.gain.exponentialRampToValueAtTime(.001, t + (finalBreak ? .24 : .1));
+    o.connect(g).connect(ac.destination);
+    o.start(t); o.stop(t + (finalBreak ? .25 : .11));
+  } catch (_) {}
+}
 
 function spawnCustom(x, y, n, spread, speed, cols) {
   for (let i = 0; i < n; i++) parts.push({
@@ -307,7 +372,7 @@ function think() {
 function act(sp) {
   const stack = slots[sp.slot];
   if (sp.act === "place_sapling") {
-    for (let d = -1; d <= 1; d++) if (slots[sp.slot + d]) slots[sp.slot + d].length = 0;
+    for (let d = -3; d <= 3; d++) if (slots[sp.slot + d]) slots[sp.slot + d].length = 0;
     placing = { type: "cherry_sapling", slot: sp.slot, k: 0, t: 0, from: heldWorld(), isSapling: true };
     holding = null;
     return;
@@ -429,7 +494,7 @@ function update(dt) {
   holdT = Math.min(1, holdT + dt / .25);
   if (placing && (placing.t += dt / .25) >= 1) {
     if (placing.isSapling) {
-      cherryTree = { slot: placing.slot, state: "sapling", t: 0, petalTimer: 0 };
+      cherryTree = { slot: placing.slot, state: "sapling", t: 0, petalTimer: 0, chops: 0, shake: 0 };
     } else {
       slots[placing.slot].push(placing.type);
     }
@@ -438,24 +503,41 @@ function update(dt) {
 
   if (cherryTree) {
     cherryTree.t += dt;
+    cherryTree.shake = Math.max(0, (cherryTree.shake || 0) - dt * 4);
     if (cherryTree.state === "sapling_sparkle" && cherryTree.t >= 0.75) {
       cherryTree.state = "growing";
       cherryTree.t = 0;
-      spawnCustom(slotX(cherryTree.slot), ground - 24 * s, 36, 48 * s, 55 * s, ["#f7b9dc", "#efa7cd", "#eb92c1", "#67e644", "#ffffff"]);
+      spawnCustom(slotX(cherryTree.slot), ground - 40 * s, 50, 110 * s, 90 * s, ["#f7b9dc", "#efa7cd", "#eb92c1", "#67e644", "#ffffff"]);
     } else if (cherryTree.state === "growing" && cherryTree.t >= 1.2) {
       cherryTree.state = "grown";
     }
-    if ((cherryTree.state === "growing" || cherryTree.state === "grown") && (cherryTree.petalTimer += dt) >= 0.22) {
+    if ((cherryTree.state === "growing" || cherryTree.state === "grown") && (cherryTree.petalTimer += dt) >= 0.14) {
       cherryTree.petalTimer = 0;
-      const cx = slotX(cherryTree.slot) + (Math.random() - .5) * 64 * s;
-      const cy = ground - (32 + Math.random() * 26) * s;
+      const cx = slotX(cherryTree.slot) + (Math.random() - .5) * 144 * s;
+      const cy = ground - (48 + Math.random() * 80) * s;
       parts.push({
         x: cx, y: cy,
-        vx: (Math.random() - .35) * 14 * s, vy: (8 + Math.random() * 10) * s,
-        life: 0, max: 1.8 + Math.random() * 1.2, sz: (1.5 + Math.random() * 1.2) * s,
+        vx: (Math.random() - .35) * 16 * s, vy: (8 + Math.random() * 12) * s,
+        life: 0, max: 2.2 + Math.random() * 1.4, sz: (1.5 + Math.random() * 1.4) * s,
         c: ["#f7b9dc", "#efa7cd", "#fccbe7", "#eb92c1"][Math.floor(Math.random() * 4)]
       });
     }
+    if (cherryTree.state === "growing" || cherryTree.state === "grown") {
+      const tw = 7 * 16 * s;
+      const th = 6 * 16 * s;
+      treeHit.hidden = false;
+      treeHit.style.width = tw + "px";
+      treeHit.style.height = th + "px";
+      treeHit.style.bottom = (16 * s + inB) + "px";
+      treeHit.style.transform = `translate3d(${(slotX(cherryTree.slot) - tw / 2).toFixed(1)}px,0,0)`;
+      treeHit.style.visibility = "visible";
+    } else {
+      treeHit.hidden = true;
+      treeHit.style.visibility = "hidden";
+    }
+  } else {
+    treeHit.hidden = true;
+    treeHit.style.visibility = "hidden";
   }
 
   if (E.alpha > .5 && !reduce && (ambient += dt) > .16) {
@@ -480,6 +562,17 @@ function block(type, cx, cy, size, alpha = 1) {
 }
 const lerp = (a, b, t) => a + (b - a) * t, ease = t => t * t * (3 - 2 * t);
 
+function drawCracks(cx, cy, size, stage) {
+  const u = size / 16;
+  const x0 = cx - size / 2, y0 = cy - size / 2;
+  ctx.fillStyle = "rgba(18, 8, 14, 0.72)";
+  const px = (x, y, w = 1, h = 1) => ctx.fillRect(Math.round(x0 + x * u), Math.round(y0 + y * u), Math.ceil(w * u), Math.ceil(h * u));
+  if (stage >= 1) { px(7, 4, 1, 3); px(8, 7, 1, 3); px(6, 6, 2, 1); }
+  if (stage >= 2) { px(4, 3, 2, 1); px(5, 4, 2, 1); px(9, 8, 2, 1); px(11, 9, 1, 3); px(5, 10, 3, 1); }
+  if (stage >= 3) { px(2, 5, 3, 1); px(10, 4, 3, 1); px(9, 5, 2, 2); px(3, 11, 2, 2); px(8, 11, 1, 3); }
+  if (stage >= 4) { px(1, 2, 2, 2); px(12, 2, 2, 2); px(2, 8, 3, 1); px(11, 6, 3, 1); px(6, 13, 3, 2); px(12, 12, 2, 2); }
+}
+
 function drawCherryTree(B) {
   if (!cherryTree) return;
   const mid = cherryTree.slot;
@@ -488,16 +581,22 @@ function drawCherryTree(B) {
     block("cherry_sapling", slotX(mid) + wob, ground - 8 * s, B);
     return;
   }
+  const treeShake = cherryTree.shake ? Math.sin(time * 55) * cherryTree.shake * 3.5 * s : 0;
   for (const b of TREE_BLOCKS) {
     const si = mid + b.dx;
     if (si < 0 || si >= slots.length) continue;
     let sc = 1;
     if (cherryTree.state === "growing") {
-      const u = Math.max(0, Math.min(1, (cherryTree.t - b.d) / 0.28));
+      const u = Math.max(0, Math.min(1, (cherryTree.t - b.d) / 0.25));
       if (u <= 0) continue;
       sc = u < 0.7 ? (u / 0.7) * 1.14 : 1.14 - ((u - 0.7) / 0.3) * 0.14;
     }
-    block(b.t, slotX(si), ground - (b.k * 16 + 8) * s, B * sc);
+    const bx = slotX(si) + treeShake * (0.4 + b.k * 0.12);
+    const by = ground - (b.k * 16 + 8) * s;
+    block(b.t, bx, by, B * sc);
+    if (b.t === "cherry_log" && cherryTree.chops > 0) {
+      drawCracks(bx, by, B * sc, cherryTree.chops);
+    }
   }
 }
 
@@ -616,6 +715,57 @@ hit.addEventListener("click", () => {
   }
   next();
   idleSound();
+});
+
+/* Talar el árbol de cerezo al darle 5 toques a cualquier madera */
+treeHit.addEventListener("click", (ev) => {
+  if (!cherryTree || (cherryTree.state !== "growing" && cherryTree.state !== "grown")) return;
+  const mid = cherryTree.slot;
+  const B = 16 * s;
+  const rectC = c.getBoundingClientRect();
+  const clickX = ev.clientX - rectC.left;
+  const clickY = ev.clientY - rectC.top;
+
+  let hitLog = null;
+  let bestDist = Infinity;
+  for (const b of TREE_BLOCKS) {
+    if (b.t !== "cherry_log") continue;
+    const bx = slotX(mid + b.dx);
+    const by = ground - (b.k * 16 + 8) * s;
+    const dx = Math.abs(clickX - bx);
+    const dy = Math.abs(clickY - by);
+    if (dx <= B * 0.95 && dy <= B * 0.95) {
+      const dist = dx + dy;
+      if (dist < bestDist) { bestDist = dist; hitLog = { bx, by }; }
+    }
+  }
+  if (!hitLog) {
+    hitLog = { bx: slotX(mid), by: ground - 24 * s };
+  }
+
+  cherryTree.chops = (cherryTree.chops || 0) + 1;
+  cherryTree.shake = 1;
+
+  if (cherryTree.chops < 5) {
+    woodSound(false);
+    spawnCustom(hitLog.bx, hitLog.by, 14, B * 0.9, B * 0.9, ["#301d29", "#422737", "#543543", "#e986bb", "#d574a9"]);
+    spawnCustom(slotX(mid), ground - 72 * s, 8, 96 * s, 40 * s, ["#f7b9dc", "#efa7cd", "#fccbe7"]);
+  } else {
+    woodSound(true);
+    for (const b of TREE_BLOCKS) {
+      const si = mid + b.dx;
+      if (si < 0 || si >= slots.length) continue;
+      const bx = slotX(si);
+      const by = ground - (b.k * 16 + 8) * s;
+      const cols = b.t === "cherry_log"
+        ? ["#301d29", "#422737", "#543543", "#e986bb", "#d574a9"]
+        : ["#f7b9dc", "#efa7cd", "#eb92c1", "#d677ab", "#fccbe7"];
+      spawnCustom(bx, by, b.t === "cherry_log" ? 8 : 5, B, B, cols);
+    }
+    cherryTree = null;
+    treeHit.hidden = true;
+    treeHit.style.visibility = "hidden";
+  }
 });
 
 /* Bucle principal */
