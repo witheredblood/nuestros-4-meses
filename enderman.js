@@ -36,6 +36,18 @@ const PIX = {
   stone: {
     p: {0:"#808080",1:"#707070",2:"#909090",3:"#686868"},
     r: ["0111102232011110","0022222212223001","0311311121000200","0200030200111110","0221111111222223","1100011103001130","2200012200002223","0001111113111100","0223210002222222","0111111030011120","0021122131222000","3000100022000223","0111111122111110","0212300111310022","0001111100220110","1111322000011100"]
+  },
+  cherry_sapling: {
+    p: {0:"#e986bb",1:"#f5daef",2:"#ec95bf",3:"#efa7cd",4:"#fccbe7",5:"#543543",6:"#f7b9dc",7:"#301d29",8:"#271620",9:"#3b232d",a:"#462c39",b:"#27111e"},
+    r: ["................","................",".0...1.22.33.3..","..331412..335...","..332166...2533.",".3322766..55133.","6667776.766141..","668722..666.15..",".089a2.962.7566.","..8877aaa988663.",".6668777b82.....","..618883.22.....","..141879........","...1.8778.......","......888.......","......888......."]
+  },
+  cherry_log: {
+    p: {0:"#301d29",1:"#3b232d",2:"#462c39",3:"#271620",4:"#543543"},
+    r: ["0122110001100110","1000022211033300","3301112444220330","1110333011122210","1000011033333300","2221100003301122","2100033312221002","0001103011033300","3322442200011033","3300122033303330","0033330030010301","2130111012224442","1001244222100011","0330000122211000","0011133000111122","2222110332442111"]
+  },
+  cherry_leaves: {
+    p: {0:"#eb92c1",1:"#84992d",2:"#efa7cd",3:"#f7b9dc",4:"#e67db5",5:"#f5daef",6:"#fccbe7",7:"#f396cd",8:"#738726",9:"#e96aa9",a:"#e2aabf",b:"#607620",c:"#f6a1d4",d:"#e25692"},
+    r: ["..01.0..233..040",".455502..333.60.","20656402113.626.","5676765181240622","5569655.1202a112","5676765..225558b",".4656400..16564.",".0555.0405676765","0042...025569655",".641.666.6676765","626813630046564.",".6.639c934.555..","34466cdc66.cc..3","334639c936ccc132","230b8363400c1833","3418166620..1103"]
   }
 };
 function makeTex(type, seed) {
@@ -45,15 +57,21 @@ function makeTex(type, seed) {
   const pick = arr => arr[Math.floor(r() * arr.length)];
   const T = PIX[type];
   for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) {
-    if (T) px(x, y, T.p[T.r[y][x]]);
-    else px(x, y, HEART[y][x] === "X" ? (r() < .15 ? "#a81f44" : "#c42a52") : pick(PAL.rose));
+    if (T) {
+      const ch = T.r[y][x];
+      if (ch !== ".") px(x, y, T.p[ch]);
+      else if (type === "cherry_leaves" && x > 0 && x < 15 && y > 0 && y < 15) px(x, y, "#993d6f");
+    } else px(x, y, HEART[y][x] === "X" ? (r() < .15 ? "#a81f44" : "#c42a52") : pick(PAL.rose));
   }
-  g.fillStyle = "rgba(0,0,0,.18)";
-  g.fillRect(0, 15, 16, 1); g.fillRect(15, 0, 1, 16);
+  if (type !== "cherry_sapling" && type !== "cherry_leaves") {
+    g.fillStyle = "rgba(0,0,0,.18)";
+    g.fillRect(0, 15, 16, 1); g.fillRect(15, 0, 1, 16);
+  }
   return c;
 }
 const TYPES = ["grass", "dirt", "stone", "rose"];
-const TEX = Object.fromEntries(TYPES.map((t, i) => [t, makeTex(t, 1234 + i * 777)]));
+const ALL_TEX = [...TYPES, "cherry_sapling", "cherry_log", "cherry_leaves"];
+const TEX = Object.fromEntries(ALL_TEX.map((t, i) => [t, makeTex(t, 1234 + i * 777)]));
 
 /* Dimensiones y suelo */
 let W = 0, H = 0, ground = 0, inB = 0, inL = 0, inR = 0, s = 1.5, dpr = 1, off = 0;
@@ -69,7 +87,7 @@ function layout() {
   W = document.documentElement.clientWidth;
   s = Math.min(2.4, Math.max(1.4, W / 260));
   const B = 16 * s;
-  H = Math.ceil(88 * s);
+  H = Math.ceil(112 * s);
   ground = H - B;
   cv.style.height = (H + inB) + "px";
   cv.width = Math.round(W * dpr); cv.height = Math.round((H + inB) * dpr);
@@ -221,6 +239,36 @@ function playSnd(kind, vol = AJUSTES.volumen) {
 const tpSound = () => playSnd("tp");
 const idleSound = () => playSnd("idle", AJUSTES.volumen * .85);
 
+/* Árbol de cerezo (al darle doble toque al Enderman) */
+let cherryTree = null;
+const TREE_BLOCKS = [
+  { dx: 0, k: 0, t: "cherry_log", d: 0.0 },
+  { dx: 0, k: 1, t: "cherry_log", d: 0.08 },
+  { dx: 0, k: 2, t: "cherry_log", d: 0.16 },
+  { dx: 1, k: 2, t: "cherry_log", d: 0.22 },
+  { dx: -1, k: 2, t: "cherry_leaves", d: 0.28 },
+  { dx: -2, k: 2, t: "cherry_leaves", d: 0.33 },
+  { dx: 2, k: 2, t: "cherry_leaves", d: 0.36 },
+  { dx: -2, k: 3, t: "cherry_leaves", d: 0.40 },
+  { dx: -1, k: 3, t: "cherry_leaves", d: 0.44 },
+  { dx: 0, k: 3, t: "cherry_leaves", d: 0.48 },
+  { dx: 1, k: 3, t: "cherry_leaves", d: 0.52 },
+  { dx: 2, k: 3, t: "cherry_leaves", d: 0.56 },
+  { dx: -1, k: 4, t: "cherry_leaves", d: 0.62 },
+  { dx: 0, k: 4, t: "cherry_leaves", d: 0.66 },
+  { dx: 1, k: 4, t: "cherry_leaves", d: 0.70 }
+];
+const isProtectedSlot = i => cherryTree && Math.abs(i - cherryTree.slot) <= 2;
+
+function spawnCustom(x, y, n, spread, speed, cols) {
+  for (let i = 0; i < n; i++) parts.push({
+    x: x + (Math.random() - .5) * spread, y: y - Math.random() * 28 * s,
+    vx: (Math.random() - .5) * speed, vy: -Math.random() * speed * .7 - 4 * s,
+    life: 0, max: .7 + Math.random() * .9, sz: (1.2 + Math.random() * 1.5) * s,
+    c: cols[Math.floor(Math.random() * cols.length)]
+  });
+}
+
 /* Comportamiento y decisiones */
 const rand = a => a[Math.floor(Math.random() * a.length)];
 const idx = fn => slots.map((_, i) => i).filter(fn);
@@ -245,11 +293,11 @@ function think() {
   }
   const r = Math.random();
   if (holding) {
-    const free = idx(i => slots[i].length < 2 && i !== lastSrc);
+    const free = idx(i => !isProtectedSlot(i) && slots[i].length < 2 && i !== lastSrc);
     if (r < .18 || !free.length) plan = [tpStep()];
     else { const i = rand(free); go(i, slots[i].length, "place"); }
   } else {
-    const full = idx(i => slots[i].length > 0);
+    const full = idx(i => !isProtectedSlot(i) && slots[i].length > 0);
     if (r < .62 && full.length) { const i = rand(full); lastSrc = i; go(i, slots[i].length - 1, "pick"); }
     else if (r < .8) plan = [tpStep()];
     else plan = [{ t: "face", dir: -E.dir }, { t: "wait", d: .8 + Math.random() * 1.5, front: false }];
@@ -258,6 +306,12 @@ function think() {
 }
 function act(sp) {
   const stack = slots[sp.slot];
+  if (sp.act === "place_sapling") {
+    for (let d = -1; d <= 1; d++) if (slots[sp.slot + d]) slots[sp.slot + d].length = 0;
+    placing = { type: "cherry_sapling", slot: sp.slot, k: 0, t: 0, from: heldWorld(), isSapling: true };
+    holding = null;
+    return;
+  }
   if (sp.act === "pick" && !holding && stack && stack.length - 1 === sp.k) {
     holding = stack.pop(); holdT = 0;
     holdFrom = { x: slotX(sp.slot), y: ground - (sp.k * 16 + 8) * s };
@@ -284,7 +338,7 @@ function update(dt) {
     stayLeft -= dt;
     if ((idleTimer -= dt) <= 0) {
       idleTimer = between(AJUSTES.idleMin, AJUSTES.idleMax);
-      if (!step || (step.t !== "tp" && step.t !== "vanish" && step.t !== "appear")) idleSound();
+      if (!step || (step.t !== "tp" && step.t !== "vanish" && step.t !== "appear" && step.t !== "appear_cherry")) idleSound();
     }
   }
   if (step) {
@@ -296,7 +350,7 @@ function update(dt) {
         const d = step.x - E.x;
         if (Math.abs(d) < .5) { E.x = step.x; next(); break; }
         E.dir = Math.sign(d);
-        const v = Math.min(Math.abs(d), 30 * s * dt);
+        const v = Math.min(Math.abs(d), (step.fast ? 44 : 30) * s * dt);
         E.x += E.dir * v; E.ph += v / (s * 6);
         const sw = Math.sin(E.ph);
         T.lF = sw * .32; T.lB = -sw * .32; T.bob = -Math.abs(Math.cos(E.ph)) * 1;
@@ -335,6 +389,29 @@ function update(dt) {
         if (k >= 1) { E.alpha = 1; E.sx = E.sy = 1; next(); }
         break;
       }
+      case "appear_cherry": {
+        if (!step.a) {
+          step.a = 1;
+          E.x = step.x; E.dir = step.dir;
+          holding = "cherry_sapling"; holdT = 1;
+          spawn(E.x, ground, 30, 16 * s, 60 * s); tpSound();
+          stayLeft = between(AJUSTES.visibleMin, AJUSTES.visibleMax);
+        }
+        const k = Math.min(1, st / .18);
+        E.alpha = k; E.sx = .15 + .85 * k; E.sy = 1.4 - .4 * k;
+        if (k >= 1) { E.alpha = 1; E.sx = E.sy = 1; next(); }
+        break;
+      }
+      case "grow_cherry": {
+        inCherrySeq = false;
+        if (cherryTree) {
+          cherryTree.state = "sapling_sparkle";
+          cherryTree.t = 0;
+          spawnCustom(slotX(cherryTree.slot), ground - 4 * s, 22, 20 * s, 38 * s, ["#55ff55", "#99ff66", "#f7b9dc", "#ffffff"]);
+        }
+        next();
+        break;
+      }
       case "tp": {
         const D = .18;
         if (!step.a) { step.a = 1; if (E.alpha > .5) { spawn(E.x, ground, 26, 16 * s, 60 * s); tpSound(); } }
@@ -350,7 +427,36 @@ function update(dt) {
   for (const key in P) P[key] += (T[key] - P[key]) * k;
 
   holdT = Math.min(1, holdT + dt / .25);
-  if (placing && (placing.t += dt / .25) >= 1) { slots[placing.slot].push(placing.type); placing = null; }
+  if (placing && (placing.t += dt / .25) >= 1) {
+    if (placing.isSapling) {
+      cherryTree = { slot: placing.slot, state: "sapling", t: 0, petalTimer: 0 };
+    } else {
+      slots[placing.slot].push(placing.type);
+    }
+    placing = null;
+  }
+
+  if (cherryTree) {
+    cherryTree.t += dt;
+    if (cherryTree.state === "sapling_sparkle" && cherryTree.t >= 0.75) {
+      cherryTree.state = "growing";
+      cherryTree.t = 0;
+      spawnCustom(slotX(cherryTree.slot), ground - 24 * s, 36, 48 * s, 55 * s, ["#f7b9dc", "#efa7cd", "#eb92c1", "#67e644", "#ffffff"]);
+    } else if (cherryTree.state === "growing" && cherryTree.t >= 1.2) {
+      cherryTree.state = "grown";
+    }
+    if ((cherryTree.state === "growing" || cherryTree.state === "grown") && (cherryTree.petalTimer += dt) >= 0.22) {
+      cherryTree.petalTimer = 0;
+      const cx = slotX(cherryTree.slot) + (Math.random() - .5) * 64 * s;
+      const cy = ground - (32 + Math.random() * 26) * s;
+      parts.push({
+        x: cx, y: cy,
+        vx: (Math.random() - .35) * 14 * s, vy: (8 + Math.random() * 10) * s,
+        life: 0, max: 1.8 + Math.random() * 1.2, sz: (1.5 + Math.random() * 1.2) * s,
+        c: ["#f7b9dc", "#efa7cd", "#fccbe7", "#eb92c1"][Math.floor(Math.random() * 4)]
+      });
+    }
+  }
 
   if (E.alpha > .5 && !reduce && (ambient += dt) > .16) {
     ambient = 0; spawn(E.x, ground - 4 * s, 1, 14 * s, 14 * s);
@@ -373,6 +479,27 @@ function block(type, cx, cy, size, alpha = 1) {
   ctx.globalAlpha = 1;
 }
 const lerp = (a, b, t) => a + (b - a) * t, ease = t => t * t * (3 - 2 * t);
+
+function drawCherryTree(B) {
+  if (!cherryTree) return;
+  const mid = cherryTree.slot;
+  if (cherryTree.state === "sapling" || cherryTree.state === "sapling_sparkle") {
+    const wob = cherryTree.state === "sapling_sparkle" ? Math.sin(time * 36) * 1.5 * s : 0;
+    block("cherry_sapling", slotX(mid) + wob, ground - 8 * s, B);
+    return;
+  }
+  for (const b of TREE_BLOCKS) {
+    const si = mid + b.dx;
+    if (si < 0 || si >= slots.length) continue;
+    let sc = 1;
+    if (cherryTree.state === "growing") {
+      const u = Math.max(0, Math.min(1, (cherryTree.t - b.d) / 0.28));
+      if (u <= 0) continue;
+      sc = u < 0.7 ? (u / 0.7) * 1.14 : 1.14 - ((u - 0.7) / 0.3) * 0.14;
+    }
+    block(b.t, slotX(si), ground - (b.k * 16 + 8) * s, B * sc);
+  }
+}
 
 function drawEnder() {
   if (E.alpha <= 0.01) return;
@@ -436,6 +563,7 @@ function draw() {
   for (let x = startX; x < W + B; x += B) block("grass", x + 8 * s, ground + 8 * s, B);
   if (inB > 0) for (let x = startX; x < W + B; x += B) block("dirt", x + 8 * s, ground + 24 * s, B);
   slots.forEach((stack, i) => stack.forEach((t, k) => block(t, slotX(i), ground - (k * 16 + 8) * s, B)));
+  drawCherryTree(B);
   if (placing) {
     const e = ease(Math.min(1, placing.t));
     const tx = slotX(placing.slot), ty = ground - (placing.k * 16 + 8) * s;
@@ -449,15 +577,43 @@ function draw() {
   ctx.globalAlpha = 1;
 }
 
-/* Interacción al tocarlo */
+/* Interacción al tocarlo (doble toque = secuencia del árbol de cerezo) */
+let inCherrySeq = false;
 hit.addEventListener("click", () => {
-  if (step && ["tp", "angry", "vanish", "appear", "away"].includes(step.t)) return;
-  if (placing) { slots[placing.slot].push(placing.type); placing = null; }
+  if (inCherrySeq) return;
+  if (step && ["vanish", "appear", "appear_cherry", "away", "grow_cherry"].includes(step.t)) return;
+  if (placing && !placing.isSapling) { slots[placing.slot].push(placing.type); placing = null; }
   holdT = 1; angry = 1.2;
   const seguido = time - lastTap < AJUSTES.dobleToque; lastTap = time;
-  plan = seguido
-    ? [{ t: "angry", d: .5 }, { t: "vanish" }, { t: "away", d: AJUSTES.castigoToque }, { t: "appear" }]
-    : [{ t: "angry", d: .35 }, tpStep(), { t: "wait", d: .6 }];
+  if (seguido) {
+    inCherrySeq = true;
+    E.alpha = 1; E.sx = E.sy = 1;
+    holding = null;
+    cherryTree = null;
+    const mid = Math.floor(slots.length / 2);
+    const fromLeft = Math.random() < 0.5;
+    const sideX = fromLeft ? (inL + 14 * s) : (W - inR - 14 * s);
+    const dir = fromLeft ? 1 : -1;
+    const h = handPos(REACH[0].L, REACH[0].a);
+    const targetX = slotX(mid) - dir * h.x * s;
+    plan = [
+      { t: "angry", d: .38 },
+      { t: "vanish" },
+      { t: "away", d: .55 },
+      { t: "appear_cherry", x: sideX, dir },
+      { t: "walk", x: targetX, fast: true },
+      { t: "face", dir },
+      { t: "reach", slot: mid, k: 0, act: "place_sapling" },
+      { t: "wait", d: .4, front: true },
+      { t: "vanish" },
+      { t: "grow_cherry" },
+      { t: "away", d: 14 },
+      { t: "appear" }
+    ];
+  } else {
+    if (step && (step.t === "angry" || step.t === "tp")) return;
+    plan = [{ t: "angry", d: .35 }, tpStep(), { t: "wait", d: .6 }];
+  }
   next();
   idleSound();
 });
