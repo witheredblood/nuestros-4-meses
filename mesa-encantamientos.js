@@ -79,17 +79,7 @@ const load = ([k, n]) => new Promise(r => {
 });
 const tex = k => { if (IMG[k]) return IMG[k]; const c = mk(64, 32); c.getContext("2d").fillStyle = FALL[k]; c.getContext("2d").fillRect(0, 0, 64, 32); return c; };
 
-/* Textura de piso tipo cuarzo suave como en la imagen */
-function makeQuartzTex() {
-  const c = mk(16, 16), q = c.getContext("2d");
-  q.fillStyle = "#ece6df"; q.fillRect(0, 0, 16, 16);
-  q.fillStyle = "#f7f3ee"; q.fillRect(0, 0, 15, 1); q.fillRect(0, 0, 1, 15);
-  q.fillStyle = "#d5cdc3"; q.fillRect(0, 15, 16, 1); q.fillRect(15, 0, 1, 16);
-  q.fillStyle = "#e4ddd5"; q.fillRect(3, 4, 4, 2); q.fillRect(9, 10, 5, 2);
-  return c;
-}
-
-/* Escena estática isométrica: piso 4x4 + esquina de librerías (4x3 de cada lado) + mesa en (2,2,0) */
+/* Escena estática isométrica: esquina de librerías (4x3 de cada lado) + mesa en (2,2,0) */
 const bg = mk(W, H), SHELF_POS = [], G = [];
 function isoPos(gx, gy, gz) {
   return [
@@ -99,7 +89,6 @@ function isoPos(gx, gy, gz) {
 }
 function init() {
   const b = bg.getContext("2d"); b.imageSmoothingEnabled = false;
-  const quartz = makeQuartzTex();
   const block = (cx, fy, h, top, sideL, sideR, shL = .18, shR = .36) => {
     const oy = fy - 16 * K - h * K;
     b.setTransform(K, K / 2, 0, K, cx - 16 * K, oy + 8 * K);
@@ -115,22 +104,12 @@ function init() {
     b.setTransform(1, 0, 0, 1, 0, 0);
   };
 
-  /* 1. Piso de bloques de cuarzo (4x4 bajo las librerías y la mesa) */
-  for (let s = 0; s <= 6; s++) {
-    for (let gx = 0; gx < 4; gx++) {
-      const gy = s - gx;
-      if (gy < 0 || gy >= 4) continue;
-      const [cx, fy] = isoPos(gx, gy, 0);
-      block(cx, fy + 6 * K, 6, quartz, quartz, quartz, .15, .3);
-    }
-  }
-
-  /* Sombra suave debajo de las librerías y la mesa */
+  /* Sombra suave debajo de la mesa */
   const [tcx, tfy] = isoPos(2, 2, 0);
-  b.fillStyle = "rgba(10,2,6,.32)";
-  b.beginPath(); b.ellipse(tcx, tfy - 12, 34, 14, 0, 0, 7); b.fill();
+  b.fillStyle = "rgba(10,2,6,.42)";
+  b.beginPath(); b.ellipse(tcx, tfy - 12, 36, 14, 0, 0, 7); b.fill();
 
-  /* 2. Esquina de librerías en L (gx=0, gy=0..3 y gy=0, gx=1..3) con 3 bloques de altura (gz=0..2) */
+  /* Esquina de librerías en L (gx=0, gy=0..3 y gy=0, gx=1..3) con 3 bloques de altura (gz=0..2) */
   const cells = [];
   for (let gz = 0; gz < 3; gz++) {
     for (let gx = 0; gx < 4; gx++) {
