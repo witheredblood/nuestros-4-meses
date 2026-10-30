@@ -1,10 +1,6 @@
-/* mesa-encantamientos.js — mesa de encantamientos isométrica con TUS texturas de Minecraft. Sin dependencias.
-   Pon estos PNG en una carpeta mc/ junto al index.html:
-   enchanting_table_top, enchanting_table_side, bookshelf, oak_planks, enchanting_table_book, ascii_sga
-   Uso: <script src="mesa-encantamientos.js"></script> antes de </body>.
-   Si existe <section id="mesa-encantamientos"></section> la usa; si no, la crea antes de #sorpresas. */
+/* mesa-encantamientos.js — mesa de encantamientos isométrica rodeada de librerías con TUS texturas de Minecraft.
+   Usa los PNG en mc/: enchanting_table_top, enchanting_table_side, bookshelf, oak_planks, enchanting_table_book, ascii_sga */
 (() => {
-/* ✏️ CONFIGURACIÓN (o define window.ENCHANT_CFG antes de cargar el script) */
 const CFG = Object.assign({
   title: "Mesa de encantamientos",
   hint: "Acércate… algo se está encantando. Toca la mesa.",
@@ -12,7 +8,7 @@ const CFG = Object.assign({
   closeLabel: "Cerrar",
   texPath: "mc/",
   glyphColor: "#f3bccb",
-  items: [ // lo que se ve en el apartado: toca cada uno para revelar el texto
+  items: [
     { title: "✦ Lealtad III", text: "Mi corazón siempre regresa a ti, sin importar la distancia ni el tiempo." },
     { title: "✦ Infinidad I", text: "Para que las risas, los abrazos y las ganas de estar juntos no se nos acaben nunca." },
     { title: "✦ Irrompible III", text: "Por lo nuestro, que cada día que pasa se vuelve más fuerte, más bonito y más real." }
@@ -20,15 +16,15 @@ const CFG = Object.assign({
 }, window.ENCHANT_CFG || {});
 
 const calm = false;
-const W = 320, H = 200, R = Math.random;
+const W = 340, H = 260, CX = W / 2, OY = 144, K = 2, R = Math.random;
 const css = document.createElement("style");
 css.textContent = `
 .mz{min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:10vh 1rem;position:relative;z-index:1}
 .mz-t{font:400 clamp(1.5rem,5vw,2.3rem)/1.25 var(--serif,monospace);margin-bottom:.4rem}
 .mz-h{opacity:.75;margin-bottom:1.2rem}
 .mz-stage{position:relative;width:min(44rem,100%);aspect-ratio:${W}/${H}}
-.mz canvas{width:100%;height:100%;display:block;image-rendering:pixelated}
-.mz-hit{position:absolute;left:36%;top:30%;width:28%;height:58%;background:none;border:0;border-radius:12px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.mz canvas{width:100%;height:100%;display:block;image-rendering:pixelated;filter:drop-shadow(0 18px 32px rgba(0,0,0,.6))}
+.mz-hit{position:absolute;left:34%;top:42%;width:32%;height:46%;background:none;border:0;border-radius:12px;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .mz-hit:focus-visible{outline:2px dashed var(--rose,#f3bccb)}
 .mz-dlg{border:0;background:none;margin:auto;padding:0;width:min(92vw,440px);overflow:visible;color:var(--cream,#fbf0e3)}
 .mz-dlg::backdrop{background:rgba(20,3,9,.82);backdrop-filter:blur(6px)}
@@ -72,7 +68,7 @@ const dlg = $(".mz-dlg");
 $(".mz-x").onclick = () => dlg.close();
 dlg.onclick = e => { if (e.target === dlg) dlg.close(); };
 
-/* Texturas: si falta alguna, se usa un color liso y se avisa en la consola */
+/* Texturas */
 const mk = (w, h) => Object.assign(document.createElement("canvas"), { width: w, height: h });
 const NAMES = { top: "enchanting_table_top", side: "enchanting_table_side", shelf: "bookshelf", plank: "oak_planks", book: "enchanting_table_book", sga: "ascii_sga" };
 const FALL = { top: "#8e1d3c", side: "#1a1428", shelf: "#8a6238", plank: "#a07a45", book: "#8e1d3c" };
@@ -83,21 +79,79 @@ const load = ([k, n]) => new Promise(r => {
 });
 const tex = k => { if (IMG[k]) return IMG[k]; const c = mk(64, 32); c.getContext("2d").fillStyle = FALL[k]; c.getContext("2d").fillRect(0, 0, 64, 32); return c; };
 
-/* Escena estática isométrica (librerías, suelo y mesa), prerenderizada una sola vez */
-const bg = mk(W, H), SH = [48, 272], G = [];
+/* Textura de piso tipo cuarzo suave como en la imagen */
+function makeQuartzTex() {
+  const c = mk(16, 16), q = c.getContext("2d");
+  q.fillStyle = "#ece6df"; q.fillRect(0, 0, 16, 16);
+  q.fillStyle = "#f7f3ee"; q.fillRect(0, 0, 15, 1); q.fillRect(0, 0, 1, 15);
+  q.fillStyle = "#d5cdc3"; q.fillRect(0, 15, 16, 1); q.fillRect(15, 0, 1, 16);
+  q.fillStyle = "#e4ddd5"; q.fillRect(3, 4, 4, 2); q.fillRect(9, 10, 5, 2);
+  return c;
+}
+
+/* Escena estática isométrica: piso 4x4 + esquina de librerías (4x3 de cada lado) + mesa en (2,2,0) */
+const bg = mk(W, H), SHELF_POS = [], G = [];
+function isoPos(gx, gy, gz) {
+  return [
+    CX + (gx - gy) * 16 * K,
+    OY + (gx + gy) * 8 * K - gz * 16 * K
+  ];
+}
 function init() {
-  const K = 2, b = bg.getContext("2d"); b.imageSmoothingEnabled = false;
-  const block = (cx, fy, h, top, side) => {
-    const oy = fy - 16 * K - h * K, shade = (a) => { b.fillStyle = `rgba(0,0,0,${a})`; b.fillRect(0, 0, 16, h); };
-    b.setTransform(K, K / 2, 0, K, cx - 16 * K, oy + 8 * K); b.drawImage(side, 0, 16 - h, 16, h, 0, 0, 16, h); shade(.2);
-    b.setTransform(K, -K / 2, 0, K, cx, oy + 16 * K); b.drawImage(side, 0, 16 - h, 16, h, 0, 0, 16, h); shade(.4);
-    b.setTransform(K, K / 2, -K, K / 2, cx, oy); b.drawImage(top, 0, 0, 16, 16, 0, 0, 16, 16);
+  const b = bg.getContext("2d"); b.imageSmoothingEnabled = false;
+  const quartz = makeQuartzTex();
+  const block = (cx, fy, h, top, sideL, sideR, shL = .18, shR = .36) => {
+    const oy = fy - 16 * K - h * K;
+    b.setTransform(K, K / 2, 0, K, cx - 16 * K, oy + 8 * K);
+    b.drawImage(sideL, 0, 16 - h, 16, h, 0, 0, 16, h);
+    if (shL > 0) { b.fillStyle = `rgba(0,0,0,${shL})`; b.fillRect(0, 0, 16, h); }
+
+    b.setTransform(K, -K / 2, 0, K, cx, oy + 16 * K);
+    b.drawImage(sideR, 0, 16 - h, 16, h, 0, 0, 16, h);
+    if (shR > 0) { b.fillStyle = `rgba(0,0,0,${shR})`; b.fillRect(0, 0, 16, h); }
+
+    b.setTransform(K, K / 2, -K, K / 2, cx, oy);
+    b.drawImage(top, 0, 0, 16, 16, 0, 0, 16, 16);
     b.setTransform(1, 0, 0, 1, 0, 0);
   };
-  b.fillStyle = "rgba(10,2,6,.45)";
-  [48, 160, 272].forEach(x => { b.beginPath(); b.ellipse(x, 156, 46, 15, 0, 0, 7); b.fill(); });
-  SH.forEach(x => { block(x, 172, 16, tex("plank"), tex("shelf")); block(x, 140, 16, tex("plank"), tex("shelf")); });
-  block(160, 172, 12, tex("top"), tex("side"));
+
+  /* 1. Piso de bloques de cuarzo (4x4 bajo las librerías y la mesa) */
+  for (let s = 0; s <= 6; s++) {
+    for (let gx = 0; gx < 4; gx++) {
+      const gy = s - gx;
+      if (gy < 0 || gy >= 4) continue;
+      const [cx, fy] = isoPos(gx, gy, 0);
+      block(cx, fy + 6 * K, 6, quartz, quartz, quartz, .15, .3);
+    }
+  }
+
+  /* Sombra suave debajo de las librerías y la mesa */
+  const [tcx, tfy] = isoPos(2, 2, 0);
+  b.fillStyle = "rgba(10,2,6,.32)";
+  b.beginPath(); b.ellipse(tcx, tfy - 12, 34, 14, 0, 0, 7); b.fill();
+
+  /* 2. Esquina de librerías en L (gx=0, gy=0..3 y gy=0, gx=1..3) con 3 bloques de altura (gz=0..2) */
+  const cells = [];
+  for (let gz = 0; gz < 3; gz++) {
+    for (let gx = 0; gx < 4; gx++) {
+      for (let gy = 0; gy < 4; gy++) {
+        if (gx === 0 || gy === 0) cells.push({ gx, gy, gz, type: "shelf" });
+      }
+    }
+  }
+  cells.push({ gx: 2, gy: 2, gz: 0, type: "table" });
+  cells.sort((a, c) => (a.gx + a.gy + a.gz) - (c.gx + c.gy + c.gz) || a.gz - c.gz);
+
+  for (const c of cells) {
+    const [cx, fy] = isoPos(c.gx, c.gy, c.gz);
+    if (c.type === "shelf") {
+      block(cx, fy, 16, tex("plank"), tex("shelf"), tex("shelf"), .12, .26);
+      if (c.gx > 0 || c.gy > 0) SHELF_POS.push([cx, fy - 24]);
+    } else {
+      block(cx, fy, 12, tex("top"), tex("side"), tex("side"), .12, .28);
+    }
+  }
+
   /* Glifos: letras a–z del alfabeto galáctico (ascii_sga.png), teñidas con glyphColor */
   for (let c = 97; c < 123; c++) {
     const k = mk(8, 8), q = k.getContext("2d");
@@ -110,27 +164,28 @@ function init() {
 /* Animación */
 const cv = $("canvas"), g = cv.getContext("2d");
 g.imageSmoothingEnabled = false;
-const P = [];
-let o = calm ? 1 : 0, target = 0, vis = false, ready = false, last = 0, spawn = 0, raf = 0, by = 72;
+const P = [], [TX, TY] = isoPos(2, 2, 0), BASE_BY = TY - 72;
+let o = calm ? 1 : 0, target = 0, vis = false, ready = false, last = 0, spawn = 0, raf = 0, by = BASE_BY;
 const add = dur => {
-  const x0 = SH[R() < .5 ? 0 : 1] - 20 + R() * 40, y0 = 80 + R() * 85;
-  P.push({ x0, y0, x1: 160, y1: by + 14, cx: (x0 + 160) / 2, cy: Math.min(y0, by) - 40 - R() * 25, t: 0, sp: 1 / dur, g: G[R() * G.length | 0] });
+  const sp = SHELF_POS[R() * SHELF_POS.length | 0] || [CX, 90];
+  const x0 = sp[0] + (R() - .5) * 18, y0 = sp[1] + (R() - .5) * 18;
+  P.push({ x0, y0, x1: TX, y1: by + 14, cx: (x0 + TX) / 2, cy: Math.min(y0, by) - 24 - R() * 20, t: 0, sp: 1 / dur, g: G[R() * G.length | 0] });
 };
 function book(t) {
   const bk = tex("book"), kb = 3, h = 10 * kb, y = by | 0, w = (3 + 15 * o) | 0, pw = (w * 5 / 6) | 0;
   [-1, 1].forEach(s => {
-    g.drawImage(bk, s < 0 ? 0 : 16, 0, 6, 10, s < 0 ? 160 - w : 160, y, w, h);
-    if (o > .15) g.drawImage(bk, s < 0 ? 1 : 13, 11, 5, 8, s < 0 ? 159 - pw : 161, y + kb, pw, 8 * kb);
+    g.drawImage(bk, s < 0 ? 0 : 16, 0, 6, 10, s < 0 ? TX - w : TX, y, w, h);
+    if (o > .15) g.drawImage(bk, s < 0 ? 1 : 13, 11, 5, 8, s < 0 ? TX - 1 - pw : TX + 1, y + kb, pw, 8 * kb);
   });
-  g.drawImage(bk, 12, 0, 2, 10, 159, y, 2, h);
-  if (o > .5) { const fw = Math.max(1, pw * (.2 + .8 * Math.abs(Math.sin(t * 2.4))) | 0); g.drawImage(bk, 24, 10, 5, 8, 159 - fw, y + kb, fw, 8 * kb); }
+  g.drawImage(bk, 12, 0, 2, 10, TX - 1, y, 2, h);
+  if (o > .5) { const fw = Math.max(1, pw * (.2 + .8 * Math.abs(Math.sin(t * 2.4))) | 0); g.drawImage(bk, 24, 10, 5, 8, TX - 1 - fw, y + kb, fw, 8 * kb); }
 }
 function frame(ts) {
   const dt = Math.min(.05, (ts - last) / 1000 || .016); last = ts;
   o = calm ? target : o + (target - o) * (1 - Math.pow(.002, dt));
-  const t = ts / 1000; by = 72 + (calm ? 0 : Math.sin(t * 1.6) * 3);
+  const t = ts / 1000; by = BASE_BY + (calm ? 0 : Math.sin(t * 1.6) * 3);
   g.clearRect(0, 0, W, H); g.drawImage(bg, 0, 0);
-  if (o > .6 && !calm) for (spawn -= dt; spawn <= 0; spawn += .07) add(1.6 + R() * .8);
+  if (o > .6 && !calm) for (spawn -= dt; spawn <= 0; spawn += .055) add(1.5 + R() * .7);
   book(t);
   for (let i = P.length - 1; i >= 0; i--) {
     const p = P[i], u = (p.t += dt * p.sp);
@@ -146,8 +201,8 @@ const kick = () => { if (!raf && ready) raf = requestAnimationFrame(frame); };
 
 /* Se abre al estar en pantalla; se cierra al salir */
 new IntersectionObserver(([e]) => {
-  vis = e.isIntersecting && e.intersectionRatio >= .3; target = vis ? 1 : 0; kick();
-}, { threshold: [0, .3, .5] }).observe($(".mz-stage"));
+  vis = e.isIntersecting && e.intersectionRatio >= .25; target = vis ? 1 : 0; kick();
+}, { threshold: [0, .25, .5] }).observe($(".mz-stage"));
 
 /* Clic: ráfaga de partículas y luego abre el apartado */
 const show = () => { dlg.showModal(); document.dispatchEvent(new CustomEvent("mesa-encantamientos:abierta")); };
