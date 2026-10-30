@@ -65,16 +65,23 @@ const dlg = $(".mz-dlg");
 $(".mz-x").onclick = () => dlg.close();
 dlg.onclick = e => { if (e.target === dlg) dlg.close(); };
 
-/* Texturas */
+/* Texturas integradas pixel-art (carga instantánea en cualquier navegador/conexión) */
 const mk = (w, h) => Object.assign(document.createElement("canvas"), { width: w, height: h });
-const NAMES = { top: "enchanting_table_top", side: "enchanting_table_side", shelf: "bookshelf", plank: "oak_planks", book: "enchanting_table_book", sga: "ascii_sga" };
-const FALL = { top: "#8e1d3c", side: "#1a1428", shelf: "#8a6238", plank: "#a07a45", book: "#8e1d3c" };
+const CHARS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const TEX_DATA = {"top":{"w":16,"h":16,"p":["ffffff","c3fbf1","a2f6e7","4aedd1","2ccdb1","a22929","741d32","7f0728","58162c","6b002f"],"d":"0114999999994110122375555557322112237555555732214337555665557334977556888865577995556888888655599555888888885559955688888888655995568888888865599555888888885559955568888886555997755688886557794337555665557334122375555557322112237555555732210114999999994110"},"side":{"w":16,"h":16,"p":["000000","ffffff","c3fbf1","a2f6e7","4aedd1","2ccdb1","a22929","3b2754","7f0728","6b002f","271e3d","100c1c","06030b","000001"],"d":"................................................................122599999999522123349866668943322334d966669d4332544bdd9669ddb445ddbabbd99cbbabbbabddbcaabcdbcbccbccdcccbccddbcdadbccbdcbc77abbbbc77bdbbba7bcb7bcaabcccdbbbcccdacdaccbcaccbbdcddcbcdbdcbabdcccccc"},"shelf":{"w":16,"h":16,"p":["632805","773007","911111","bc1616","695433","7c623e","cca66c","bc9862","b38c51","9b7742","9f844d","271e11","362a15","2c2213","41311a","3163a3","2a4e7a","315b8e","118e6b","0c6b50","898989","b5b5b5","a89b0a","897e08","758e11","5e720d","556809","494949","3f3f3f"],"d":"8aa995999aaaa9a88dddccdddccbhgd88cee22eeemnefgc8921132eeolk2fgi9631132fdomn2fgi6831031fopmo1fhi8820e21gpcno1ghja9877666788777889899aa5a99aaa99588ccbbcpqcdbccbd8832cfgop2eepqec89lkjfgop23dopij5632jfgrs132oplk6831jfhrsc23opij8a214ghpp412pqjg88776667887777888"},"plank":{"w":16,"h":16,"p":["b8945f","af8f55","9f844d","67502c","7e6237","967441","c29d62"],"d":"0106666606666605001152100011002210001012222110055445543344343343062666626660112010012125211000012210111500011222334454333344454306601166666666020100001222121225601122221111220233455433345443336206600266626066110022122001011112210125001222223443345554343333"},"book":{"w":32,"h":20,"p":["000000","8f8668","a76e2d","774e22","875622","c58439","ffd800","ffb100","ecddcc","f7ebde","04050a","c4b78b","dfd3a6","f4e9bf","c0b79a"],"d":"262222322268223322226286222300007444333225573333334447755223000024333332555922333333429555230000233333325558553333333285552300002333333255595533333332955523000023333332555955333333329555230000233333325558553333333285552300002433333255592233333342955523000074443332255733333344477552230000262222322268223322226286222300000eeeeeeeeee00eeeeeeeeee0dddddddd1dddddeddddd1dddddeddddcbcdccccc1bcdcceccccc1bcdccecccdccbccccdd1cbcccecddcb1cbcccecddcbdddddddd1dddddeddddd1dddddeddddcccdcbbdc1ccdcbebdccc1cbdcbebdccccddddddd1cddddeddddd1cddddeddddcbbcccbcd1bbcccebcdbc1bcccbebcdbcccddcddd1ccddcedddcc1cdddcecddcc0000000000000000000000000000000000000000"}};
+const SGA_DATA = [[12,18,2,2,2,2,3,0],[4,4,4,4,8,16,31,0],[1,0,1,1,3,2,2,0],[31,0,3,4,24,0,0,0],[17,1,1,1,1,1,31,0],[31,0,21,0,0,0,0,0],[4,4,4,7,4,4,4,0],[31,0,31,4,4,4,4,0],[1,1,1,0,1,1,1,0],[1,1,0,1,0,1,1,0],[4,4,4,21,4,4,4,0],[1,5,1,1,1,5,1,0],[17,16,16,16,16,16,31,0],[9,9,8,4,4,2,1,0],[15,8,8,4,4,2,1,0],[5,4,5,5,5,1,5,0],[4,0,31,16,16,16,31,0],[9,0,0,0,0,0,9,0],[1,1,1,3,2,2,2,0],[31,16,16,16,16,0,16,0],[0,0,10,0,31,0,0,0],[4,4,4,4,31,0,31,0],[0,0,4,0,0,17,0,0],[17,8,8,4,2,2,1,0],[5,5,5,5,5,5,5,0],[4,10,17,17,17,17,17,0]];
 const IMG = {};
-const load = ([k, n]) => new Promise(r => {
-  const i = new Image(); i.onload = () => { IMG[k] = i; r(); };
-  i.onerror = () => { console.warn("Falta " + CFG.texPath + n + ".png"); r(); }; i.src = CFG.texPath + n + ".png";
-});
-const tex = k => { if (IMG[k]) return IMG[k]; const c = mk(64, 32); c.getContext("2d").fillStyle = FALL[k]; c.getContext("2d").fillRect(0, 0, 64, 32); return c; };
+for (const [k, t] of Object.entries(TEX_DATA)) {
+  const c = mk(t.w, t.h), x = c.getContext("2d");
+  for (let i = 0; i < t.d.length; i++) {
+    const ch = t.d[i];
+    if (ch === ".") continue;
+    x.fillStyle = "#" + t.p[CHARS.indexOf(ch)];
+    x.fillRect(i % t.w, (i / t.w) | 0, 1, 1);
+  }
+  IMG[k] = c;
+}
+const tex = k => IMG[k];
 
 /* Escena isométrica: librerías (4x3) y mesa en (2,2,0) */
 const bg = mk(W, H), SHELF_POS = [], G = [];
@@ -126,11 +133,16 @@ function init() {
     }
   }
 
-  for (let c = 97; c < 123; c++) {
-    const k = mk(8, 8), q = k.getContext("2d");
-    if (IMG.sga) q.drawImage(IMG.sga, (c % 16) * 8, (c >> 4) * 8, 8, 8, 0, 0, 8, 8);
-    else { q.fillStyle = "#fff"; let x = R() * 6 | 0, y = R() * 6 | 0; for (let i = 0; i < 7; i++) { q.fillRect(x, y, 1, 1); R() < .5 ? x = Math.max(0, Math.min(7, x + (R() < .5 ? -1 : 1))) : y = Math.max(0, Math.min(7, y + (R() < .5 ? -1 : 1))); } }
-    q.globalCompositeOperation = "source-in"; q.fillStyle = CFG.glyphColor; q.fillRect(0, 0, 8, 8); G.push(k);
+  for (let i = 0; i < SGA_DATA.length; i++) {
+    const k = mk(8, 8), q = k.getContext("2d"), rows = SGA_DATA[i];
+    q.fillStyle = CFG.glyphColor;
+    for (let y = 0; y < 8; y++) {
+      const row = rows[y];
+      for (let x = 0; x < 8; x++) {
+        if ((row >> x) & 1) q.fillRect(x, y, 1, 1);
+      }
+    }
+    G.push(k);
   }
 }
 
@@ -269,5 +281,5 @@ $(".mz-hit").onclick = () => {
   setTimeout(() => { if (want && !shown) { shown = true; show(); } }, 2500);
 };
 dlg.addEventListener("close", () => { want = false; shown = false; });
-Promise.all(Object.entries(NAMES).map(load)).then(() => { init(); ready = true; kick(); });
+init(); ready = true; kick();
 })();
