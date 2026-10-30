@@ -61,13 +61,13 @@
     $("#petals").append(p);
   }
 
-  /* Progreso: carta + sorpresa desbloquean el cierre */
+  /* Progreso: mesa de encantamientos + carta + sorpresa desbloquean el cierre */
   const done = new Set(), prog = $("#prog");
-  prog.textContent = "Descubierto 0 de 2";
+  prog.textContent = "Descubierto 0 de 3";
   function mark(k) {
     if (done.has(k)) return;
     done.add(k);
-    if (done.size < 2) { prog.textContent = `Descubierto ${done.size} de 2`; return; }
+    if (done.size < 3) { prog.textContent = `Descubierto ${done.size} de 3`; return; }
     const b = document.createElement("button");
     b.className = "btn"; b.textContent = C.text.moreBtn;
     b.onclick = () => {
@@ -76,6 +76,7 @@
     };
     prog.replaceChildren(b);
   }
+  document.addEventListener("mesa-encantamientos:abierta", () => mark("mesa"));
 
   /* Bienvenida -> Pantalla de carga de mundo de Minecraft -> Regalo */
   const DIRT_P = {0:"#b88860",1:"#987048",2:"#785838",3:"#584028",4:"#888888",5:"#707070",6:"#705840"};

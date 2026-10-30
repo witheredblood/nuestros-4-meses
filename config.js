@@ -102,3 +102,23 @@ window.CONFIG = {
     finalSign: "Siempre tuyo ♥"
   }
 };
+
+// ✨ MESA DE ENCANTAMIENTOS (los 3 encantamientos que se revelan al tocar la mesa)
+window.ENCHANT_CFG = {
+  title: "Mesa de encantamientos",
+  hint: "Acércate… algo se está encantando. Toca la mesa.",
+  items: [
+    {
+      title: "✦ Lealtad III",
+      text: "Mi corazón siempre regresa a ti, sin importar la distancia ni el tiempo."
+    },
+    {
+      title: "✦ Infinidad I",
+      text: "Para que las risas, los abrazos y las ganas de estar juntos no se nos acaben nunca."
+    },
+    {
+      title: "✦ Irrompible III",
+      text: "Por lo nuestro, que cada día que pasa se vuelve más fuerte, más bonito y más real."
+    }
+  ]
+};
