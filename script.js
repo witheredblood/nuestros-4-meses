@@ -253,25 +253,44 @@
     if (!rest.length) { rbtn.disabled = true; rbtn.textContent = C.text.reasonsDone; }
   };
 
-  /* Ocho estrofas (cada una separada, se revela al tocarla) */
+  /* Ocho estrofas en libros escritos de Minecraft (con brillo encantado y lectura en mc/book_page.png) */
   const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII"];
+  const bookDlg = $("#book-dlg"), bkMeta = $("#bk-meta"), bkNum = $("#bk-num"), bkTxt = $("#bk-txt");
+  const bkPrev = $("#bk-prev"), bkNext = $("#bk-next"), bkClose = $("#bk-close");
+  const bookBtns = [];
+  let curBook = 0;
+
+  function openBookAt(idx) {
+    curBook = Math.max(0, Math.min(C.messages.length - 1, idx));
+    const m = C.messages[curBook];
+    const num = typeof m === "object" ? m.num : (ROMAN[curBook] || "I");
+    const txt = typeof m === "object" ? m.verse : m;
+    if (bkMeta) bkMeta.textContent = `Página ${curBook + 1} de ${C.messages.length}`;
+    if (bkNum) bkNum.textContent = `— ${num} —`;
+    if (bkTxt) bkTxt.textContent = txt;
+    if (bkPrev) bkPrev.disabled = curBook === 0;
+    if (bkNext) bkNext.disabled = curBook === C.messages.length - 1;
+    if (bookBtns[curBook]) bookBtns[curBook].classList.add("read");
+    mark("sorp");
+    if (bookDlg && !bookDlg.open) bookDlg.showModal();
+  }
+
   C.messages.forEach((m, idx) => {
     const num = typeof m === "object" ? m.num : (ROMAN[idx] || "♥");
-    const txt = typeof m === "object" ? m.verse : m;
     const b = document.createElement("button");
     b.className = "msg";
-    b.innerHTML = `<span class="msg-num">${num}</span><span class="msg-hrt" aria-hidden="true">♥</span>`;
-    b.setAttribute("aria-label", `Estrofa ${num}`);
-    b.onclick = () => {
-      if (b.classList.contains("on")) return;
-      b.classList.add("on");
-      b.innerHTML = `<strong class="stanza-num">${num}</strong><span class="stanza-txt"></span>`;
-      b.querySelector(".stanza-txt").textContent = txt;
-      b.removeAttribute("aria-label");
-      mark("sorp");
-    };
+    b.type = "button";
+    b.innerHTML = `<span class="mc-book-ico"><img src="mc/written_book.png" alt="" width="52" height="52"><span class="mc-book-glint" aria-hidden="true"></span></span><span class="msg-num">${num}<span class="msg-hrt" aria-hidden="true">♥</span></span>`;
+    b.setAttribute("aria-label", `Abrir libro de estrofa ${num}`);
+    b.onclick = () => openBookAt(idx);
+    bookBtns.push(b);
     $("#msgs").append(b);
   });
+
+  if (bkPrev) bkPrev.onclick = () => openBookAt(curBook - 1);
+  if (bkNext) bkNext.onclick = () => openBookAt(curBook + 1);
+  if (bkClose) bkClose.onclick = () => bookDlg.close();
+  if (bookDlg) bookDlg.onclick = e => { if (e.target === bookDlg) bookDlg.close(); };
 
   /* Corazón interactivo */
   let n = 0; const heart = $("#heart");

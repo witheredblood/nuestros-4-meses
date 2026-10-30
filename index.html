@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.cdnfonts.com/css/minecraft-3" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=19">
+<link rel="stylesheet" href="style.css?v=25">
 </head>
 <body>
 <div id="mc-sky" aria-hidden="true">
@@ -99,9 +99,24 @@
   <div id="prog" role="status"></div>
 </main>
 
-<script src="config.js?v=24"></script>
-<script src="script.js?v=24"></script>
-<script src="mesa-encantamientos.js?v=24"></script>
-<script src="enderman.js?v=24"></script>
+<dialog id="book-dlg" class="book-dlg" aria-label="Libro escrito">
+  <div class="mc-book-wrap">
+    <div class="mc-book-page">
+      <div class="mc-book-meta" id="bk-meta">Estrofa I</div>
+      <div class="mc-book-num" id="bk-num">I</div>
+      <p class="mc-book-txt" id="bk-txt"></p>
+      <div class="mc-book-nav">
+        <button type="button" id="bk-prev" class="mc-page-btn" aria-label="Estrofa anterior">◀</button>
+        <button type="button" id="bk-next" class="mc-page-btn" aria-label="Siguiente estrofa">▶</button>
+      </div>
+    </div>
+    <button type="button" id="bk-close" class="btn bk-close">Cerrar</button>
+  </div>
+</dialog>
+
+<script src="config.js?v=25"></script>
+<script src="script.js?v=25"></script>
+<script src="mesa-encantamientos.js?v=25"></script>
+<script src="enderman.js?v=25"></script>
 </body>
 </html>

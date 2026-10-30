@@ -65,15 +65,34 @@ dialog[open]{animation:pop .45s cubic-bezier(.2,1.3,.4,1)}
 .paper p:last-child{margin-bottom:0}
 
 .box{min-height:5.5rem;max-width:30rem;font:400 1.15rem/1.55 var(--serif);margin:1rem 0;display:grid;place-items:center}
-.msgtitle{margin-top:2.5rem;margin-bottom:1rem;font-size:1.15rem;color:var(--rose)}
-.msgs{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.85rem;justify-content:center;width:min(44rem,100%);margin-bottom:2.5rem}
-.msg{min-height:4.2rem;padding:.75rem 1rem;border-radius:14px;border:1px solid rgba(243,188,203,.38);background:rgba(255,255,255,.05);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.25rem;transition:.35s}
-.msg-num{font-size:1.05rem;color:var(--cream)}
-.msg-hrt{font-size:.95rem;color:var(--rose)}
-.msg:hover{border-color:var(--rose);transform:translateY(-2px)}
-.msg.on{grid-column:1/-1;background:var(--cream);color:var(--wine);text-shadow:none;font:400 .92rem/1.65 var(--serif);border-color:var(--cream);padding:1.15rem 1.35rem;transform:rotate(-.4deg);box-shadow:0 10px 26px rgba(0,0,0,.4);cursor:default}
-.stanza-num{display:block;font-size:1.05rem;color:var(--red);margin-bottom:.45rem;letter-spacing:.08em}
-.stanza-txt{display:block;white-space:pre-line;text-align:center}
+.msgtitle{margin-top:2.5rem;margin-bottom:1.2rem;font-size:1.15rem;color:var(--rose)}
+.msgs{display:grid;grid-template-columns:repeat(4,minmax(68px,1fr));gap:1rem .85rem;justify-content:center;width:min(26rem,100%);margin-bottom:2.5rem}
+.msg{padding:.65rem .4rem;border-radius:12px;border:2px solid rgba(243,188,203,.28);background:rgba(16,10,22,.55);box-shadow:inset 0 -2px 0 rgba(0,0,0,.45),0 6px 16px rgba(0,0,0,.35);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.4rem;transition:transform .25s,border-color .25s,background .25s}
+.msg:hover{border-color:var(--rose);background:rgba(243,188,203,.14);transform:translateY(-4px)}
+.msg.read{border-color:rgba(243,188,203,.65);background:rgba(142,29,60,.28)}
+.mc-book-ico{position:relative;width:52px;height:52px;display:block;image-rendering:pixelated;filter:drop-shadow(0 4px 8px rgba(0,0,0,.55))}
+.mc-book-ico img{width:100%;height:100%;display:block;image-rendering:pixelated}
+/* Efecto de brillo encantado de Libro Escrito (Written Book) de Minecraft */
+.mc-book-glint{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(-55deg,rgba(150,60,255,0) 0%,rgba(150,60,255,0) 32%,rgba(190,95,255,.65) 45%,rgba(255,185,255,.9) 50%,rgba(170,70,255,.65) 55%,rgba(150,60,255,0) 68%,rgba(150,60,255,0) 100%);background-size:240% 240%;mix-blend-mode:screen;-webkit-mask:url("mc/written_book.png") center/100% 100% no-repeat;mask:url("mc/written_book.png") center/100% 100% no-repeat;image-rendering:pixelated;animation:mcGlint 3.2s linear infinite}
+@keyframes mcGlint{0%{background-position:200% 0%}100%{background-position:-40% 200%}}
+.msg-num{font-size:.95rem;color:var(--cream);display:inline-flex;align-items:center;gap:4px}
+.msg-hrt{font-size:.8rem;color:var(--rose);opacity:0;transition:opacity .25s}
+.msg.read .msg-hrt{opacity:1}
+
+/* Interfaz de libro abierto de Minecraft (mc/book_page.png) */
+.book-dlg{border:0;background:none;margin:auto;padding:0;width:min(94vw,350px);overflow:visible}
+.book-dlg::backdrop{background:rgba(14,4,9,.82);backdrop-filter:blur(6px)}
+.book-dlg[open]{animation:pop .4s cubic-bezier(.2,1.25,.35,1)}
+.mc-book-wrap{display:flex;flex-direction:column;align-items:center;gap:1rem}
+.mc-book-page{position:relative;width:min(315px,88vw);aspect-ratio:146/180;background:url("mc/book_page.png") center/100% 100% no-repeat;image-rendering:pixelated;filter:drop-shadow(0 22px 45px rgba(0,0,0,.75));padding:26px 26px 34px 36px;display:flex;flex-direction:column;align-items:center;color:#26150d;text-shadow:none}
+.mc-book-meta{align-self:flex-end;font-size:.74rem;color:#7a5c43;margin-bottom:.35rem}
+.mc-book-num{font-size:1.15rem;color:#7a1832;margin-bottom:.65rem;letter-spacing:.08em}
+.mc-book-txt{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;white-space:pre-line;font-size:clamp(.82rem,2.7vw,.94rem);line-height:1.68;color:#24130c;margin:0}
+.mc-book-nav{width:100%;display:flex;justify-content:space-between;align-items:center;padding-top:.4rem}
+.mc-page-btn{background:none;border:0;color:#6e4f36;font-size:1.1rem;padding:.2rem .5rem;cursor:pointer;text-shadow:none;transition:color .2s,transform .2s}
+.mc-page-btn:hover:not(:disabled){color:#8e1d3c;transform:scale(1.18)}
+.mc-page-btn:disabled{opacity:.25;cursor:default}
+.bk-close{background:rgba(28,10,20,.92);color:var(--cream);text-shadow:2px 2px 0 rgba(0,0,0,.55)}
 .heart{width:110px;height:110px;border:0;background:none;color:var(--red);filter:drop-shadow(0 0 18px rgba(243,106,140,.5));transition:color .3s}
 .heart svg{width:100%;height:100%;fill:currentColor}
 .heart:hover{color:#b3264a}
@@ -145,4 +164,3 @@ body{-webkit-text-size-adjust:100%}
 #ender{position:fixed;left:0;bottom:0;width:100%;z-index:4;pointer-events:none}
 #ender-hit{position:fixed;left:0;bottom:env(safe-area-inset-bottom,0px);z-index:4;border:0;padding:0;background:none;border-radius:8px;will-change:transform;touch-action:manipulation;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
 #ender-hit:focus-visible{outline:2px dashed var(--rose)}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01s!important}html{scroll-behavior:auto}.sign{opacity:1}}
