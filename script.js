@@ -26,7 +26,7 @@
     }
   }
 
-  /* Flores y corazones flotantes */
+  /* Flores y hojas de cerezo flotantes */
   const FLOWERS = [
     "assets/flores/BlockSprite_pink-petals.png",
     "assets/flores/Invicon_Allium.png",
@@ -43,38 +43,62 @@
     "assets/flores/Invicon_Poppy.png",
     "assets/flores/Invicon_Red_Tulip.png",
     "assets/flores/Invicon_Sunflower.png",
-    "assets/flores/Invicon_White_Tulip.webp"
+    "assets/flores/Invicon_White_Tulip.webp",
+    "mc/cherry_0.png",
+    "mc/cherry_1.png",
+    "mc/cherry_2.png",
+    "mc/cherry_3.png"
   ];
-  for (let i = 0; i < 24; i++) {
-    const isFlower = i % 3 !== 0;
-    const p = document.createElement(isFlower ? "img" : "span");
-    p.className = isFlower ? "p flw" : "p";
-    if (isFlower) {
-      p.src = FLOWERS[i % FLOWERS.length];
-      p.alt = "";
-      const sz = 18 + Math.random() * 14;
-      p.style.cssText = `left:${Math.random() * 100}%;height:${sz}px;animation-duration:${16 + Math.random() * 16}s;animation-delay:${-Math.random() * 30}s`;
-    } else {
-      p.textContent = i % 2 ? "♥" : "✦";
-      p.style.cssText = `left:${Math.random() * 100}%;font-size:${11 + Math.random() * 14}px;animation-duration:${16 + Math.random() * 16}s;animation-delay:${-Math.random() * 30}s`;
-    }
+  for (let i = 0; i < 28; i++) {
+    const src = FLOWERS[i % FLOWERS.length];
+    const isCherry = src.includes("cherry_");
+    const p = document.createElement("img");
+    p.className = "p flw";
+    p.src = src;
+    p.alt = "";
+    const sz = isCherry ? (10 + Math.random() * 6) : (18 + Math.random() * 14);
+    p.style.cssText = `left:${Math.random() * 100}%;height:${sz}px;animation-duration:${15 + Math.random() * 16}s;animation-delay:${-Math.random() * 30}s`;
     $("#petals").append(p);
   }
 
-  /* Progreso de secciones */
-  const done = new Set(), prog = $("#prog");
-  prog.textContent = "Descubierto 0 de 3";
+  function spawnSpriteParticles(rect, imgSrc, count = 6, szMin = 16, szVar = 8) {
+    for (let i = 0; i < count; i++) {
+      const f = document.createElement("img");
+      f.className = "fx-img";
+      f.src = imgSrc;
+      f.alt = "";
+      const sz = (szMin + Math.random() * szVar) | 0;
+      f.style.cssText = `left:${rect.left + rect.width / 2 + (Math.random() - .5) * 44}px;top:${rect.top + rect.height / 2 + (Math.random() - .5) * 20}px;--dx:${(Math.random() - .5) * 140}px;width:${sz}px;height:${sz}px`;
+      f.onanimationend = () => f.remove();
+      document.body.append(f);
+    }
+  }
+
+  /* Barra de experiencia (XP) de Minecraft */
+  const done = new Set(), prog = $("#prog"), xpLvl = $("#xp-lvl"), xpTxt = $("#xp-txt"), xpFill = $("#xp-bar-fill");
+  const XP_LVLS = [0, 1, 2, 4];
   function mark(k) {
     if (done.has(k)) return;
     done.add(k);
-    if (done.size < 3) { prog.textContent = `Descubierto ${done.size} de 3`; return; }
-    const b = document.createElement("button");
-    b.className = "btn"; b.textContent = C.text.moreBtn;
-    b.onclick = () => {
-      const f = $("#final"); f.hidden = false; f.classList.add("show");
-      f.scrollIntoView({ behavior: calm ? "auto" : "smooth" }); prog.remove();
-    };
-    prog.replaceChildren(b);
+    const n = done.size, lvl = XP_LVLS[n] || 4, pct = Math.round((n / 3) * 100);
+    if (xpLvl) xpLvl.textContent = lvl;
+    if (xpFill) xpFill.style.width = pct + "%";
+    if (prog) spawnSpriteParticles(prog.getBoundingClientRect(), "mc/xp_orb.png", 6, 14, 6);
+    if (n < 3) {
+      if (xpTxt) xpTxt.textContent = `Descubierto ${n} de 3 · Nivel ${lvl}/4`;
+      return;
+    }
+    if (xpTxt) xpTxt.textContent = "¡Nivel 4 alcanzado!";
+    setTimeout(() => {
+      const b = document.createElement("button");
+      b.className = "btn";
+      b.textContent = "✦ Nivel 4: " + C.text.moreBtn + " ✦";
+      b.onclick = () => {
+        const f = $("#final"); f.hidden = false; f.classList.add("show");
+        f.scrollIntoView({ behavior: calm ? "auto" : "smooth" }); prog.remove();
+      };
+      prog.replaceChildren(b);
+    }, 550);
   }
   document.addEventListener("mesa-encantamientos:abierta", () => mark("mesa"));
 
@@ -320,33 +344,88 @@
   if (bkClose) bkClose.onclick = () => bookDlg.close();
   if (bookDlg) bookDlg.onclick = e => { if (e.target === bookDlg) bookDlg.close(); };
 
+  /* Icono isométrico de cofre de Minecraft */
+  const chestCv = $("#chest-ico");
+  if (chestCv) {
+    const cg = chestCv.getContext("2d"); cg.imageSmoothingEnabled = false;
+    const poly = (pts, col) => {
+      cg.fillStyle = col; cg.beginPath();
+      pts.forEach((p, i) => i ? cg.lineTo(p[0], p[1]) : cg.moveTo(p[0], p[1]));
+      cg.closePath(); cg.fill();
+    };
+    poly([[12, 2], [22, 7], [12, 12], [2, 7]], "#c48428");
+    poly([[2, 7], [12, 12], [12, 22], [2, 17]], "#9c641c");
+    poly([[12, 12], [22, 7], [22, 17], [12, 22]], "#784c14");
+    poly([[2, 10], [12, 15], [22, 10], [22, 11.5], [12, 16.5], [2, 11.5]], "#1f1912");
+    poly([[15.5, 11.5], [18, 10.2], [18, 13.8], [15.5, 15.1]], "#d8d8d8");
+  }
+
+  /* Dos camitas de Minecraft juntas en isométrico 3D */
+  const bedsCv = $("#mc-beds");
+  if (bedsCv) {
+    const bg = bedsCv.getContext("2d"); bg.imageSmoothingEnabled = false;
+    const K = 1.65, OX = 94, OY = 56;
+    const iso = (x, y, z) => [OX + (x - y) * K, OY + (x + y) * 0.5 * K - z * K];
+    const quad = (p0, p1, p2, p3, col) => {
+      bg.fillStyle = col; bg.beginPath();
+      bg.moveTo(p0[0], p0[1]); bg.lineTo(p1[0], p1[1]);
+      bg.lineTo(p2[0], p2[1]); bg.lineTo(p3[0], p3[1]);
+      bg.closePath(); bg.fill();
+    };
+    const box3d = (x0, y0, z0, dx, dy, dz, cTop, cLeft, cRight) => {
+      const x1 = x0 + dx, y1 = y0 + dy, z1 = z0 + dz;
+      quad(iso(x0, y1, z0), iso(x1, y1, z0), iso(x1, y1, z1), iso(x0, y1, z1), cLeft);
+      quad(iso(x1, y0, z0), iso(x1, y1, z0), iso(x1, y1, z1), iso(x1, y0, z1), cRight);
+      quad(iso(x0, y0, z1), iso(x1, y0, z1), iso(x1, y1, z1), iso(x0, y1, z1), cTop);
+    };
+    const drawBed = (yOff, cTop, cLeft, cRight) => {
+      const legs = [[-16, yOff], [13, yOff], [-16, yOff + 13], [13, yOff + 13]];
+      legs.forEach(([lx, ly]) => box3d(lx, ly, 0, 3, 3, 3, "#b8945f", "#8a6b3e", "#67502c"));
+      box3d(-16, yOff, 3, 32, 16, 2, "#b8945f", "#967441", "#755830");
+      box3d(-16, yOff, 5, 11, 16, 4, "#f5f5f5", "#dcdcdc", "#bdbdbd");
+      box3d(-5, yOff, 5, 21, 16, 4, cTop, cLeft, cRight);
+    };
+    bg.fillStyle = "rgba(0,0,0,.38)";
+    bg.beginPath(); bg.ellipse(OX, OY + 18, 66, 26, 0, 0, Math.PI * 2); bg.fill();
+    drawBed(-17, "#c92b2b", "#a32121", "#7d1818");
+    drawBed(1, "#f38baa", "#d96c8d", "#b55170");
+    const hrtImg = new Image();
+    hrtImg.onload = () => {
+      const [hx, hy] = iso(-10, 0, 16);
+      bg.drawImage(hrtImg, (hx - 9) | 0, (hy - 9) | 0, 18, 18);
+    };
+    hrtImg.src = "mc/particle_heart.png";
+  }
+
   /* Corazón interactivo */
   let n = 0; const heart = $("#heart");
   heart.onclick = () => {
     heart.classList.remove("beat"); void heart.offsetWidth; heart.classList.add("beat");
     $("#hmsg").textContent = C.heartLines[Math.min(n++, C.heartLines.length - 1)]; mark("sorp");
     if (calm) return;
-    const r = heart.getBoundingClientRect();
-    for (let i = 0; i < 6; i++) {
-      const f = document.createElement("span"); f.className = "fx"; f.textContent = "♥";
-      f.style.cssText = `left:${r.left + r.width / 2}px;top:${r.top + r.height / 2}px;--dx:${(Math.random() - .5) * 140}px;font-size:${12 + Math.random() * 14}px`;
-      f.onanimationend = () => f.remove(); document.body.append(f);
-    }
+    spawnSpriteParticles(heart.getBoundingClientRect(), "mc/particle_heart.png", 7, 16, 10);
   };
 
-  /* Perrita Luna */
-  const lunaBtn = $("#luna-pet");
-  if (lunaBtn) {
-    lunaBtn.onclick = () => {
-      lunaBtn.classList.remove("hop"); void lunaBtn.offsetWidth; lunaBtn.classList.add("hop");
-      const r = lunaBtn.getBoundingClientRect();
-      for (let i = 0; i < 6; i++) {
-        const f = document.createElement("span"); f.className = "fx"; f.textContent = "♥";
-        f.style.cssText = `left:${r.left + r.width / 2 + (Math.random() - .5) * 40}px;top:${r.top + 36}px;--dx:${(Math.random() - .5) * 130}px;font-size:${14 + Math.random() * 14}px;color:#ff5555`;
-        f.onanimationend = () => f.remove(); document.body.append(f);
-      }
-    };
+  /* Perrita Luna y sus premios */
+  const lunaBtn = $("#luna-pet"), lunaStatus = $("#luna-status");
+  function petLuna(msg) {
+    if (!lunaBtn) return;
+    lunaBtn.classList.remove("hop"); void lunaBtn.offsetWidth; lunaBtn.classList.add("hop");
+    if (msg && lunaStatus) lunaStatus.textContent = msg;
+    const r = lunaBtn.getBoundingClientRect();
+    spawnSpriteParticles({ left: r.left, top: r.top, width: r.width, height: 70 }, "mc/particle_heart.png", 7, 16, 10);
   }
+  if (lunaBtn) {
+    lunaBtn.onclick = () => petLuna("¡Guau! Luna está feliz de verte y te quiere mucho ♥");
+  }
+  document.querySelectorAll(".treat-btn").forEach(btn => {
+    btn.onclick = () => {
+      const isBone = btn.dataset.treat === "bone";
+      petLuna(isBone
+        ? "¡Luna recibió su huesito y no para de mover la colita por ti! ♥"
+        : "¡Ñam! A Luna le encantó su filete y te manda muchos lengüetazos ♥");
+    };
+  });
 
   /* Botón de música opcional */
   if (C.music) {

@@ -34,8 +34,8 @@ css.textContent = `
 .mz-it:hover,.mz-it[aria-expanded=true]{border-color:#ffffa0;background:#3d1b2f}
 .mz-tx{display:block;margin-top:.5rem;font:400 .95rem/1.55 var(--serif,monospace);color:var(--rose,#f3bccb)}
 .mz-tx[hidden]{display:none}
-.mz-x{margin-top:1.2rem;padding:.65rem 1.5rem;border:2px solid #000;border-radius:0;background:#5c2038;box-shadow:inset -3px -4px 0 #360f1f,inset 3px 3px 0 #9e4266;color:inherit;font:inherit;cursor:pointer}
-.mz-x:hover{background:#782a49;color:#ffffa0;border-color:#fff}`;
+.mz-x{margin-top:1.2rem;padding:.65rem 1.5rem;border:2px solid #000;border-radius:0;background:#6f6f6f url("mc/button.png") center/100% 100% no-repeat;color:#fff;text-shadow:2px 2px 0 #383838;font:inherit;image-rendering:pixelated;cursor:pointer}
+.mz-x:hover{background-image:url("mc/button_highlighted.png");color:#ffffa0;text-shadow:2px 2px 0 #3f3f15}`;
 document.head.append(css);
 
 let sec = document.getElementById("mesa-encantamientos");

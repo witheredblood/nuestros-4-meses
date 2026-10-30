@@ -9,13 +9,15 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.cdnfonts.com/css/minecraft-3" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=29">
+<link rel="stylesheet" href="style.css?v=30">
 </head>
 <body>
 <div id="mc-sky" aria-hidden="true">
   <div id="mc-stars"></div>
   <div id="mc-moon"></div>
   <div id="mc-clouds"></div>
+  <div class="mc-lantern mc-lantern-l"><span class="lantern-chain"></span><img src="mc/lantern.png" alt="" width="32" height="32"></div>
+  <div class="mc-lantern mc-lantern-r"><span class="lantern-chain"></span><img src="mc/lantern.png" alt="" width="32" height="32"></div>
 </div>
 <div id="petals" aria-hidden="true"></div>
 
@@ -24,12 +26,7 @@
 </div>
 
 <div id="mc-music-toast" class="minecraft-toast" role="status" aria-live="polite" hidden>
-  <svg class="toast-disc" viewBox="0 0 10 10" aria-hidden="true" shape-rendering="crispEdges">
-    <path fill="#111" d="M2,1h6v1h1v1h1v4h-1v1h-1v1h-6v-1h-1v-1h-1v-4h1v-1h1z"/>
-    <path fill="#292929" d="M3,2h4v1h1v4h-1v1h-4v-1h-1v-4h1z"/>
-    <path fill="#b832d6" d="M3,4h1v2h-1zM6,4h1v2h-1zM4,3h2v1h-2zM4,6h2v1h-2z"/>
-    <rect fill="#ff99ff" x="4" y="4" width="2" height="2"/>
-  </svg>
+  <img src="mc/music_disc.png" alt="" class="toast-disc" width="36" height="36">
   <div class="toast-body">
     <p class="toast-title">Ahora sonando:</p>
     <p class="toast-song">C418 - Blind Spots</p>
@@ -64,7 +61,10 @@
   <section id="carta" class="sec">
     <h2 data-t="letterTitle"></h2>
     <p class="sub" data-t="letterHint"></p>
-    <button id="env" class="env" aria-label="Abrir el sobre"><span class="flap"></span><span class="seal">♥</span></button>
+    <button id="env" class="env" aria-label="Abrir el libro y pluma">
+      <span class="flap"></span>
+      <span class="seal"><img src="mc/writable_book.png" alt="" class="env-book" width="42" height="42"></span>
+    </button>
     <article id="paper" class="paper" aria-live="polite"></article>
   </section>
 
@@ -72,31 +72,43 @@
     <h2 data-t="surpTitle"></h2>
     <p class="sub" data-t="surpHint"></p>
     <p class="box" id="reason" aria-live="polite"></p>
-    <button id="rbtn" class="btn" data-t="reasonBtn"></button>
-    <p class="sub msgtitle" data-t="msgHint"></p>
-    <div class="msgs" id="msgs"></div>
+    <button id="rbtn" class="btn btn-icon">
+      <img src="mc/honey_bottle.png" alt="" class="btn-ico" width="24" height="24">
+      <span data-t="reasonBtn"></span>
+    </button>
+
+    <div class="mc-chest-gui">
+      <div class="mc-chest-head">
+        <canvas id="chest-ico" width="24" height="24" aria-hidden="true"></canvas>
+        <span data-t="msgHint"></span>
+      </div>
+      <div class="msgs" id="msgs"></div>
+    </div>
+
     <button id="heart" class="heart" aria-label="Corazón de Minecraft: tócalo">
-      <svg viewBox="-1 -1 11 10" aria-hidden="true" shape-rendering="crispEdges">
-        <path fill="#000" d="M1,0h2v1h1v1h1v-1h1v-1h2v1h1v3h-1v1h-1v1h-1v1h-1v1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-3h1z"/>
-        <path fill="#b81212" d="M1,1h2v1h1v1h1v-1h1v-1h2v3h-1v1h-1v1h-1v1h-1v-1h-1v-1h-1v-1h-1z"/>
-        <path fill="#ff2424" d="M1,1h2v1h1v1h1v-1h1v-1h1v2h-1v1h-1v1h-1v1h-1v-1h-1v-1h-1z"/>
-        <rect fill="#fff" x="1" y="2" width="1" height="1"/>
-      </svg>
+      <span class="mc-hud-heart">
+        <img src="mc/heart_container.png" alt="" class="hc-bg" width="90" height="90">
+        <img src="mc/heart_full.png" alt="" class="hc-fg" width="90" height="90">
+      </span>
     </button>
     <p class="box hmsg" id="hmsg" aria-live="polite"></p>
   </section>
 
   <section id="final" class="sec" hidden>
     <div class="hrt" aria-hidden="true">
-      <svg viewBox="-1 -1 11 10" width="56" height="56" shape-rendering="crispEdges">
-        <path fill="#000" d="M1,0h2v1h1v1h1v-1h1v-1h2v1h1v3h-1v1h-1v1h-1v1h-1v1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-3h1z"/>
-        <path fill="#b81212" d="M1,1h2v1h1v1h1v-1h1v-1h2v3h-1v1h-1v1h-1v1h-1v-1h-1v-1h-1v-1h-1z"/>
-        <path fill="#ff2424" d="M1,1h2v1h1v1h1v-1h1v-1h1v2h-1v1h-1v1h-1v1h-1v-1h-1v-1h-1z"/>
-        <rect fill="#fff" x="1" y="2" width="1" height="1"/>
-      </svg>
+      <span class="mc-hud-heart mc-hud-heart-sm">
+        <img src="mc/heart_container.png" alt="" class="hc-bg" width="54" height="54">
+        <img src="mc/heart_full.png" alt="" class="hc-fg" width="54" height="54">
+      </span>
     </div>
     <h2 data-t="finalTitle"></h2>
     <p class="big" data-t="finalText"></p>
+
+    <div class="mc-beds-card">
+      <canvas id="mc-beds" width="188" height="112" aria-hidden="true"></canvas>
+      <p class="spawn-msg">Punto de aparición establecido:<br><span>Mi spawn point siempre va a ser a tu lado ♥</span></p>
+    </div>
+
     <p class="sign" data-t="finalSign"></p>
   </section>
 
@@ -105,10 +117,29 @@
       <span class="mc-nametag">Luna <span class="nt-heart">♥</span></span>
       <img src="assets/luna.png" alt="Luna, nuestra perrita de Minecraft" class="luna-img" width="154" height="250" loading="lazy">
     </button>
-    <p class="luna-msg">Lunita me ayudó a hacer esta página, ella te ama y te quiere mucho ♥</p>
+    <div class="luna-treats" role="group" aria-label="Darle premios a Luna">
+      <button type="button" class="treat-btn" data-treat="bone">
+        <img src="mc/bone.png" alt="" width="28" height="28">
+        <span>Dar huesito</span>
+      </button>
+      <button type="button" class="treat-btn" data-treat="beef">
+        <img src="mc/cooked_beef.png" alt="" width="28" height="28">
+        <span>Dar filete</span>
+      </button>
+    </div>
+    <p id="luna-status" class="luna-msg">Lunita me ayudó a hacer esta página, ella te ama y te quiere mucho ♥</p>
   </footer>
 
-  <div id="prog" role="status"></div>
+  <div id="prog" class="mc-xp-hud" role="status">
+    <div class="xp-top">
+      <img src="mc/xp_orb.png" alt="" class="xp-orb-ico" width="18" height="18">
+      <span id="xp-lvl" class="xp-lvl">0</span>
+      <span id="xp-txt" class="xp-txt">Descubierto 0 de 3 · Sube a Nivel 4</span>
+    </div>
+    <div class="xp-bar-wrap" aria-hidden="true">
+      <div id="xp-bar-fill" class="xp-bar-fill"></div>
+    </div>
+  </div>
 </main>
 
 <dialog id="book-dlg" class="book-dlg" aria-label="Libro escrito">
@@ -118,17 +149,17 @@
       <div class="mc-book-num" id="bk-num">I</div>
       <p class="mc-book-txt" id="bk-txt"></p>
       <div class="mc-book-nav">
-        <button type="button" id="bk-prev" class="mc-page-btn" aria-label="Estrofa anterior">◀</button>
-        <button type="button" id="bk-next" class="mc-page-btn" aria-label="Siguiente estrofa">▶</button>
+        <button type="button" id="bk-prev" class="mc-page-btn prev" aria-label="Estrofa anterior"></button>
+        <button type="button" id="bk-next" class="mc-page-btn next" aria-label="Siguiente estrofa"></button>
       </div>
     </div>
     <button type="button" id="bk-close" class="btn bk-close">Cerrar</button>
   </div>
 </dialog>
 
-<script src="config.js?v=29"></script>
-<script src="script.js?v=29"></script>
-<script src="mesa-encantamientos.js?v=29"></script>
-<script src="enderman.js?v=29"></script>
+<script src="config.js?v=30"></script>
+<script src="script.js?v=30"></script>
+<script src="mesa-encantamientos.js?v=30"></script>
+<script src="enderman.js?v=30"></script>
 </body>
 </html>
