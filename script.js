@@ -280,12 +280,55 @@
     const b = document.createElement("button");
     b.className = "msg";
     b.type = "button";
-    b.innerHTML = `<span class="mc-book-ico"><img src="mc/written_book.png" alt="" width="52" height="52"><span class="mc-book-glint" aria-hidden="true"></span></span><span class="msg-num">${num}<span class="msg-hrt" aria-hidden="true">♥</span></span>`;
+    b.innerHTML = `<span class="mc-book-ico"><canvas class="mc-book-cv" width="16" height="16"></canvas></span><span class="msg-num">${num}<span class="msg-hrt" aria-hidden="true">♥</span></span>`;
     b.setAttribute("aria-label", `Abrir libro de estrofa ${num}`);
     b.onclick = () => openBookAt(idx);
     bookBtns.push(b);
     $("#msgs").append(b);
   });
+
+  /* Renderizador pixel-art 16x16 del destello encantado (Written Book glint) de Minecraft */
+  const wbImg = new Image();
+  wbImg.src = "mc/written_book.png";
+  wbImg.onload = () => {
+    const srcCv = document.createElement("canvas");
+    srcCv.width = srcCv.height = 16;
+    const sctx = srcCv.getContext("2d");
+    sctx.drawImage(wbImg, 0, 0, 16, 16);
+    const baseData = sctx.getImageData(0, 0, 16, 16).data;
+    const cvs = [...document.querySelectorAll(".mc-book-cv")].map(c => c.getContext("2d"));
+
+    function animGlint(now) {
+      const t = now * 0.001;
+      for (let ci = 0; ci < cvs.length; ci++) {
+        const ctx = cvs[ci];
+        const out = ctx.createImageData(16, 16);
+        const d = out.data;
+        // En Minecraft el glint usa dos bandas diagonales violetas/magentas aditivas sobre cada píxel del ítem
+        for (let y = 0; y < 16; y++) {
+          for (let x = 0; x < 16; x++) {
+            const i = (y * 16 + x) * 4;
+            const a = baseData[i + 3];
+            if (!a) continue;
+            // Banda principal y banda secundaria cruzada como en RenderType.glint() de Minecraft
+            const w1 = Math.sin((x * 0.36 + y * 0.24) - t * 3.2);
+            const w2 = Math.sin((x * 0.22 - y * 0.34) + t * 2.1);
+            const g1 = Math.pow(Math.max(0, w1), 3);
+            const g2 = Math.pow(Math.max(0, w2), 4) * 0.75;
+            const k = Math.min(1.25, g1 + g2);
+            // Color aditivo encantado de Minecraft (morado eléctrico / magenta brillante)
+            d[i]     = Math.min(255, baseData[i]     + (175 * k) | 0);
+            d[i + 1] = Math.min(255, baseData[i + 1] + (55  * k) | 0);
+            d[i + 2] = Math.min(255, baseData[i + 2] + (255 * k) | 0);
+            d[i + 3] = a;
+          }
+        }
+        ctx.putImageData(out, 0, 0);
+      }
+      requestAnimationFrame(animGlint);
+    }
+    requestAnimationFrame(animGlint);
+  };
 
   if (bkPrev) bkPrev.onclick = () => openBookAt(curBook - 1);
   if (bkNext) bkNext.onclick = () => openBookAt(curBook + 1);
