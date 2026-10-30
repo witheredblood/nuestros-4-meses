@@ -9,64 +9,69 @@ html,body{max-width:100vw;overflow-x:hidden}
 body{background:linear-gradient(180deg,#080714 0%,#140f2d 32%,#281236 68%,#3b1029 100%) fixed;color:var(--cream);font:400 1rem/1.75 var(--sans);text-shadow:2px 2px 0 rgba(0,0,0,.55);-webkit-font-smoothing:none;-webkit-text-size-adjust:100%}
 h1,h2{font-family:var(--serif);font-weight:400}
 button{font:inherit;color:inherit;cursor:pointer}
-:focus-visible{outline:2px solid var(--rose);outline-offset:4px}
-.kicker{font:italic 500 1.3rem var(--serif);color:var(--rose);margin-bottom:.5rem}
-.btn{background:rgba(243,188,203,.12);border:1px solid var(--rose);border-radius:99px;padding:.8rem 1.8rem;transition:.3s}
-.btn:hover:not(:disabled){background:var(--rose);color:var(--wine);transform:translateY(-2px)}
-.btn:disabled{opacity:.65;cursor:default}
+:focus-visible{outline:2px solid #ffff55;outline-offset:3px}
+.kicker{font:500 1.2rem var(--serif);color:#ffff55;text-shadow:2px 2px 0 #3f3f15;margin-bottom:.5rem}
+
+/* Botones estilo interfaz 3D de Minecraft */
+.btn{background:#5c2038;border:2px solid #000;border-radius:0;padding:.75rem 1.6rem;color:var(--cream);text-shadow:2px 2px 0 #240914;box-shadow:inset -3px -4px 0 #360f1f,inset 3px 3px 0 #9e4266,0 6px 16px rgba(0,0,0,.45);image-rendering:pixelated;transition:transform .15s,background .15s,color .15s}
+.btn:hover:not(:disabled){background:#782a49;color:#ffffa0;border-color:#fff;box-shadow:inset -3px -4px 0 #471429,inset 3px 3px 0 #c45b84,0 8px 20px rgba(0,0,0,.55);transform:translateY(-2px)}
+.btn:active:not(:disabled){transform:translateY(1px);box-shadow:inset 3px 3px 0 #360f1f,inset -2px -2px 0 #9e4266}
+.btn:disabled{background:#2d1a24;color:#9c828d;box-shadow:inset -2px -3px 0 #1a0e14,inset 2px 2px 0 #4a2d3c;cursor:default}
+
 .sec,.screen{min-height:100svh;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:12vh 1.2rem;position:relative;z-index:1}
 p,h1,h2{max-width:100%;overflow-wrap:break-word}
-.screen{position:fixed;inset:0;z-index:20;background:linear-gradient(180deg,rgba(8,7,20,.88),rgba(43,8,19,.92));backdrop-filter:blur(2px);transition:opacity 1.1s,transform 1.1s}
+.screen{position:fixed;inset:0;z-index:20;background:linear-gradient(180deg,rgba(8,7,20,.9),rgba(43,8,19,.94));backdrop-filter:blur(2px);transition:opacity 1.1s,transform 1.1s}
 .screen.gone{opacity:0;transform:scale(1.12);pointer-events:none}
 .screen h1{font-size:clamp(1.6rem,6vw,3rem);line-height:1.3;margin-bottom:1rem;animation:in 1.6s both}
 .screen p:not(.mc-title):not(.mc-pct){margin-bottom:2.2rem;opacity:.85;animation:in 1.6s .6s both}
 .screen .btn{animation:in 1.6s 1.2s both}
 @keyframes in{from{opacity:0;transform:translateY(14px)}}
-h2{font-size:clamp(1.5rem,5vw,2.3rem);line-height:1.25;margin-bottom:.6rem}
-.sub{opacity:.75;max-width:30rem;margin-bottom:2rem}
-@keyframes pop{from{opacity:0;transform:scale(.8) rotate(-4deg)}}
+h2{font-size:clamp(1.5rem,5vw,2.3rem);line-height:1.25;margin-bottom:.6rem;color:#ffff55;text-shadow:2px 2px 0 #3f3f15}
+.sub{opacity:.85;max-width:30rem;margin-bottom:2rem}
+@keyframes pop{from{opacity:0;transform:scale(.85)}}
 
-/* Contador */
-.four{font:400 clamp(7rem,28vw,13rem)/1 var(--serif);background:linear-gradient(180deg,var(--cream),var(--rose) 60%,var(--red));-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;filter:drop-shadow(4px 4px 0 rgba(0,0,0,.5)) drop-shadow(0 0 35px rgba(243,106,140,.35));animation:breathe 5s ease-in-out infinite}
+/* Contador estilo casillas de inventario de Minecraft */
+.four{font:400 clamp(7rem,28vw,13rem)/1 var(--serif);background:linear-gradient(180deg,var(--cream),var(--rose) 60%,var(--red));-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;filter:drop-shadow(5px 5px 0 #000) drop-shadow(0 0 30px rgba(243,106,140,.35));animation:breathe 5s ease-in-out infinite}
 @keyframes breathe{50%{transform:scale(1.04)}}
-.meses{font:400 1.5rem var(--serif);margin:-.2rem 0 1.5rem;letter-spacing:.08em}
+.meses{font:400 1.5rem var(--serif);margin:-.2rem 0 1.5rem;letter-spacing:.08em;color:var(--rose)}
 .big{font:400 clamp(.95rem,3.3vw,1.4rem)/1.6 var(--serif);max-width:min(32rem,100%);margin-bottom:2rem}
-#count{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin-bottom:2rem;width:min(26rem,100%)}
+#count{display:grid;grid-template-columns:repeat(4,1fr);gap:.65rem;margin-bottom:2rem;width:min(27rem,100%)}
 #count.warn{display:block;color:var(--rose);font-size:.82rem;max-width:100%}
-#count div{border:1px solid rgba(243,188,203,.3);border-radius:12px;padding:.7rem .2rem;background:rgba(0,0,0,.15)}
-#count b{display:block;font:500 1.9rem/1.2 var(--serif)}
+#count div{border:3px solid #000;border-radius:0;padding:.75rem .2rem;background:rgba(20,10,24,.88);box-shadow:inset 3px 3px 0 #120716,inset -3px -3px 0 #6e304b,0 6px 16px rgba(0,0,0,.5)}
+#count b{display:block;font:500 1.85rem/1.2 var(--serif);color:#ffff55;text-shadow:2px 2px 0 #3f3f15}
 #count small{font-size:.8rem;color:var(--rose)}
-.note{max-width:min(28rem,100%);font-size:.88rem;opacity:.9;border-top:1px solid rgba(243,188,203,.3);padding-top:1.5rem}
+.note{max-width:min(29rem,100%);font-size:.88rem;opacity:.95;background:rgba(16,8,20,.78);border:2px solid #000;box-shadow:inset 0 -2px 0 #4a2236,inset 2px 2px 0 #8a4462;padding:.9rem 1.2rem}
 
-/* Carta */
-.env{position:relative;width:min(300px,80vw);height:min(200px,53vw);border:0;border-radius:6px;background:linear-gradient(160deg,#a3213f,var(--red));box-shadow:0 18px 40px rgba(0,0,0,.5);transition:opacity .7s,transform .7s,height .8s,margin .8s}
-.env:hover:not(.open){transform:translateY(-5px) rotate(-1deg)}
-.flap{position:absolute;inset:0 0 auto 0;height:58%;background:#741430;clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:top;transition:transform .8s}
+/* Carta y pergamino estilo Minecraft */
+.env{position:relative;width:min(300px,82vw);height:min(196px,52vw);border:3px solid #000;border-radius:0;background:#8e1d3c;box-shadow:inset -4px -4px 0 #4d0d20,inset 4px 4px 0 #c9466a,0 18px 40px rgba(0,0,0,.6);image-rendering:pixelated;transition:opacity .7s,transform .7s,height .8s,margin .8s}
+.env:hover:not(.open){transform:translateY(-5px);border-color:#ffffa0}
+.flap{position:absolute;inset:0 0 auto 0;height:56%;background:#6e132c;border-bottom:3px solid #2b0610;clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:top;transition:transform .8s}
 .open .flap{transform:rotateX(180deg)}
-.seal{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:44px;height:44px;border-radius:50%;background:var(--cream);color:var(--red);display:grid;place-items:center;font-size:1.3rem;box-shadow:0 2px 8px rgba(0,0,0,.4);transition:opacity .4s}
+.seal{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);width:46px;height:46px;border:3px solid #000;border-radius:0;background:#fbf0e3;color:#d91c38;display:grid;place-items:center;font-size:1.4rem;text-shadow:2px 2px 0 rgba(0,0,0,.25);box-shadow:inset -3px -3px 0 #c9b49b,inset 3px 3px 0 #fff,0 4px 10px rgba(0,0,0,.5);transition:opacity .4s}
 .open .seal{opacity:0}
-.env.gone{opacity:0;transform:scale(.85);height:0;margin:0;pointer-events:none}
-.paper{background:var(--cream);color:#3a1420;text-shadow:none;max-width:34rem;width:100%;padding:0 1.8rem;text-align:left;box-shadow:0 20px 50px rgba(0,0,0,.5);border-radius:4px;font:400 1rem/1.8 var(--serif);max-height:0;opacity:0;overflow:hidden;transition:max-height 1.8s,opacity 1.2s,padding 1s}
-.paper.show{max-height:2500px;opacity:1;padding-block:2.2rem}
+.env.gone{opacity:0;transform:scale(.85);height:0;margin:0;border:0;pointer-events:none}
+.paper{background:#f5e8d0;color:#26130c;text-shadow:none;max-width:34rem;width:100%;padding:0 1.6rem;text-align:left;border:0;border-radius:0;font:400 .98rem/1.8 var(--serif);max-height:0;opacity:0;overflow:hidden;transition:max-height 1.8s,opacity 1.2s,padding 1s}
+.paper.show{max-height:2500px;opacity:1;padding-block:2rem;border:4px solid #291509;box-shadow:inset 0 0 0 3px #c8ad86,inset -4px -4px 0 #ab8c63,0 20px 50px rgba(0,0,0,.65)}
 .paper p{margin-bottom:1.25rem}
 .paper p:last-child{margin-bottom:0}
 
-/* Sorpresas y libros escritos */
-.box{min-height:5.5rem;max-width:30rem;font:400 1.15rem/1.55 var(--serif);margin:1rem 0;display:grid;place-items:center}
-.msgtitle{margin-top:2.5rem;margin-bottom:1.2rem;font-size:1.15rem;color:var(--rose)}
-.msgs{display:grid;grid-template-columns:repeat(4,minmax(68px,1fr));gap:1rem .85rem;justify-content:center;width:min(26rem,100%);margin-bottom:2.5rem}
-.msg{padding:.65rem .4rem;border-radius:12px;border:2px solid rgba(243,188,203,.28);background:rgba(16,10,22,.55);box-shadow:inset 0 -2px 0 rgba(0,0,0,.45),0 6px 16px rgba(0,0,0,.35);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.4rem;transition:transform .25s,border-color .25s,background .25s}
-.msg:hover{border-color:var(--rose);background:rgba(243,188,203,.14);transform:translateY(-4px)}
-.msg.read{border-color:rgba(243,188,203,.65);background:rgba(142,29,60,.28)}
-.mc-book-ico{position:relative;width:54px;height:54px;display:block;image-rendering:pixelated;filter:drop-shadow(0 0 8px rgba(185,80,255,.45)) drop-shadow(0 4px 8px rgba(0,0,0,.55))}
+/* Sorpresas, casillas de inventario y libros escritos */
+.box{min-height:4.8rem;width:min(30rem,94vw);font:400 1.05rem/1.6 var(--serif);margin:1rem 0;padding:.85rem 1.2rem;display:grid;place-items:center;background:rgba(16,6,20,.86);border:3px solid #000;box-shadow:inset 0 0 0 2px #522040,0 8px 22px rgba(0,0,0,.5)}
+.box:empty{background:none;border-color:transparent;box-shadow:none}
+.msgtitle{margin-top:2.5rem;margin-bottom:1.2rem;font-size:1.15rem;color:#ffff55;text-shadow:2px 2px 0 #3f3f15}
+.msgs{display:grid;grid-template-columns:repeat(4,minmax(68px,1fr));gap:.85rem;justify-content:center;width:min(25rem,100%);margin-bottom:2.5rem;background:rgba(18,10,22,.82);border:3px solid #000;box-shadow:inset -3px -3px 0 #3d1d30,inset 3px 3px 0 #7a3b5e,0 12px 30px rgba(0,0,0,.55);padding:.9rem}
+.msg{padding:.6rem .35rem;border-radius:0;border:3px solid #000;background:#21111c;box-shadow:inset 3px 3px 0 #11080e,inset -3px -3px 0 #592b46;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.35rem;transition:transform .18s,border-color .18s,background .18s}
+.msg:hover{border-color:#ffffa0;background:#361a2d;transform:translateY(-3px)}
+.msg.read{border-color:var(--rose);background:#42182d;box-shadow:inset 3px 3px 0 #240b18,inset -3px -3px 0 #8c3b61}
+.mc-book-ico{position:relative;width:52px;height:52px;display:block;image-rendering:pixelated;filter:drop-shadow(0 0 8px rgba(185,80,255,.45)) drop-shadow(0 4px 8px rgba(0,0,0,.55))}
 .mc-book-cv{width:100%;height:100%;display:block;image-rendering:pixelated}
-.msg-num{font-size:.95rem;color:var(--cream);display:inline-flex;align-items:center;gap:4px}
-.msg-hrt{font-size:.8rem;color:var(--rose);opacity:0;transition:opacity .25s}
+.msg-num{font-size:.92rem;color:var(--cream);display:inline-flex;align-items:center;gap:4px}
+.msg-hrt{font-size:.8rem;color:#ff5555;opacity:0;transition:opacity .25s}
 .msg.read .msg-hrt{opacity:1}
 
 .book-dlg{border:0;background:none;margin:auto;padding:0;width:min(94vw,350px);overflow:visible}
-.book-dlg::backdrop{background:rgba(14,4,9,.82);backdrop-filter:blur(6px)}
-.book-dlg[open]{animation:pop .4s cubic-bezier(.2,1.25,.35,1)}
+.book-dlg::backdrop{background:rgba(14,4,9,.84);backdrop-filter:blur(6px)}
+.book-dlg[open]{animation:pop .35s cubic-bezier(.2,1.25,.35,1)}
 .mc-book-wrap{display:flex;flex-direction:column;align-items:center;gap:1rem}
 .mc-book-page{position:relative;width:min(315px,88vw);aspect-ratio:146/180;background:url("mc/book_page.png") center/100% 100% no-repeat;image-rendering:pixelated;filter:drop-shadow(0 22px 45px rgba(0,0,0,.75));padding:26px 26px 34px 36px;display:flex;flex-direction:column;align-items:center;color:#26150d;text-shadow:none}
 .mc-book-meta{align-self:flex-end;font-size:.74rem;color:#7a5c43;margin-bottom:.35rem}
@@ -76,21 +81,22 @@ h2{font-size:clamp(1.5rem,5vw,2.3rem);line-height:1.25;margin-bottom:.6rem}
 .mc-page-btn{background:none;border:0;color:#6e4f36;font-size:1.1rem;padding:.2rem .5rem;cursor:pointer;text-shadow:none;transition:color .2s,transform .2s}
 .mc-page-btn:hover:not(:disabled){color:#8e1d3c;transform:scale(1.18)}
 .mc-page-btn:disabled{opacity:.25;cursor:default}
-.bk-close{background:rgba(28,10,20,.92);color:var(--cream);text-shadow:2px 2px 0 rgba(0,0,0,.55)}
-.heart{width:110px;height:110px;border:0;background:none;color:var(--red);filter:drop-shadow(0 0 18px rgba(243,106,140,.5));transition:color .3s}
-.heart svg{width:100%;height:100%;fill:currentColor}
-.heart:hover{color:#b3264a}
-.heart.beat{animation:beat .5s}
-@keyframes beat{30%{transform:scale(1.25)}60%{transform:scale(.95)}}
-.hmsg{min-height:3rem;margin-bottom:0}
-.fx{position:fixed;pointer-events:none;z-index:30;color:var(--rose);animation:rise 1.2s ease-out forwards}
+
+/* Corazón pixel-art de Minecraft */
+.heart{width:96px;height:96px;border:0;background:none;padding:0;image-rendering:pixelated;filter:drop-shadow(0 6px 18px rgba(255,36,36,.45));transition:transform .2s}
+.heart svg{width:100%;height:100%;display:block;image-rendering:pixelated}
+.heart:hover{transform:scale(1.08)}
+.heart.beat{animation:beat .45s}
+@keyframes beat{30%{transform:scale(1.26)}60%{transform:scale(.94)}}
+.hmsg{min-height:3.4rem;margin-bottom:0}
+.fx{position:fixed;pointer-events:none;z-index:30;color:#ff3b3b;text-shadow:2px 2px 0 #4a0808;animation:rise 1.2s ease-out forwards}
 @keyframes rise{to{transform:translate(var(--dx),-120px) scale(.4);opacity:0}}
 
 /* Cierre y perrita Luna */
 #final.show{animation:in 2s both}
-#final h2{font-size:clamp(1.6rem,5.5vw,2.8rem);line-height:1.25;margin-bottom:1.2rem}
-.hrt{font-size:3.2rem;color:#c42a52;animation:breathe 3s ease-in-out infinite;margin-bottom:1rem}
-.sign{font:400 1.25rem var(--serif);color:var(--rose);opacity:0}
+#final h2{font-size:clamp(1.6rem,5.5vw,2.6rem);line-height:1.25;margin-bottom:1.2rem}
+.hrt{animation:breathe 3s ease-in-out infinite;margin-bottom:1.2rem;filter:drop-shadow(0 6px 16px rgba(255,36,36,.45))}
+.sign{font:400 1.25rem var(--serif);color:#ffff55;text-shadow:2px 2px 0 #3f3f15;opacity:0}
 .show .sign{animation:in 2.5s 2s both}
 
 .luna-sec{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:3rem 1.2rem 5.5rem;position:relative;z-index:1}
@@ -101,7 +107,7 @@ h2{font-size:clamp(1.5rem,5vw,2.3rem);line-height:1.25;margin-bottom:.6rem}
 .mc-nametag{display:inline-flex;align-items:center;gap:6px;background:rgba(0,0,0,.58);border:2px solid rgba(0,0,0,.78);padding:3px 11px;color:#fff;font-size:.9rem;text-shadow:2px 2px 0 #222;box-shadow:0 4px 12px rgba(0,0,0,.45)}
 .nt-heart{color:#ff5555;text-shadow:2px 2px 0 #4a1111}
 .luna-img{width:min(165px,44vw);height:auto;display:block;filter:drop-shadow(0 14px 24px rgba(0,0,0,.6));animation:breathe 4.5s ease-in-out infinite}
-.luna-msg{margin-top:1.1rem;max-width:min(28rem,92vw);font-size:clamp(.92rem,3vw,1.08rem);line-height:1.65;color:var(--rose);background:rgba(16,12,24,.68);border:2px solid #000;box-shadow:inset 0 -2px 0 #555,inset 2px 2px 0 #aaa,0 8px 20px rgba(0,0,0,.45);padding:.85rem 1.2rem}
+.luna-msg{margin-top:1.1rem;max-width:min(28rem,92vw);font-size:clamp(.92rem,3vw,1.08rem);line-height:1.65;color:var(--rose);background:rgba(16,12,24,.82);border:3px solid #000;box-shadow:inset 0 -3px 0 #4a2236,inset 3px 3px 0 #9e4266,0 8px 20px rgba(0,0,0,.5);padding:.85rem 1.2rem}
 
 /* Fondo y avisos estilo Minecraft */
 #mc-sky{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
@@ -117,9 +123,9 @@ h2{font-size:clamp(1.5rem,5vw,2.3rem);line-height:1.25;margin-bottom:.6rem}
 .p{position:absolute;bottom:-3rem;color:var(--rose);opacity:0;animation:float linear infinite}
 .p.flw{width:auto;object-fit:contain;image-rendering:pixelated;filter:drop-shadow(2px 2px 0 rgba(0,0,0,.4))}
 @keyframes float{10%{opacity:.55}85%{opacity:.3}to{transform:translateY(-112vh) rotate(40deg);opacity:0}}
-#prog{position:fixed;bottom:calc(2.3rem + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);z-index:5;font-size:.85rem;color:var(--rose);background:rgba(43,8,19,.85);padding:.4rem 1rem;border-radius:99px;white-space:nowrap;border:1px solid rgba(243,188,203,.25)}
-#prog .btn{padding:.5rem 1.4rem;background:var(--wine2)}
-#music{position:fixed;top:calc(1rem + env(safe-area-inset-top,0px));right:calc(1rem + env(safe-area-inset-right,0px));z-index:6;width:2.8rem;height:2.8rem;padding:0;border-radius:50%;background:rgba(43,8,19,.85)}
+#prog{position:fixed;bottom:calc(2.3rem + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);z-index:5;font-size:.85rem;color:#ffff55;text-shadow:2px 2px 0 #3f3f15;background:rgba(18,10,22,.92);padding:.45rem 1.1rem;border-radius:0;white-space:nowrap;border:3px solid #000;box-shadow:inset -2px -2px 0 #4a2236,inset 2px 2px 0 #8a4462,0 6px 18px rgba(0,0,0,.55)}
+#prog .btn{padding:.45rem 1.2rem}
+#music{position:fixed;top:calc(1rem + env(safe-area-inset-top,0px));right:calc(1rem + env(safe-area-inset-right,0px));z-index:6;width:2.8rem;height:2.8rem;padding:0;border-radius:0}
 #music[aria-pressed=true]{background:var(--rose);color:var(--wine)}
 .mc-toast{position:fixed;top:calc(.9rem + env(safe-area-inset-top,0px));left:50%;transform:translate(-50%,-150%);z-index:35;pointer-events:none;transition:transform .5s cubic-bezier(.2,1.15,.3,1)}
 .mc-toast.show{transform:translate(-50%,0)}

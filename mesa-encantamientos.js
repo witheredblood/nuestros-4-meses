@@ -28,14 +28,14 @@ css.textContent = `
 .mz-dlg::backdrop{background:rgba(20,3,9,.82);backdrop-filter:blur(6px)}
 .mz-dlg[open]{animation:mz-pop .45s cubic-bezier(.2,1.3,.4,1)}
 @keyframes mz-pop{from{opacity:0;transform:scale(.85) translateY(12px)}}
-.mz-gui{background:#1c0a14;border:3px solid var(--red,#8e1d3c);box-shadow:0 0 0 3px #0e0409,0 25px 60px rgba(0,0,0,.6);padding:1.4rem;text-align:left}
-.mz-gui h3{font:400 1.35rem var(--serif,monospace);color:var(--rose,#f3bccb);margin-bottom:.4rem}
-.mz-it{display:block;width:100%;margin-top:.6rem;padding:.8rem 1rem;text-align:left;background:#2a1320;border:2px solid #4a2236;color:inherit;font:inherit;cursor:pointer;transition:.25s}
-.mz-it:hover,.mz-it[aria-expanded=true]{border-color:var(--rose,#f3bccb);background:#3a1a2c}
+.mz-gui{background:#180b14;border:3px solid #000;box-shadow:inset -3px -3px 0 #3d182c,inset 3px 3px 0 #8e3b63,0 25px 60px rgba(0,0,0,.7);padding:1.4rem;text-align:left}
+.mz-gui h3{font:400 1.35rem var(--serif,monospace);color:#ffff55;text-shadow:2px 2px 0 #3f3f15;margin-bottom:.4rem}
+.mz-it{display:block;width:100%;margin-top:.6rem;padding:.8rem 1rem;text-align:left;background:#2a1320;border:3px solid #000;box-shadow:inset 2px 2px 0 #160911,inset -2px -2px 0 #5c2842;color:inherit;font:inherit;cursor:pointer;transition:.2s}
+.mz-it:hover,.mz-it[aria-expanded=true]{border-color:#ffffa0;background:#3d1b2f}
 .mz-tx{display:block;margin-top:.5rem;font:400 .95rem/1.55 var(--serif,monospace);color:var(--rose,#f3bccb)}
 .mz-tx[hidden]{display:none}
-.mz-x{margin-top:1.2rem;padding:.6rem 1.6rem;border:1px solid var(--rose,#f3bccb);border-radius:99px;background:none;color:inherit;font:inherit;cursor:pointer}
-.mz-x:hover{background:var(--rose,#f3bccb);color:#2b0813}`;
+.mz-x{margin-top:1.2rem;padding:.65rem 1.5rem;border:2px solid #000;border-radius:0;background:#5c2038;box-shadow:inset -3px -4px 0 #360f1f,inset 3px 3px 0 #9e4266;color:inherit;font:inherit;cursor:pointer}
+.mz-x:hover{background:#782a49;color:#ffffa0;border-color:#fff}`;
 document.head.append(css);
 
 let sec = document.getElementById("mesa-encantamientos");

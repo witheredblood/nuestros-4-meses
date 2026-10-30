@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.cdnfonts.com/css/minecraft-3" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=27">
+<link rel="stylesheet" href="style.css?v=28">
 </head>
 <body>
 <div id="mc-sky" aria-hidden="true">
@@ -75,14 +75,26 @@
     <button id="rbtn" class="btn" data-t="reasonBtn"></button>
     <p class="sub msgtitle" data-t="msgHint"></p>
     <div class="msgs" id="msgs"></div>
-    <button id="heart" class="heart" aria-label="Corazón: tócalo">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+    <button id="heart" class="heart" aria-label="Corazón de Minecraft: tócalo">
+      <svg viewBox="0 0 9 9" aria-hidden="true" shape-rendering="crispEdges">
+        <path fill="#000" d="M1,0h2v1h1v1h1v-1h1v-1h2v1h1v3h-1v1h-1v1h-1v1h-1v1h-1v-1h-1v-1h-1v-1h-1v-3h1z"/>
+        <path fill="#b81212" d="M1,1h2v1h1v1h1v-1h1v-1h2v3h-1v1h-1v1h-1v1h-1v-1h-1v-1h-1v-1h-1z"/>
+        <path fill="#ff2424" d="M1,1h2v1h1v1h1v-1h1v-1h1v2h-1v1h-1v1h-1v1h-1v-1h-1v-1h-1z"/>
+        <rect fill="#fff" x="1" y="1" width="1" height="1"/>
+      </svg>
     </button>
     <p class="box hmsg" id="hmsg" aria-live="polite"></p>
   </section>
 
   <section id="final" class="sec" hidden>
-    <div class="hrt" aria-hidden="true">♥</div>
+    <div class="hrt" aria-hidden="true">
+      <svg viewBox="0 0 9 9" width="54" height="54" shape-rendering="crispEdges">
+        <path fill="#000" d="M1,0h2v1h1v1h1v-1h1v-1h2v1h1v3h-1v1h-1v1h-1v1h-1v1h-1v-1h-1v-1h-1v-1h-1v-3h1z"/>
+        <path fill="#b81212" d="M1,1h2v1h1v1h1v-1h1v-1h2v3h-1v1h-1v1h-1v1h-1v-1h-1v-1h-1v-1h-1z"/>
+        <path fill="#ff2424" d="M1,1h2v1h1v1h1v-1h1v-1h1v2h-1v1h-1v1h-1v1h-1v-1h-1v-1h-1z"/>
+        <rect fill="#fff" x="1" y="1" width="1" height="1"/>
+      </svg>
+    </div>
     <h2 data-t="finalTitle"></h2>
     <p class="big" data-t="finalText"></p>
     <p class="sign" data-t="finalSign"></p>
@@ -114,9 +126,9 @@
   </div>
 </dialog>
 
-<script src="config.js?v=27"></script>
-<script src="script.js?v=27"></script>
-<script src="mesa-encantamientos.js?v=27"></script>
-<script src="enderman.js?v=27"></script>
+<script src="config.js?v=28"></script>
+<script src="script.js?v=28"></script>
+<script src="mesa-encantamientos.js?v=28"></script>
+<script src="enderman.js?v=28"></script>
 </body>
 </html>
