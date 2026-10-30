@@ -9,7 +9,7 @@ hit.setAttribute("aria-label", "Enderman: tócalo y se teletransporta");
 const treeHit = document.createElement("button");
 treeHit.id = "tree-hit"; treeHit.hidden = true;
 treeHit.setAttribute("aria-label", "Madera de cerezo: toca 5 veces para talar el árbol");
-treeHit.style.cssText = "position:fixed;z-index:4;border:0;padding:0;background:none;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent";
+treeHit.style.cssText = "position:fixed;left:0;bottom:0;z-index:6;border:0;padding:0;background:none;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent";
 const probe = document.createElement("div");
 probe.style.cssText = "position:fixed;top:0;left:0;width:0;height:0;visibility:hidden;pointer-events:none;" +
   "padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)";
@@ -722,7 +722,7 @@ treeHit.addEventListener("click", (ev) => {
   if (!cherryTree || (cherryTree.state !== "growing" && cherryTree.state !== "grown")) return;
   const mid = cherryTree.slot;
   const B = 16 * s;
-  const rectC = c.getBoundingClientRect();
+  const rectC = cv.getBoundingClientRect();
   const clickX = ev.clientX - rectC.left;
   const clickY = ev.clientY - rectC.top;
 
