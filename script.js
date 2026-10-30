@@ -4,7 +4,7 @@
   document.title = C.text.welcomeTitle;
   const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  /* Cielo nocturno de Minecraft: estrellas cuadradas y nubes de bloques */
+  /* Cielo nocturno: estrellas y nubes */
   const starsBox = $("#mc-stars"), cloudsBox = $("#mc-clouds");
   if (starsBox) {
     for (let i = 0; i < 48; i++) {
@@ -26,7 +26,7 @@
     }
   }
 
-  /* Corazones y flores de Minecraft flotando suaves en el fondo */
+  /* Flores y corazones flotantes */
   const FLOWERS = [
     "assets/flores/BlockSprite_pink-petals.png",
     "assets/flores/Invicon_Allium.png",
@@ -46,7 +46,7 @@
     "assets/flores/Invicon_White_Tulip.webp"
   ];
   for (let i = 0; i < 24; i++) {
-    const isFlower = i % 3 !== 0; // 16 flores de Minecraft + 8 corazones/destellos
+    const isFlower = i % 3 !== 0;
     const p = document.createElement(isFlower ? "img" : "span");
     p.className = isFlower ? "p flw" : "p";
     if (isFlower) {
@@ -61,7 +61,7 @@
     $("#petals").append(p);
   }
 
-  /* Progreso: mesa de encantamientos + carta + sorpresa desbloquean el cierre */
+  /* Progreso de secciones */
   const done = new Set(), prog = $("#prog");
   prog.textContent = "Descubierto 0 de 3";
   function mark(k) {
@@ -78,7 +78,7 @@
   }
   document.addEventListener("mesa-encantamientos:abierta", () => mark("mesa"));
 
-  /* Bienvenida -> Pantalla de carga de mundo de Minecraft -> Regalo */
+  /* Pantalla de carga de mundo */
   const DIRT_P = {0:"#b88860",1:"#987048",2:"#785838",3:"#584028",4:"#888888",5:"#707070",6:"#705840"};
   const DIRT_R = ["0112201122322020","2132214320120133","0223022202223302","1502132011212012","1210312213252132","2311213332232220","0222422002002121","2200112213112211","1221212321122232","2132233222220021","2120020130031142","1221102151123123","2312110222222200","2122621123032011","1230232300212211","1201124211221123"];
   function setDirtBg(el) {
@@ -87,11 +87,11 @@
     for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) {
       g.fillStyle = DIRT_P[DIRT_R[y][x]]; g.fillRect(x, y, 1, 1);
     }
-    g.fillStyle = "rgba(0,0,0,.62)"; g.fillRect(0, 0, 16, 16); // oscurecido clásico de fondo de menú
+    g.fillStyle = "rgba(0,0,0,.62)"; g.fillRect(0, 0, 16, 16);
     el.style.backgroundImage = `url(${c.toDataURL()})`;
   }
 
-  /* Audio y cartel de "¡Logro conseguido!" + canción "C418 - Blind Spots" */
+  /* Logro y música de fondo */
   let achCtx = null, achBuf = null, achAudio = null, bgSong = null;
   function prepAchievementAudio() {
     try {
@@ -114,7 +114,6 @@
         bgSong.loop = true;
         bgSong.volume = 0.45;
         bgSong.preload = "auto";
-        // Desbloqueo silencioso en iOS dentro del toque de usuario
         bgSong.muted = true;
         const p = bgSong.play();
         if (p && p.then) p.then(() => { bgSong.pause(); bgSong.currentTime = 0; bgSong.muted = false; }).catch(() => { bgSong.muted = false; });
@@ -150,7 +149,6 @@
         setTimeout(() => { toast.hidden = true; }, 600);
       }, 5500);
     }
-    // Cuando termina de sonar el logro (~5.2s), arranca C418 - Blind Spots y sale el cartel por la derecha
     setTimeout(startMusicAfterAchievement, 5200);
     try {
       if (achCtx && achBuf) {
@@ -199,7 +197,6 @@
       fEl.style.width = pct + "%";
       for (const [p, txt] of steps) if (pct >= p) tEl.textContent = txt;
 
-      // Cuadrícula central de chunks como cuando creas un mundo en Minecraft
       g.fillStyle = "#141414"; g.fillRect(0, 0, 110, 110);
       const count = Math.floor(k * cells.length);
       for (let i = 0; i < count; i++) {
@@ -245,7 +242,7 @@
     setTimeout(() => { b.classList.add("gone"); $("#paper").classList.add("show"); mark("letter"); }, calm ? 0 : 900);
   };
 
-  /* Razones (al azar, sin repetir) */
+  /* Razones */
   const rest = [...C.reasons], rbtn = $("#rbtn");
   rbtn.onclick = () => {
     const r = rest.splice(Math.floor(Math.random() * rest.length), 1)[0];
@@ -253,7 +250,7 @@
     if (!rest.length) { rbtn.disabled = true; rbtn.textContent = C.text.reasonsDone; }
   };
 
-  /* Ocho estrofas en libros escritos de Minecraft (con brillo encantado y lectura en mc/book_page.png) */
+  /* Ocho estrofas (libros encantados) */
   const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII"];
   const bookDlg = $("#book-dlg"), bkMeta = $("#bk-meta"), bkNum = $("#bk-num"), bkTxt = $("#bk-txt");
   const bkPrev = $("#bk-prev"), bkNext = $("#bk-next"), bkClose = $("#bk-close");
@@ -287,7 +284,6 @@
     $("#msgs").append(b);
   });
 
-  /* Renderizador pixel-art 16x16 directo (sin getImageData para que Brave Shields nunca lo bloquee) */
   const BOOK_PX = [[8,1,57,16,3],[9,1,57,16,3],[10,1,57,16,3],[6,2,57,16,3],[7,2,57,16,3],[8,2,93,34,16],[9,2,108,44,25],[10,2,117,50,30],[11,2,77,24,7],[4,3,57,16,3],[5,3,57,16,3],[6,3,93,34,16],[7,3,108,44,25],[8,3,117,50,30],[9,3,117,50,30],[10,3,108,44,25],[11,3,117,50,30],[12,3,77,24,7],[2,4,57,16,3],[3,4,57,16,3],[4,4,93,34,16],[5,4,117,50,30],[6,4,117,50,30],[7,4,117,50,30],[8,4,57,16,3],[9,4,57,16,3],[10,4,117,50,30],[11,4,108,44,25],[12,4,117,50,30],[13,4,77,24,7],[0,5,57,16,3],[1,5,57,16,3],[2,5,93,34,16],[3,5,117,50,30],[4,5,117,50,30],[5,5,57,16,3],[6,5,117,50,30],[7,5,117,50,30],[8,5,117,50,30],[9,5,57,16,3],[10,5,57,16,3],[11,5,117,50,30],[12,5,108,44,25],[13,5,117,50,30],[14,5,77,24,7],[0,6,77,24,7],[1,6,93,34,16],[2,6,117,50,30],[3,6,108,44,25],[4,6,117,50,30],[5,6,117,50,30],[6,6,57,16,3],[7,6,117,50,30],[8,6,117,50,30],[9,6,117,50,30],[10,6,57,16,3],[11,6,57,16,3],[12,6,117,50,30],[13,6,108,44,25],[14,6,57,16,3],[15,6,77,24,7],[0,7,77,24,7],[1,7,57,16,3],[2,7,93,34,16],[3,7,117,50,30],[4,7,108,44,25],[5,7,117,50,30],[6,7,117,50,30],[7,7,57,16,3],[8,7,117,50,30],[9,7,117,50,30],[10,7,117,50,30],[11,7,108,44,25],[12,7,57,16,3],[13,7,57,16,3],[14,7,91,91,91],[0,8,77,24,7],[1,8,57,16,3],[2,8,183,183,183],[3,8,93,34,16],[4,8,117,50,30],[5,8,108,44,25],[6,8,117,50,30],[7,8,117,50,30],[8,8,117,50,30],[9,8,93,34,16],[10,8,57,16,3],[11,8,57,16,3],[12,8,153,153,153],[13,8,183,183,183],[14,8,153,153,153],[0,9,22,16,5],[1,9,93,34,16],[2,9,214,214,214],[3,9,183,183,183],[4,9,93,34,16],[5,9,117,50,30],[6,9,108,44,25],[7,9,93,34,16],[8,9,57,16,3],[9,9,57,16,3],[10,9,153,153,153],[11,9,183,183,183],[12,9,183,183,183],[13,9,153,153,153],[14,9,57,16,3],[15,9,77,24,7],[1,10,22,16,5],[2,10,93,34,16],[3,10,214,214,214],[4,10,183,183,183],[5,10,93,34,16],[6,10,57,16,3],[7,10,57,16,3],[8,10,153,153,153],[9,10,183,183,183],[10,10,183,183,183],[11,10,153,153,153],[12,10,57,16,3],[13,10,57,16,3],[14,10,22,16,5],[15,10,22,16,5],[2,11,22,16,5],[3,11,93,34,16],[4,11,214,214,214],[5,11,183,183,183],[6,11,153,153,153],[7,11,183,183,183],[8,11,183,183,183],[9,11,153,153,153],[10,11,57,16,3],[11,11,77,24,7],[12,11,22,16,5],[13,11,22,16,5],[3,12,22,16,5],[4,12,93,34,16],[5,12,214,214,214],[6,12,183,183,183],[7,12,153,153,153],[8,12,57,16,3],[9,12,77,24,7],[10,12,22,16,5],[11,12,22,16,5],[4,13,22,16,3],[5,13,93,34,16],[6,13,57,16,3],[7,13,77,24,7],[8,13,22,16,5],[9,13,22,16,5],[5,14,22,16,5],[6,14,22,16,5],[7,14,22,16,5]];
   const bookCvs = [...document.querySelectorAll(".mc-book-cv")].map(c => {
     const x = c.getContext("2d"); x.imageSmoothingEnabled = false; return x;
@@ -338,7 +334,7 @@
     }
   };
 
-  /* Perrita Luna al final: al tocarla salta feliz y suelta corazoncitos */
+  /* Perrita Luna */
   const lunaBtn = $("#luna-pet");
   if (lunaBtn) {
     lunaBtn.onclick = () => {
@@ -352,7 +348,7 @@
     };
   }
 
-  /* Música opcional: solo suena si ella la activa */
+  /* Botón de música opcional */
   if (C.music) {
     const a = new Audio(C.music), m = document.createElement("button");
     a.loop = true; m.id = "music"; m.className = "btn"; m.textContent = "♪";

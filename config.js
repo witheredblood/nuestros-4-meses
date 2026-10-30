@@ -1,17 +1,11 @@
-/* ============================================================
-   TODO LO PERSONAL VIVE AQUÍ. Edita este archivo y recarga la página.
-   (Los colores están al inicio de style.css, en :root)
-   ============================================================ */
 window.CONFIG = {
-
-  // 📅 FECHA DE NOVIAZGO — 10 de julio de 2026
+  // Fecha de noviazgo (AAAA-MM-DD)
   startDate: "2026-07-10",
 
-  // 🎵 Música opcional: pon el archivo en esta carpeta, por ejemplo "cancion.mp3".
-  // Si lo dejas vacío no aparece ningún botón. Nunca suena sola: ella la activa.
+  // Música manual opcional (vacío = desactivado)
   music: "",
 
-  // 💌 LA CARTA — cada bloque es una estrofa de la carta.
+  // Carta (cada elemento es una estrofa)
   letter: [
     "Eres hermosa, perdona la franqueza,<br>pero es lo primero que viene a mi mente,<br>al contemplar de cerca tu belleza<br>cada vez que la vida te pone enfrente.",
     "Hoy cumplimos cuatro meses de historia<br>y sigo pensando que no tengo remedio;<br>tu amor se ha quedado grabado en mi memoria,<br>alejando del mundo cualquier intermedio.",
@@ -21,7 +15,7 @@ window.CONFIG = {
     "Estoy enamorado y no lo digo a la ligera,<br>estos cuatro meses son solo el inicio;<br>no sé si alguien más con esta fuerza te quiera,<br>pero por tu amor, la vida entera sacrificio."
   ],
 
-  // 💗 RAZONES (el botón las muestra al azar sin repetir).
+  // Razones (se muestran al azar sin repetir)
   reasons: [
     "Por la paz tan bonita que siento cada vez que estoy contigo.",
     "Por tu risa, que tiene el poder de arreglarme hasta el día más pesado.",
@@ -33,7 +27,7 @@ window.CONFIG = {
     "Porque a tu lado me siento en casa, tranquilo y completamente feliz."
   ],
 
-  // ✉️ Ocho estrofas que aparecen por separado al tocarlas.
+  // Ocho estrofas (libros I a VIII)
   messages: [
     {
       num: "I",
@@ -69,7 +63,7 @@ window.CONFIG = {
     }
   ],
 
-  // El corazón dice una de estas frases en cada toque (la última se repite).
+  // Frases del corazón
   heartLines: [
     "Te quiero.",
     "Otra vez: te quiero.",
@@ -78,7 +72,7 @@ window.CONFIG = {
     "Felices 4 meses de novios, mi niña bonita ♥"
   ],
 
-  // Textos de la página
+  // Textos de la interfaz
   text: {
     welcomeTitle: "Para mi niña bonita",
     welcomeText: "Hice algo especial para ti.",
@@ -103,7 +97,7 @@ window.CONFIG = {
   }
 };
 
-// ✨ MESA DE ENCANTAMIENTOS (los 3 encantamientos que se revelan al tocar la mesa)
+// Mesa de encantamientos
 window.ENCHANT_CFG = {
   title: "Mesa de encantamientos",
   hint: "Toca el libro para abrirlo.",

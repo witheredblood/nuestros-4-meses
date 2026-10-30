@@ -1,6 +1,3 @@
-/* mesa-encantamientos.js — mesa de encantamientos isométrica rodeada de librerías con TUS texturas de Minecraft.
-   El libro 3D permanece cerrado y girando horizontalmente sobre la mesa como en Minecraft;
-   al tocarlo gira hacia el frente, se inclina, se abre en 3D pasando páginas y abre el apartado. */
 (() => {
 const CFG = Object.assign({
   title: "Mesa de encantamientos",
@@ -41,7 +38,6 @@ css.textContent = `
 .mz-x:hover{background:var(--rose,#f3bccb);color:#2b0813}`;
 document.head.append(css);
 
-/* DOM */
 let sec = document.getElementById("mesa-encantamientos");
 if (!sec) {
   sec = document.createElement("section"); sec.id = "mesa-encantamientos";
@@ -80,7 +76,7 @@ const load = ([k, n]) => new Promise(r => {
 });
 const tex = k => { if (IMG[k]) return IMG[k]; const c = mk(64, 32); c.getContext("2d").fillStyle = FALL[k]; c.getContext("2d").fillRect(0, 0, 64, 32); return c; };
 
-/* Escena estática isométrica: esquina de librerías (4x3 de cada lado) + mesa en (2,2,0) */
+/* Escena isométrica: librerías (4x3) y mesa en (2,2,0) */
 const bg = mk(W, H), SHELF_POS = [], G = [];
 function isoPos(gx, gy, gz) {
   return [
@@ -105,12 +101,10 @@ function init() {
     b.setTransform(1, 0, 0, 1, 0, 0);
   };
 
-  /* Sombra suave debajo de la mesa */
   const [tcx, tfy] = isoPos(2, 2, 0);
   b.fillStyle = "rgba(10,2,6,.42)";
   b.beginPath(); b.ellipse(tcx, tfy - 12, 36, 14, 0, 0, 7); b.fill();
 
-  /* Esquina de librerías en L (gx=0, gy=0..3 y gy=0, gx=1..3) con 3 bloques de altura (gz=0..2) */
   const cells = [];
   for (let gz = 0; gz < 3; gz++) {
     for (let gx = 0; gx < 4; gx++) {
@@ -132,7 +126,6 @@ function init() {
     }
   }
 
-  /* Glifos: letras a–z del alfabeto galáctico (ascii_sga.png), teñidas con glyphColor */
   for (let c = 97; c < 123; c++) {
     const k = mk(8, 8), q = k.getContext("2d");
     if (IMG.sga) q.drawImage(IMG.sga, (c % 16) * 8, (c >> 4) * 8, 8, 8, 0, 0, 8, 8);
@@ -141,7 +134,7 @@ function init() {
   }
 }
 
-/* Renderizador 3D real del BookModel de Minecraft sobre la mesa */
+/* Libro 3D y partículas */
 const cv = $("canvas"), g = cv.getContext("2d"), TAU = Math.PI * 2;
 g.imageSmoothingEnabled = false;
 const P = [], [TX, TY] = isoPos(2, 2, 0), BASE_BY = TY - 56;
@@ -155,27 +148,19 @@ const show = () => { dlg.showModal(); document.dispatchEvent(new CustomEvent("me
 
 function book(t) {
   const bk = tex("book"), S = 2.35, y0 = by;
-  // Sombra flotante del libro sobre el mantel rojo/diamante de la mesa
   g.fillStyle = "rgba(0,0,0,.35)";
   g.beginPath(); g.ellipse(TX, TY - 42, 13 + 4 * o, 6.5 + 2 * o, 0, 0, TAU); g.fill();
 
-  // En Minecraft:
-  // - Cerrado (o=0): el libro está acostado/inclinado suavemente y gira 360° en su eje vertical (th).
-  // - Abierto (o=1): el libro mira hacia el frente (hacia ti), se inclina como atril y abre sus dos tapas en V hacia la cámara.
-  const pitch = 0.28 + 0.58 * o; // inclinación hacia el espectador (tipo atril mirando al frente)
-  const openAng = 0.04 + 1.15 * o; // ángulo de apertura de cada tapa (0 = cerrado, 1.19 = abierto en V)
+  const pitch = 0.28 + 0.58 * o;
+  const openAng = 0.04 + 1.15 * o;
   const cy = Math.cos(th), sy = Math.sin(th), cp = Math.cos(pitch), sp = Math.sin(pitch);
 
-  // Transforma punto local del libro (lx: ancho de tapa, ly: alto de página -5..5, lz: hacia el frente de las páginas)
   function toWorld(lx, ly, lz) {
-    // Inclinamos hacia el frente (+y1 es hacia el espectador, +z1 es hacia arriba)
     const y1 = ly * cp + lz * sp;
     const z1 = -ly * sp + lz * cp;
-    // Rotación en el eje vertical del mundo (yaw = th)
     const wx = lx * cy - y1 * sy;
     const wy = lx * sy + y1 * cy;
     const wz = z1;
-    // Proyección isométrica exacta (el vector hacia la cámara es wx + wy + wz)
     return {
       sx: TX + (wx - wy) * S,
       sy: y0 + (wx + wy) * 0.5 * S - wz * S,
@@ -193,39 +178,27 @@ function book(t) {
     quads.push({ A, B, C, sx, sy, sw, sh, shade, depth });
   }
 
-  // Vectores de las dos tapas según apertura (o=0: ambas apuntan hacia +lz como libro cerrado; o=1: abiertas en V hacia -lx y +lx)
-  // Tapa izquierda/superior y tapa derecha/inferior articuladas en el lomo (lz = 0, lx = 0)
-  const halfGap = 1.05 * (1 - o * 0.75); // separación entre tapas por el bloque de hojas
+  const halfGap = 1.05 * (1 - o * 0.75);
   const ca = Math.cos(openAng), sa = Math.sin(openAng);
-  // Cuando openAng -> 0 (cerrado): la tapa se extiende a lo largo de +lz (con tapas en lx = -halfGap y +halfGap)
-  // Usamos rotación continua para cada ala:
-  // Ala izquierda gira desde estar plegada (lx = -halfGap, extendida en +lz) hasta abierta (extendida en -lx, +lz)
   const L_ux = -6 * sa, L_uz = 6 * ca;
   const R_ux =  6 * sa, R_uz = 6 * ca;
-  // Normal unitaria hacia afuera de cada tapa (para posicionar el bloque de hojas adentro)
   const L_nx = -ca, L_nz = -sa;
   const R_nx =  ca, R_nz = -sa;
 
-  // 1. Lomo (seam: 2x10, UV 12,0) en la base (lx: -halfGap..+halfGap, ly: -5..5, lz: 0)
   pushQuad([-halfGap, -5, 0], [halfGap * 2, 0, 0], [0, 10, 0], 12, 0, 2, 10, 0.22);
 
-  // 2. Tapa izquierda (exterior e interior, 6x10, UV 0,0 y 6,0)
   pushQuad([-halfGap, -5, 0], [L_ux, 0, L_uz], [0, 10, 0], 0, 0, 6, 10, 0.08);
   pushQuad([-halfGap - L_nx * 0.15, -5, -L_nz * 0.15], [L_ux, 0, L_uz], [0, 10, 0], 6, 0, 6, 10, 0.14);
 
-  // 3. Tapa derecha (exterior e interior, 6x10, UV 16,0 y 22,0)
   pushQuad([halfGap, -5, 0], [R_ux, 0, R_uz], [0, 10, 0], 16, 0, 6, 10, 0.18);
   pushQuad([halfGap - R_nx * 0.15, -5, -R_nz * 0.15], [R_ux, 0, R_uz], [0, 10, 0], 22, 0, 6, 10, 0.14);
 
-  // 4. Bloques de hojas (5x8, UV 1,11 y 13,11) apoyados sobre el interior de cada tapa
   const pThick = 0.95;
   const Lp0 = [-halfGap - L_nx * pThick + L_ux * 0.06, -4, -L_nz * pThick + L_uz * 0.06];
   const Rp0 = [ halfGap - R_nx * pThick + R_ux * 0.06, -4, -R_nz * pThick + R_uz * 0.06];
   const Lpu = [L_ux * 0.82, 0, L_uz * 0.82], Rpu = [R_ux * 0.82, 0, R_uz * 0.82];
-  // Cara superior de las páginas
   pushQuad(Lp0, Lpu, [0, 8, 0], 1, 11, 5, 8, 0.04);
   pushQuad(Rp0, Rpu, [0, 8, 0], 13, 11, 5, 8, 0.08);
-  // Cantos blancos de las hojas (visibles especialmente cuando el libro está cerrado girando)
   pushQuad([-halfGap, 4, 0], [Lpu[0], 0, Lpu[2]], [-L_nx * pThick, 0, -L_nz * pThick], 1, 11, 5, 2, 0.12);
   pushQuad([-halfGap, -4, 0], [Lpu[0], 0, Lpu[2]], [-L_nx * pThick, 0, -L_nz * pThick], 1, 11, 5, 2, 0.18);
   pushQuad([halfGap, 4, 0], [Rpu[0], 0, Rpu[2]], [-R_nx * pThick, 0, -R_nz * pThick], 13, 11, 5, 2, 0.12);
@@ -233,7 +206,6 @@ function book(t) {
   pushQuad([-halfGap + Lpu[0], -4, Lpu[2]], [-L_nx * pThick, 0, -L_nz * pThick], [0, 8, 0], 1, 11, 2, 8, 0.1);
   pushQuad([ halfGap + Rpu[0], -4, Rpu[2]], [-R_nx * pThick, 0, -R_nz * pThick], [0, 8, 0], 13, 11, 2, 8, 0.15);
 
-  // 5. Hojas pasando en 3D (flipPage1 y flipPage2, UV 24,10) cuando el libro se abre
   if (o > 0.25) {
     for (let ip = 0; ip < 2; ip++) {
       const ph = (t * 1.9 + ip * 1.55) % Math.PI;
@@ -243,7 +215,6 @@ function book(t) {
     }
   }
 
-  // Ordenar caras de atrás hacia adelante (painter's algorithm) y dibujar con transformación afín
   quads.sort((a, b) => a.depth - b.depth);
   for (const q of quads) {
     const ux = (q.B.sx - q.A.sx) / q.sw, uy = (q.B.sy - q.A.sy) / q.sw;
@@ -261,7 +232,6 @@ function book(t) {
 function frame(ts) {
   const dt = Math.min(.05, (ts - last) / 1000 || .016); last = ts;
   const t = ts / 1000;
-  // Ángulo frontal hacia la cámara en nuestra proyección isométrica: -PI/4
   const FRONT = -Math.PI / 4;
   if (want) {
     const n = Math.round((th - FRONT) / TAU) * TAU + FRONT;
@@ -289,10 +259,8 @@ function frame(ts) {
 }
 const kick = () => { if (!raf && ready) raf = requestAnimationFrame(frame); };
 
-/* Las partículas fluyen solo cuando la mesa está en pantalla */
 new IntersectionObserver(([e]) => { vis = e.isIntersecting && e.intersectionRatio >= .2; kick(); }, { threshold: [0, .2] }).observe($(".mz-stage"));
 
-/* Clic: el libro gira hacia el frente, se inclina, se abre en 3D (con ráfaga de glifos) y abre el apartado */
 $(".mz-hit").onclick = () => {
   if (want) return;
   want = true; shown = false;

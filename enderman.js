@@ -1,29 +1,18 @@
-/* ============================================================
-   ENDERMAN (estilo launcher de Minecraft)
-   - Camina por la parte de abajo de la pantalla
-   - Agarra bloques y los pone en otro sitio (máx. 2 de alto)
-   - Se teletransporta solo, o cuando lo tocas
-   Pensado para iPhone: safe-area (notch / barra home), pantallas
-   retina (devicePixelRatio), toques sin bloquear el scroll y
-   pausa automática cuando la pestaña no está visible.
-   ============================================================ */
 (() => {
-const reduce = false; // siempre activo para que el Enderman camine y mueva bloques
+const reduce = false;
 
-/* ---------- Elementos ---------- */
 const cv = document.createElement("canvas");
 cv.id = "ender"; cv.setAttribute("aria-hidden", "true");
 const hit = document.createElement("button");
 hit.id = "ender-hit"; hit.hidden = true;
 hit.setAttribute("aria-label", "Enderman: tócalo y se teletransporta");
-// Sonda para leer los márgenes seguros de iOS (notch, barra de inicio)
 const probe = document.createElement("div");
 probe.style.cssText = "position:fixed;top:0;left:0;width:0;height:0;visibility:hidden;pointer-events:none;" +
   "padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)";
 document.body.append(cv, hit, probe);
 const ctx = cv.getContext("2d");
 
-/* ---------- Texturas de bloques (16x16, pixel art) ---------- */
+/* Texturas de bloques (16x16) */
 const rng = seed => () => (seed = seed * 16807 % 2147483647) / 2147483647;
 const HEART = [
   "................", "................", "................",
@@ -35,7 +24,6 @@ const HEART = [
 const PAL = {
   rose: ["#f3bccb", "#eaa8ba", "#f8cfda", "#e597ad"]
 };
-// Texturas 16x16 extraídas píxel por píxel de tus 3 imágenes (césped, tierra y piedra)
 const PIX = {
   grass: {
     p: {0:"#70b848",1:"#78b848",2:"#70b048",3:"#68a838",4:"#70b040",5:"#60a030",6:"#68b040",7:"#80c050",8:"#68a840",9:"#60a038",a:"#509028",b:"#88b858",c:"#80b050",d:"#584028",e:"#90c060",f:"#88c060",g:"#98d068",h:"#60a838",i:"#98c868",j:"#589830",k:"#707070",l:"#785838",m:"#987048",n:"#b88860",o:"#888888"},
@@ -60,16 +48,16 @@ function makeTex(type, seed) {
     if (T) px(x, y, T.p[T.r[y][x]]);
     else px(x, y, HEART[y][x] === "X" ? (r() < .15 ? "#a81f44" : "#c42a52") : pick(PAL.rose));
   }
-  g.fillStyle = "rgba(0,0,0,.18)"; // borde sutil para que se distingan apilados
+  g.fillStyle = "rgba(0,0,0,.18)";
   g.fillRect(0, 15, 16, 1); g.fillRect(15, 0, 1, 16);
   return c;
 }
 const TYPES = ["grass", "dirt", "stone", "rose"];
 const TEX = Object.fromEntries(TYPES.map((t, i) => [t, makeTex(t, 1234 + i * 777)]));
 
-/* ---------- Medidas (se recalculan al girar el teléfono) ---------- */
+/* Dimensiones y suelo */
 let W = 0, H = 0, ground = 0, inB = 0, inL = 0, inR = 0, s = 1.5, dpr = 1, off = 0;
-let slots = [];               // cada slot es una pila de bloques sobre el piso de césped
+let slots = [];
 const slotX = i => off + i * 16 * s + 8 * s;
 
 function layout() {
@@ -79,10 +67,10 @@ function layout() {
   inR = parseFloat(cs.paddingRight) || 0;
   dpr = Math.min(window.devicePixelRatio || 1, 3);
   W = document.documentElement.clientWidth;
-  s = Math.min(2.4, Math.max(1.4, W / 260));   // escala: ~1.5 en iPhone
+  s = Math.min(2.4, Math.max(1.4, W / 260));
   const B = 16 * s;
-  H = Math.ceil(88 * s);                       // incluye la fila base de césped (16*s)
-  ground = H - B;                              // el Enderman pisa encima de la fila de césped
+  H = Math.ceil(88 * s);
+  ground = H - B;
   cv.style.height = (H + inB) + "px";
   cv.width = Math.round(W * dpr); cv.height = Math.round((H + inB) * dpr);
 
@@ -96,7 +84,7 @@ function layout() {
     plan = []; step = null;
   }
   E.x = Math.min(Math.max(E.x || W * .7, 12 * s + inL), W - 12 * s - inR);
-  hitW = Math.max(44, 20 * s); hitH = Math.max(44, 52 * s); // área de toque mínima de Apple: 44pt
+  hitW = Math.max(44, 20 * s); hitH = Math.max(44, 52 * s);
   hit.style.width = hitW + "px"; hit.style.height = hitH + "px";
   hit.style.bottom = (inB + B) + "px";
 }
@@ -110,41 +98,37 @@ function seed() {
   if (!slots.some(st => st.length)) slots[1].push("rose");
 }
 
-/* ---------- Estado del Enderman ---------- */
+/* Estado y ajustes */
 const E = { x: 0, dir: -1, alpha: 0, sx: 1, sy: 1, shake: 0, ph: 0 };
-const P = { L: 0, aF: 0, aB: 0, lF: 0, lB: 0, head: 0, bob: 0 }; // pose actual
-const T = { ...P };                                                // pose objetivo
-// Poses para alcanzar un bloque en la fila k (0 = suelo, 1 = encima de otro)
+const P = { L: 0, aF: 0, aB: 0, lF: 0, lB: 0, head: 0, bob: 0 };
+const T = { ...P };
 const REACH = [{ L: .45, a: -.5 }, { L: .15, a: -.95 }];
 const CARRY = -1.0;
 let holding = null, holdT = 1, holdFrom = null, placing = null, lastSrc = -1;
 let plan = [], step = null, st = 0, angry = 0, time = 0, hitW = 44, hitH = 44;
 let parts = [], ambient = 0, ac = null;
-let stayLeft = 0, lastTap = -99, idleTimer = 3.5;  // tiempo paseando / último toque / próximo sonido neutral
+let stayLeft = 0, lastTap = -99, idleTimer = 3.5;
 
-/* ---------- AJUSTES (cámbialos a tu gusto) ---------- */
 const AJUSTES = {
-  visibleMin: 25, visibleMax: 50,  // segundos que se queda paseando antes de irse
-  ausenteMin: 10, ausenteMax: 40,  // segundos que se ausenta antes de volver
-  castigoToque: 300,               // si lo tocas 2 veces seguidas, se va 5 min (300 s)
-  dobleToque: 4,                   // segundos entre toques para que cuente como "seguidas"
-  idleMin: 5, idleMax: 11,         // cada cuántos segundos hace un sonido neutral
-  volumen: 0.85                    // volumen de los sonidos del Enderman (0 a 1)
+  visibleMin: 25, visibleMax: 50,
+  ausenteMin: 10, ausenteMax: 40,
+  castigoToque: 300,
+  dobleToque: 4,
+  idleMin: 5, idleMax: 11,
+  volumen: 0.85
 };
 const between = (a, b) => a + Math.random() * (b - a);
 
-// Posición de la mano (en unidades del modelo, mirando a la derecha, pies en 0,0)
 function handPos(L, a, bob = 0) {
   const hipY = -28 + bob, shx = 11 * Math.sin(L), shy = hipY - 11 * Math.cos(L);
   return { x: shx - 28 * Math.sin(a), y: shy + 28 * Math.cos(a) };
 }
-// Dónde va el bloque cargado, en coordenadas de pantalla
 function heldWorld() {
   const h = handPos(P.L, P.aF, P.bob);
   return { x: E.x + (h.x + 1) * s * E.dir * E.sx, y: ground + (h.y - 5) * s * E.sy };
 }
 
-/* ---------- Partículas moradas ---------- */
+/* Partículas y sonidos */
 const PCOL = ["#b14be0", "#e07cff", "#7a2fb0", "#d9a6ff"];
 function spawn(x, y, n, spread, speed) {
   for (let i = 0; i < n; i++) parts.push({
@@ -155,7 +139,6 @@ function spawn(x, y, n, spread, speed) {
   });
 }
 
-/* ---------- Sonido "vwoop" (solo al tocarlo; iOS exige un toque) ---------- */
 function vwoop() {
   if (!ac || ac.state !== "running") return;
   try {
@@ -180,7 +163,6 @@ const SND_FILES = {
   ]
 };
 const SND_BUF = { idle: [], tp: [] };
-// Respaldo con elementos <audio> pre-cargados (funciona incluso si se abre con file:// o si decodeAudioData tarda)
 const SND_EL = {
   idle: SND_FILES.idle.map(u => { const a = new Audio(u); a.preload = "auto"; return a; }),
   tp: SND_FILES.tp.map(u => { const a = new Audio(u); a.preload = "auto"; return a; })
@@ -224,7 +206,6 @@ function playSnd(kind, vol = AJUSTES.volumen) {
       return;
     } catch (_) {}
   }
-  // Si el buffer WebAudio aún no está listo o se abrió sin servidor, usa el MP3 directo
   const els = SND_EL[kind];
   if (els && els.length) {
     try {
@@ -240,7 +221,7 @@ function playSnd(kind, vol = AJUSTES.volumen) {
 const tpSound = () => playSnd("tp");
 const idleSound = () => playSnd("idle", AJUSTES.volumen * .85);
 
-/* ---------- Cerebro: decide qué hacer ---------- */
+/* Comportamiento y decisiones */
 const rand = a => a[Math.floor(Math.random() * a.length)];
 const idx = fn => slots.map((_, i) => i).filter(fn);
 function tpStep() {
@@ -252,12 +233,11 @@ function go(i, k, act) {
   const sx = slotX(i), h = handPos(REACH[k].L, REACH[k].a);
   let dir = sx >= E.x ? 1 : -1, x = sx - dir * h.x * s;
   if (x < 8 + inL || x > W - 8 - inR) { dir = -dir; x = sx - dir * h.x * s; }
-  const far = Math.abs(x - E.x) > W * .5 && Math.random() < .6; // lejos: a veces se teletransporta
+  const far = Math.abs(x - E.x) > W * .5 && Math.random() < .6;
   plan = [far ? { t: "tp", x } : { t: "walk", x }, { t: "face", dir }, { t: "reach", slot: i, k, act }];
 }
 function think() {
-  if (reduce) { plan = [{ t: "wait", d: 1e9 }]; return; } // movimiento reducido: solo se mueve si lo tocas
-  // Ya paseó suficiente: se va un rato y vuelve en otro lugar (nunca se lleva bloques)
+  if (reduce) { plan = [{ t: "wait", d: 1e9 }]; return; }
   if (!holding && stayLeft <= 0) {
     plan = [{ t: "wait", d: 1, front: true }, { t: "vanish" },
       { t: "away", d: between(AJUSTES.ausenteMin, AJUSTES.ausenteMax) }, { t: "appear" }];
@@ -288,11 +268,10 @@ function act(sp) {
 }
 const next = () => { step = plan.shift() || null; st = 0; };
 
-/* ---------- Actualización por frame ---------- */
+/* Actualización */
 function update(dt) {
   time += dt;
   angry = Math.max(0, angry - dt);
-  // Pose base
   const sway = Math.sin(time * 1.6) * .04;
   Object.assign(T, {
     L: 0, lF: 0, lB: 0, bob: 0, head: angry > 0 ? 1 : 0,
@@ -300,7 +279,7 @@ function update(dt) {
   });
 
   if (!step) { if (!plan.length) think(); next(); }
-  E.front = false;                       // de frente solo cuando se queda quieto mirándote
+  E.front = false;
   if (E.alpha > .99) {
     stayLeft -= dt;
     if ((idleTimer -= dt) <= 0) {
@@ -332,11 +311,11 @@ function update(dt) {
         break;
       }
       case "angry":
-        E.front = !holding;                // se queda mirándote, enojado
+        E.front = !holding;
         T.head = 1; E.shake = (Math.random() - .5) * 2.4 * s;
         if (st >= step.d) { E.shake = 0; next(); }
         break;
-      case "vanish": {                     // se va (sin volver todavía)
+      case "vanish": {
         if (!step.a) { step.a = 1; if (E.alpha > .5) { spawn(E.x, ground, 26, 16 * s, 60 * s); tpSound(); } }
         const k = Math.min(1, st / .18);
         E.alpha = Math.min(E.alpha, 1 - k); E.sx = 1 - .85 * k; E.sy = 1 + .4 * k;
@@ -344,7 +323,7 @@ function update(dt) {
         break;
       }
       case "away": if (st >= step.d) next(); break;
-      case "appear": {                     // vuelve en un lugar al azar, con sonido de teleport
+      case "appear": {
         if (!step.a) {
           step.a = 1; E.x = step.x ?? tpStep().x; E.dir = Math.random() < .5 ? 1 : -1;
           spawn(E.x, ground, 30, 16 * s, 60 * s); tpSound();
@@ -367,26 +346,23 @@ function update(dt) {
       }
     }
   }
-  // Suavizar pose hacia el objetivo
   const k = 1 - Math.exp(-dt * 12);
   for (const key in P) P[key] += (T[key] - P[key]) * k;
 
   holdT = Math.min(1, holdT + dt / .25);
   if (placing && (placing.t += dt / .25) >= 1) { slots[placing.slot].push(placing.type); placing = null; }
 
-  // Partículas ambientales (como en el juego)
   if (E.alpha > .5 && !reduce && (ambient += dt) > .16) {
     ambient = 0; spawn(E.x, ground - 4 * s, 1, 14 * s, 14 * s);
   }
   parts = parts.filter(p => (p.life += dt) < p.max);
   parts.forEach(p => { p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= .96; });
 
-  // Mover el botón invisible de toque encima del Enderman
   hit.style.transform = `translate3d(${(E.x - hitW / 2).toFixed(1)}px,0,0)`;
   hit.style.visibility = E.alpha > .3 ? "visible" : "hidden";
 }
 
-/* ---------- Dibujo ---------- */
+/* Dibujo */
 const COL = { back: "#0b080c", body: "#151017", front: "#1f1922", head: "#18121a" };
 function rect(x, y, w, h, c) { ctx.fillStyle = c; ctx.fillRect(x, y, w, h); }
 function limb(x, y, a, c) { ctx.save(); ctx.translate(x, y); ctx.rotate(a); rect(-1, 0, 2, 28, c); ctx.restore(); }
@@ -406,13 +382,13 @@ function drawEnder() {
   ctx.translate(E.x + E.shake, ground);
   ctx.scale(s * E.dir * E.sx, s * E.sy);
 
-  if (E.front) {                            // DE FRENTE (estilo de tu versión): dos ojos mirándote
+  if (E.front) {
     const lift = P.head * 3, out = .05 + P.head * .18, sw = Math.sin(time * 1.6) * .03;
-    rect(-3, -28, 2, 28, COL.body); rect(1, -28, 2, 28, COL.body);   // piernas
-    rect(-4, -40, 8, 12, COL.body);                                   // torso
-    limb(-5, -39, out + sw, COL.front); limb(5, -39, -out - sw, COL.front); // brazos largos
-    rect(-4, -43, 8, 3, COL.head);                                    // mandíbula
-    rect(-4, -48 - lift, 8, 5, COL.head);                             // cabeza
+    rect(-3, -28, 2, 28, COL.body); rect(1, -28, 2, 28, COL.body);
+    rect(-4, -40, 8, 12, COL.body);
+    limb(-5, -39, out + sw, COL.front); limb(5, -39, -out - sw, COL.front);
+    rect(-4, -43, 8, 3, COL.head);
+    rect(-4, -48 - lift, 8, 5, COL.head);
     ctx.shadowColor = "#cc44ff"; ctx.shadowBlur = 8;
     rect(-3.6, -45.5 - lift, 2.8, 1.3, "#cc44ff"); rect(.8, -45.5 - lift, 2.8, 1.3, "#cc44ff");
     ctx.shadowBlur = 0;
@@ -421,32 +397,32 @@ function drawEnder() {
     return;
   }
 
-  limb(shx, shy, P.aB, COL.back);          // brazo de atrás
-  limb(0, hipY, P.lB, COL.back);           // pierna de atrás
+  limb(shx, shy, P.aB, COL.back);
+  limb(0, hipY, P.lB, COL.back);
 
-  ctx.save();                               // torso + cabeza
+  ctx.save();
   ctx.translate(0, hipY); ctx.rotate(P.L);
   rect(-2, -12, 4, 12, COL.body);
   ctx.translate(0, -12);
-  const lift = P.head * 3;                  // boca abierta cuando se enoja
-  rect(-4, -3, 8, 3, COL.head);             // mandíbula
-  rect(-4, -8 - lift, 8, 5, COL.head);      // parte de arriba
+  const lift = P.head * 3;
+  rect(-4, -3, 8, 3, COL.head);
+  rect(-4, -8 - lift, 8, 5, COL.head);
   ctx.shadowColor = "#d35cff"; ctx.shadowBlur = 8;
-  rect(.5, -6 - lift, 3.5, 1.6, "#c43cf2"); // ojo morado brillante
+  rect(.5, -6 - lift, 3.5, 1.6, "#c43cf2");
   ctx.shadowBlur = 0;
   rect(1.6, -6 - lift, 1.4, .8, "#f6d2ff");
   ctx.restore();
 
-  limb(0, hipY, P.lF, COL.front);           // pierna de adelante
-  if (holding && holdT >= 1) {              // bloque entre las manos
+  limb(0, hipY, P.lF, COL.front);
+  if (holding && holdT >= 1) {
     const h = handPos(P.L, P.aF, P.bob);
     block(holding, h.x + 1, h.y - 5, 12, E.alpha);
     ctx.globalAlpha = E.alpha;
   }
-  limb(shx, shy, P.aF, COL.front);          // brazo de adelante
+  limb(shx, shy, P.aF, COL.front);
   ctx.restore();
 
-  if (holding && holdT < 1) {               // animación al agarrar
+  if (holding && holdT < 1) {
     const to = heldWorld(), e = ease(holdT);
     block(holding, lerp(holdFrom.x, to.x, e), lerp(holdFrom.y, to.y, e), lerp(16, 12, e) * s, E.alpha);
   }
@@ -456,12 +432,9 @@ function draw() {
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, W, H + inB);
   ctx.imageSmoothingEnabled = false;
-  // Línea completa de bloques de tierra con césped de lado a lado (el suelo donde pisa)
   const B = 16 * s, startX = off - Math.ceil(off / B) * B;
   for (let x = startX; x < W + B; x += B) block("grass", x + 8 * s, ground + 8 * s, B);
-  // Si hay safe-area abajo en iPhone, rellenar debajo con tierra para que no quede hueco
   if (inB > 0) for (let x = startX; x < W + B; x += B) block("dirt", x + 8 * s, ground + 24 * s, B);
-  // Bloques que el Enderman agarra y mueve encima del suelo
   slots.forEach((stack, i) => stack.forEach((t, k) => block(t, slotX(i), ground - (k * 16 + 8) * s, B)));
   if (placing) {
     const e = ease(Math.min(1, placing.t));
@@ -476,9 +449,7 @@ function draw() {
   ctx.globalAlpha = 1;
 }
 
-/* ---------- Toque ----------
-   1er toque: se enoja y se teletransporta a otro lado (abajo).
-   2º toque seguido: se va del todo por AJUSTES.castigoToque segundos (como tu versión). */
+/* Interacción al tocarlo */
 hit.addEventListener("click", () => {
   if (step && ["tp", "angry", "vanish", "appear", "away"].includes(step.t)) return;
   if (placing) { slots[placing.slot].push(placing.type); placing = null; }
@@ -491,7 +462,7 @@ hit.addEventListener("click", () => {
   idleSound();
 });
 
-/* ---------- Bucle (se pausa si la pestaña no se ve: ahorra batería) ---------- */
+/* Bucle principal */
 let raf = 0, last = 0, running = false;
 function frame(t) {
   const dt = Math.min(.05, Math.max(0, (t - last) / 1000 || 0)); last = t;
@@ -512,7 +483,6 @@ let rt; const relayout = () => { clearTimeout(rt); rt = setTimeout(() => running
 addEventListener("resize", relayout);
 addEventListener("orientationchange", relayout);
 
-// Aparece cuando termina la pantalla de carga del mundo (con respaldo por si hay caché)
 const openBtn = document.getElementById("open");
 if (openBtn) {
   addEventListener("mc-ready", () => setTimeout(start, 600), { once: true });
