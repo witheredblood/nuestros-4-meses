@@ -160,27 +160,26 @@ function book(t) {
   g.beginPath(); g.ellipse(TX, TY - 42, 13 + 4 * o, 6.5 + 2 * o, 0, 0, TAU); g.fill();
 
   // En Minecraft:
-  // - Cerrado (o=0): el libro está acostado/inclinado suavemente (~18°) y gira 360° en su eje vertical (th).
-  //   Las dos tapas están paralelas separadas por el grosor de las hojas, con el lomo de un lado.
-  // - Abierto (o=1): el libro mira hacia el frente, se inclina (~62°) y abre sus dos tapas en V mientras pasan hojas.
-  const pitch = 0.32 + 0.76 * o; // inclinación del lomo respecto a la horizontal
-  const openAng = 0.04 + 1.18 * o; // ángulo de apertura de cada tapa (0 = paralelas cerradas, 1.22 = abiertas en V)
+  // - Cerrado (o=0): el libro está acostado/inclinado suavemente y gira 360° en su eje vertical (th).
+  // - Abierto (o=1): el libro mira hacia el frente (hacia ti), se inclina como atril y abre sus dos tapas en V hacia la cámara.
+  const pitch = 0.28 + 0.58 * o; // inclinación hacia el espectador (tipo atril mirando al frente)
+  const openAng = 0.04 + 1.15 * o; // ángulo de apertura de cada tapa (0 = cerrado, 1.19 = abierto en V)
   const cy = Math.cos(th), sy = Math.sin(th), cp = Math.cos(pitch), sp = Math.sin(pitch);
 
-  // Transforma punto local del libro (lx: ancho de tapa, ly: largo del lomo -5..5, lz: grosor/altura) a 3D mundo y pantalla
+  // Transforma punto local del libro (lx: ancho de tapa, ly: alto de página -5..5, lz: hacia el frente de las páginas)
   function toWorld(lx, ly, lz) {
-    // Primero inclinamos el eje del lomo (ly, lz) por pitch
-    const y1 = ly * cp - lz * sp;
-    const z1 = ly * sp + lz * cp;
-    // Luego rotamos en el eje vertical del mundo (yaw = th)
+    // Inclinamos hacia el frente (+y1 es hacia el espectador, +z1 es hacia arriba)
+    const y1 = ly * cp + lz * sp;
+    const z1 = -ly * sp + lz * cp;
+    // Rotación en el eje vertical del mundo (yaw = th)
     const wx = lx * cy - y1 * sy;
     const wy = lx * sy + y1 * cy;
     const wz = z1;
-    // Proyección isométrica a pantalla
+    // Proyección isométrica exacta (el vector hacia la cámara es wx + wy + wz)
     return {
       sx: TX + (wx - wy) * S,
       sy: y0 + (wx + wy) * 0.5 * S - wz * S,
-      depth: wx + wy + wz * 1.15
+      depth: wx + wy + wz
     };
   }
 
