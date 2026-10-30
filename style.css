@@ -24,9 +24,25 @@ button{font:inherit;color:inherit;cursor:pointer}
 p,h1,h2{max-width:100%;overflow-wrap:break-word}
 .screen{position:fixed;inset:0;z-index:20;background:linear-gradient(180deg,rgba(8,7,20,.9),rgba(43,8,19,.94));backdrop-filter:blur(2px);transition:opacity 1.1s,transform 1.1s}
 .screen.gone{opacity:0;transform:scale(1.12);pointer-events:none}
-.screen h1{font-size:clamp(1.6rem,6vw,3rem);line-height:1.3;margin-bottom:1rem;color:#ffff55;text-shadow:3px 3px 0 #3f3f15;animation:in 1.6s both}
-.screen p:not(.mc-title):not(.mc-pct){margin-bottom:2.2rem;opacity:.9;animation:in 1.6s .6s both}
-.screen .btn{animation:in 1.6s 1.2s both}
+.screen h1{font-size:clamp(1.6rem,6vw,3rem);line-height:1.3;margin-bottom:.7rem;color:#ffff55;text-shadow:3px 3px 0 #3f3f15;animation:in 1.6s both}
+.screen p:not(.mc-title):not(.mc-pct):not(.secret-msg){margin-bottom:1.5rem;opacity:.9;animation:in 1.6s .6s both}
+.screen > .btn{animation:in 1.6s 1.2s both}
+
+/* Bloqueo hasta el 10 de noviembre y código secreto */
+.mc-lock-box{width:min(24.5rem,94vw);background:#c6c6c6;border:3px solid #000;box-shadow:inset -3px -3px 0 #555,inset 3px 3px 0 #fff,0 14px 36px rgba(0,0,0,.65);padding:.8rem .85rem;margin-bottom:1.25rem;image-rendering:pixelated;animation:in 1.4s .8s both}
+.lock-head{display:flex;align-items:center;justify-content:center;gap:.5rem;color:#373737;text-shadow:none;font-size:.88rem;margin-bottom:.6rem}
+.lock-ico{width:22px;height:22px;image-rendering:pixelated;animation:breathe 2.5s ease-in-out infinite}
+.lock-count{display:grid;grid-template-columns:repeat(4,1fr);gap:.45rem;margin-bottom:.7rem}
+.lock-count div{background:#8b8b8b url("mc/slot.png") center/100% 100% no-repeat;padding:.5rem .15rem;box-shadow:inset 2px 2px 0 #373737,inset -2px -2px 0 #fff}
+.lock-count b{display:block;font:500 1.35rem/1.15 var(--serif);color:#ffff55;text-shadow:2px 2px 0 #3f3f15}
+.lock-count small{font-size:.7rem;color:#fff;text-shadow:1px 1px 0 #222}
+.secret-form{display:flex;gap:.4rem;width:100%}
+.mc-input{flex:1;min-width:0;background:#000;border:2px solid #a0a0a0;box-shadow:inset 2px 2px 0 #222;color:#fff;font:400 .84rem var(--mc);padding:.45rem .65rem;border-radius:0;outline:none}
+.mc-input:focus{border-color:#ffff55}
+.mc-input::placeholder{color:#777}
+.secret-btn{padding:.45rem .9rem;font-size:.84rem}
+.secret-msg{font-size:.78rem;color:#8e1d3c;text-shadow:none;min-height:1.1rem;margin-top:.35rem}
+.secret-msg.ok{color:#1b6e14}
 @keyframes in{from{opacity:0;transform:translateY(14px)}}
 h2{font-size:clamp(1.5rem,5vw,2.3rem);line-height:1.25;margin-bottom:.6rem;color:#ffff55;text-shadow:2px 2px 0 #3f3f15}
 .sub{opacity:.85;max-width:30rem;margin-bottom:2rem}

@@ -188,7 +188,83 @@
   }
   function acGain(ctx, v) { const g = ctx.createGain(); g.gain.value = v; return g; }
 
+  /* Bloqueo hasta el 10 de noviembre y desbloqueo con código secreto */
+  const openBtn = $("#open"), openLbl = $("#open-lbl"), openLockIco = $("#open-lock-ico");
+  const lockBox = $("#mc-lock-box"), lockCount = $("#lock-count");
+  const secretForm = $("#secret-form"), secretInput = $("#secret-input"), secretMsg = $("#secret-msg");
+  const SECRET_CODE = String(C.secretCode || "091020040525200310072026").trim();
+  const nowInit = new Date();
+  const unlockTarget = C.unlockDate ? new Date(C.unlockDate) : new Date(nowInit.getFullYear(), 10, 10, 0, 0, 0);
+  const yearNov10 = new Date(nowInit.getFullYear(), 10, 10, 0, 0, 0);
+  const targetMs = nowInit.getFullYear() < 2026 ? yearNov10.getTime() : unlockTarget.getTime();
+  let isUnlocked = Date.now() >= targetMs;
+  let lockTimer = 0;
+
+  function unlockSite(byCode) {
+    if (isUnlocked) return;
+    isUnlocked = true;
+    if (lockTimer) clearInterval(lockTimer);
+    if (openBtn) openBtn.disabled = false;
+    if (openLockIco) openLockIco.hidden = true;
+    if (openLbl) openLbl.textContent = C.text.openBtn;
+    if (byCode && lockBox) {
+      if (secretMsg) {
+        secretMsg.className = "secret-msg ok";
+        secretMsg.textContent = "¡Código correcto! Mundo desbloqueado ♥";
+      }
+      const r = lockBox.getBoundingClientRect();
+      spawnSpriteParticles(r, "mc/xp_orb.png", 8, 16, 8);
+      spawnSpriteParticles(r, "mc/particle_heart.png", 6, 16, 8);
+      setTimeout(() => { lockBox.hidden = true; }, 750);
+    } else if (lockBox) {
+      lockBox.hidden = true;
+    }
+  }
+
+  if (!isUnlocked && lockBox && lockCount) {
+    lockBox.hidden = false;
+    if (openBtn) openBtn.disabled = true;
+    if (openLockIco) openLockIco.hidden = false;
+    if (openLbl) openLbl.textContent = "Disponible el 10 de noviembre";
+
+    const lLabels = ["días", "horas", "min", "seg"], lNums = lLabels.map(l => {
+      const d = document.createElement("div"), b = document.createElement("b"), s = document.createElement("small");
+      s.textContent = l; d.append(b, s); lockCount.append(d); return b;
+    });
+    const tickLock = () => {
+      const rem = Math.max(0, Math.floor((targetMs - Date.now()) / 1000));
+      [Math.floor(rem / 86400), Math.floor(rem % 86400 / 3600), Math.floor(rem % 3600 / 60), rem % 60].forEach((v, i) => lNums[i].textContent = v);
+      if (rem <= 0) unlockSite(false);
+    };
+    tickLock();
+    lockTimer = setInterval(tickLock, 1000);
+
+    if (secretInput) {
+      secretInput.addEventListener("input", () => {
+        if (secretInput.value.replace(/\s+/g, "") === SECRET_CODE) unlockSite(true);
+      });
+    }
+    if (secretForm) {
+      secretForm.onsubmit = e => {
+        e.preventDefault();
+        if (secretInput && secretInput.value.replace(/\s+/g, "") === SECRET_CODE) {
+          unlockSite(true);
+        } else if (secretMsg) {
+          secretMsg.className = "secret-msg";
+          secretMsg.textContent = "Código incorrecto · Espera al 10 de noviembre ♥";
+        }
+      };
+    }
+    let keyBuf = "";
+    window.addEventListener("keydown", e => {
+      if (isUnlocked || !/^[0-9]$/.test(e.key)) return;
+      keyBuf = (keyBuf + e.key).slice(-SECRET_CODE.length);
+      if (keyBuf === SECRET_CODE) unlockSite(true);
+    });
+  }
+
   $("#open").onclick = () => {
+    if (!isUnlocked) return;
     prepAchievementAudio();
     const w = $("#welcome"), L = $("#mc-load");
     if (!L) {

@@ -2,6 +2,10 @@ window.CONFIG = {
   // Fecha de noviazgo (AAAA-MM-DD)
   startDate: "2026-07-10",
 
+  // Fecha de desbloqueo (10 de noviembre a las 00:00) y código secreto de acceso anticipado
+  unlockDate: "2026-11-10T00:00:00",
+  secretCode: "091020040525200310072026",
+
   // Música manual opcional (vacío = desactivado)
   music: "",
 

@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.cdnfonts.com/css/minecraft-3" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=30">
+<link rel="stylesheet" href="style.css?v=31">
 </head>
 <body>
 <div id="mc-sky" aria-hidden="true">
@@ -36,7 +36,24 @@
 <section id="welcome" class="screen">
   <h1 data-t="welcomeTitle"></h1>
   <p data-t="welcomeText"></p>
-  <button id="open" class="btn" data-t="openBtn"></button>
+
+  <div id="mc-lock-box" class="mc-lock-box" hidden>
+    <div class="lock-head">
+      <img src="mc/clock.png" alt="" class="lock-ico" width="24" height="24">
+      <span>Se desbloquea el 10 de noviembre</span>
+    </div>
+    <div id="lock-count" class="lock-count" role="timer" aria-label="Cuenta regresiva al 10 de noviembre"></div>
+    <form id="secret-form" class="secret-form" autocomplete="off">
+      <input id="secret-input" type="password" inputmode="numeric" class="mc-input" placeholder="Código secreto..." aria-label="Código secreto">
+      <button type="submit" class="btn secret-btn">OK</button>
+    </form>
+    <p id="secret-msg" class="secret-msg" aria-live="polite"></p>
+  </div>
+
+  <button id="open" class="btn btn-icon">
+    <img id="open-lock-ico" src="mc/locked.png" alt="" class="btn-ico" width="20" height="20" hidden>
+    <span id="open-lbl" data-t="openBtn"></span>
+  </button>
 </section>
 
 <section id="mc-load" class="screen" hidden aria-live="polite">
@@ -157,9 +174,9 @@
   </div>
 </dialog>
 
-<script src="config.js?v=30"></script>
-<script src="script.js?v=30"></script>
-<script src="mesa-encantamientos.js?v=30"></script>
-<script src="enderman.js?v=30"></script>
+<script src="config.js?v=31"></script>
+<script src="script.js?v=31"></script>
+<script src="mesa-encantamientos.js?v=31"></script>
+<script src="enderman.js?v=31"></script>
 </body>
 </html>
