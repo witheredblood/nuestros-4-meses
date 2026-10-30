@@ -287,48 +287,37 @@
     $("#msgs").append(b);
   });
 
-  /* Renderizador pixel-art 16x16 del destello encantado (Written Book glint) de Minecraft */
-  const wbImg = new Image();
-  wbImg.src = "mc/written_book.png";
-  wbImg.onload = () => {
-    const srcCv = document.createElement("canvas");
-    srcCv.width = srcCv.height = 16;
-    const sctx = srcCv.getContext("2d");
-    sctx.drawImage(wbImg, 0, 0, 16, 16);
-    const baseData = sctx.getImageData(0, 0, 16, 16).data;
-    const cvs = [...document.querySelectorAll(".mc-book-cv")].map(c => c.getContext("2d"));
+  /* Renderizador pixel-art 16x16 directo (sin getImageData para que Brave Shields nunca lo bloquee) */
+  const BOOK_PX = [[8,1,57,16,3],[9,1,57,16,3],[10,1,57,16,3],[6,2,57,16,3],[7,2,57,16,3],[8,2,93,34,16],[9,2,108,44,25],[10,2,117,50,30],[11,2,77,24,7],[4,3,57,16,3],[5,3,57,16,3],[6,3,93,34,16],[7,3,108,44,25],[8,3,117,50,30],[9,3,117,50,30],[10,3,108,44,25],[11,3,117,50,30],[12,3,77,24,7],[2,4,57,16,3],[3,4,57,16,3],[4,4,93,34,16],[5,4,117,50,30],[6,4,117,50,30],[7,4,117,50,30],[8,4,57,16,3],[9,4,57,16,3],[10,4,117,50,30],[11,4,108,44,25],[12,4,117,50,30],[13,4,77,24,7],[0,5,57,16,3],[1,5,57,16,3],[2,5,93,34,16],[3,5,117,50,30],[4,5,117,50,30],[5,5,57,16,3],[6,5,117,50,30],[7,5,117,50,30],[8,5,117,50,30],[9,5,57,16,3],[10,5,57,16,3],[11,5,117,50,30],[12,5,108,44,25],[13,5,117,50,30],[14,5,77,24,7],[0,6,77,24,7],[1,6,93,34,16],[2,6,117,50,30],[3,6,108,44,25],[4,6,117,50,30],[5,6,117,50,30],[6,6,57,16,3],[7,6,117,50,30],[8,6,117,50,30],[9,6,117,50,30],[10,6,57,16,3],[11,6,57,16,3],[12,6,117,50,30],[13,6,108,44,25],[14,6,57,16,3],[15,6,77,24,7],[0,7,77,24,7],[1,7,57,16,3],[2,7,93,34,16],[3,7,117,50,30],[4,7,108,44,25],[5,7,117,50,30],[6,7,117,50,30],[7,7,57,16,3],[8,7,117,50,30],[9,7,117,50,30],[10,7,117,50,30],[11,7,108,44,25],[12,7,57,16,3],[13,7,57,16,3],[14,7,91,91,91],[0,8,77,24,7],[1,8,57,16,3],[2,8,183,183,183],[3,8,93,34,16],[4,8,117,50,30],[5,8,108,44,25],[6,8,117,50,30],[7,8,117,50,30],[8,8,117,50,30],[9,8,93,34,16],[10,8,57,16,3],[11,8,57,16,3],[12,8,153,153,153],[13,8,183,183,183],[14,8,153,153,153],[0,9,22,16,5],[1,9,93,34,16],[2,9,214,214,214],[3,9,183,183,183],[4,9,93,34,16],[5,9,117,50,30],[6,9,108,44,25],[7,9,93,34,16],[8,9,57,16,3],[9,9,57,16,3],[10,9,153,153,153],[11,9,183,183,183],[12,9,183,183,183],[13,9,153,153,153],[14,9,57,16,3],[15,9,77,24,7],[1,10,22,16,5],[2,10,93,34,16],[3,10,214,214,214],[4,10,183,183,183],[5,10,93,34,16],[6,10,57,16,3],[7,10,57,16,3],[8,10,153,153,153],[9,10,183,183,183],[10,10,183,183,183],[11,10,153,153,153],[12,10,57,16,3],[13,10,57,16,3],[14,10,22,16,5],[15,10,22,16,5],[2,11,22,16,5],[3,11,93,34,16],[4,11,214,214,214],[5,11,183,183,183],[6,11,153,153,153],[7,11,183,183,183],[8,11,183,183,183],[9,11,153,153,153],[10,11,57,16,3],[11,11,77,24,7],[12,11,22,16,5],[13,11,22,16,5],[3,12,22,16,5],[4,12,93,34,16],[5,12,214,214,214],[6,12,183,183,183],[7,12,153,153,153],[8,12,57,16,3],[9,12,77,24,7],[10,12,22,16,5],[11,12,22,16,5],[4,13,22,16,3],[5,13,93,34,16],[6,13,57,16,3],[7,13,77,24,7],[8,13,22,16,5],[9,13,22,16,5],[5,14,22,16,5],[6,14,22,16,5],[7,14,22,16,5]];
+  const bookCvs = [...document.querySelectorAll(".mc-book-cv")].map(c => {
+    const x = c.getContext("2d"); x.imageSmoothingEnabled = false; return x;
+  });
+  const offBook = document.createElement("canvas"); offBook.width = offBook.height = 16;
+  const offCtx = offBook.getContext("2d");
 
-    function animGlint(now) {
-      const t = now * 0.001;
-      for (let ci = 0; ci < cvs.length; ci++) {
-        const ctx = cvs[ci];
-        const out = ctx.createImageData(16, 16);
-        const d = out.data;
-        // En Minecraft el glint usa dos bandas diagonales violetas/magentas aditivas sobre cada píxel del ítem
-        for (let y = 0; y < 16; y++) {
-          for (let x = 0; x < 16; x++) {
-            const i = (y * 16 + x) * 4;
-            const a = baseData[i + 3];
-            if (!a) continue;
-            // Banda principal y banda secundaria cruzada como en RenderType.glint() de Minecraft
-            const w1 = Math.sin((x * 0.36 + y * 0.24) - t * 3.2);
-            const w2 = Math.sin((x * 0.22 - y * 0.34) + t * 2.1);
-            const g1 = Math.pow(Math.max(0, w1), 3);
-            const g2 = Math.pow(Math.max(0, w2), 4) * 0.75;
-            const k = Math.min(1.25, g1 + g2);
-            // Color aditivo encantado de Minecraft (morado eléctrico / magenta brillante)
-            d[i]     = Math.min(255, baseData[i]     + (175 * k) | 0);
-            d[i + 1] = Math.min(255, baseData[i + 1] + (55  * k) | 0);
-            d[i + 2] = Math.min(255, baseData[i + 2] + (255 * k) | 0);
-            d[i + 3] = a;
-          }
-        }
-        ctx.putImageData(out, 0, 0);
-      }
-      requestAnimationFrame(animGlint);
+  function drawEnchantedBooks(now) {
+    const t = (now || 0) * 0.001;
+    offCtx.clearRect(0, 0, 16, 16);
+    for (let i = 0; i < BOOK_PX.length; i++) {
+      const p = BOOK_PX[i], x = p[0], y = p[1];
+      const w1 = Math.sin((x * 0.36 + y * 0.24) - t * 3.2);
+      const w2 = Math.sin((x * 0.22 - y * 0.34) + t * 2.1);
+      const g1 = w1 > 0 ? w1 * w1 * w1 : 0;
+      const g2 = w2 > 0 ? w2 * w2 * w2 * w2 * 0.75 : 0;
+      const k = Math.min(1.25, g1 + g2);
+      const r = Math.min(255, p[2] + ((180 * k) | 0));
+      const g = Math.min(255, p[3] + ((60  * k) | 0));
+      const b = Math.min(255, p[4] + ((255 * k) | 0));
+      offCtx.fillStyle = `rgb(${r},${g},${b})`;
+      offCtx.fillRect(x, y, 1, 1);
     }
-    requestAnimationFrame(animGlint);
-  };
+    for (let c = 0; c < bookCvs.length; c++) {
+      bookCvs[c].clearRect(0, 0, 16, 16);
+      bookCvs[c].drawImage(offBook, 0, 0);
+    }
+    requestAnimationFrame(drawEnchantedBooks);
+  }
+  drawEnchantedBooks(0);
 
   if (bkPrev) bkPrev.onclick = () => openBookAt(curBook - 1);
   if (bkNext) bkNext.onclick = () => openBookAt(curBook + 1);
