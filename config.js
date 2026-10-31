@@ -164,7 +164,7 @@ window.CONFIG = {
       title: "Lena Raine - otherside",
       subtitle: "Disco oficial de Minecraft",
       icon: "mc/music_disc_otherside.png",
-      src: "sonidos/otherside.ogg",
+      src: "sonidos/otherside.mp3",
       color: "#55ffff"
     },
     {
@@ -172,7 +172,7 @@ window.CONFIG = {
       title: "Aaron Cherof - Relic",
       subtitle: "Disco oficial de Minecraft",
       icon: "mc/music_disc_relic.png",
-      src: "sonidos/relic.ogg",
+      src: "sonidos/relic.mp3",
       color: "#ffaa55"
     },
     {
@@ -180,7 +180,7 @@ window.CONFIG = {
       title: "C418 - cat",
       subtitle: "Disco clásico de Minecraft",
       icon: "mc/music_disc_cat.png",
-      src: "sonidos/cat.ogg",
+      src: "sonidos/cat.mp3",
       color: "#55ff55"
     }
   ]

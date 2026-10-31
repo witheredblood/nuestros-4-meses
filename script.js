@@ -532,11 +532,16 @@
     { id: "cherry", label: "Hora cambiada a: Amanecer de Cerezos ✿" }
   ];
   let skyIdx = 0, skyTimer = 0;
+  try {
+    const savedSky = SKY_MODES.findIndex(m => m.id === localStorage.getItem("mc-sky"));
+    if (savedSky > 0) { skyIdx = savedSky; document.body.dataset.sky = SKY_MODES[savedSky].id; }
+  } catch (_) {}
   if (moonBtn) {
     moonBtn.onclick = () => {
       skyIdx = (skyIdx + 1) % SKY_MODES.length;
       const mode = SKY_MODES[skyIdx];
       document.body.dataset.sky = mode.id;
+      try { localStorage.setItem("mc-sky", mode.id); } catch (_) {}
       playUiTone([523.25, 659.25, 783.99], 0.16, "sine", 0.07);
       const r = moonBtn.getBoundingClientRect();
       spawnSpriteParticles(r, mode.id === "cherry" ? "mc/cherry_0.png" : "mc/particle_heart.png", 6, 14, 8);
@@ -649,21 +654,57 @@
   }
   const ISO_TEX = Object.fromEntries(Object.keys(ISO_PIX).map(k => [k, makeIsoTex(k)]));
   function drawIsoBlock(ctx, cx, fy, K, topTex, leftTex, rightTex, shL = 0.14, shR = 0.32) {
-    const h = 16, oy = fy - 16 * K - h * K;
+    const D = ctx.__d || 1, h = 16, oy = fy - 16 * K - h * K;
     ctx.fillStyle = "rgba(10,2,6,.42)";
     ctx.beginPath(); ctx.ellipse(cx, fy - 12, 18 * K, 8.5 * K, 0, 0, Math.PI * 2); ctx.fill();
 
-    ctx.setTransform(K, K / 2, 0, K, cx - 16 * K, oy + 8 * K);
+    ctx.setTransform(K * D, K / 2 * D, 0, K * D, (cx - 16 * K) * D, (oy + 8 * K) * D);
     ctx.drawImage(leftTex, 0, 0, 16, 16, 0, 0, 16, 16);
     if (shL > 0) { ctx.fillStyle = `rgba(0,0,0,${shL})`; ctx.fillRect(0, 0, 16, 16); }
 
-    ctx.setTransform(K, -K / 2, 0, K, cx, oy + 16 * K);
+    ctx.setTransform(K * D, -K / 2 * D, 0, K * D, cx * D, (oy + 16 * K) * D);
     ctx.drawImage(rightTex, 0, 0, 16, 16, 0, 0, 16, 16);
     if (shR > 0) { ctx.fillStyle = `rgba(0,0,0,${shR})`; ctx.fillRect(0, 0, 16, 16); }
 
-    ctx.setTransform(K, K / 2, -K, K / 2, cx, oy);
+    ctx.setTransform(K * D, K / 2 * D, -K * D, K / 2 * D, cx * D, oy * D);
     ctx.drawImage(topTex, 0, 0, 16, 16, 0, 0, 16, 16);
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.setTransform(D, 0, 0, D, 0, 0);
+  }
+
+  /* Canvas isométrico nítido en pantallas de alta densidad */
+  function setupIsoCanvas(cv) {
+    const D = Math.min(window.devicePixelRatio || 1, 3);
+    const w = cv.width, h = cv.height;
+    cv.style.width = w + "px"; cv.style.height = h + "px";
+    cv.width = Math.round(w * D); cv.height = Math.round(h * D);
+    const ctx = cv.getContext("2d");
+    ctx.__d = D;
+    ctx.setTransform(D, 0, 0, D, 0, 0);
+    ctx.imageSmoothingEnabled = false;
+    return ctx;
+  }
+
+  /* Anima solo mientras el elemento está en pantalla (ahorra batería) */
+  function animateWhenVisible(el, draw) {
+    let visible = true, raf = 0;
+    const loop = now => { draw(now); raf = visible ? requestAnimationFrame(loop) : 0; };
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(entries => {
+        visible = entries[0].isIntersecting;
+        if (visible && !raf) raf = requestAnimationFrame(loop);
+      }, { rootMargin: "80px" }).observe(el);
+    }
+    raf = requestAnimationFrame(loop);
+  }
+
+  /* Aviso corto estilo chat de Minecraft */
+  let miniToastTimer = 0;
+  function miniToast(text) {
+    if (!skyToast) return;
+    skyToast.textContent = text;
+    skyToast.hidden = false;
+    clearTimeout(miniToastTimer);
+    miniToastTimer = setTimeout(() => { skyToast.hidden = true; }, 2600);
   }
 
   /* 3. Mesa de Trabajo (Crafting Table 3x3 + vista isométrica 3D) */
@@ -676,7 +717,8 @@
     "mc/amethyst_shard.png", "mc/writable_book.png"
   ];
   if (craftTabs && craftGrid && craftOut && C.recipes && C.recipes.length) {
-    let curRecipe = C.recipes[0];
+    let curRecipe = C.recipes[0], matched = true, craftPulse = 0;
+    const craftCounts = {};
     const slotImgs = [];
     const floatImg = new Image();
     floatImg.src = curRecipe.resultIcon;
@@ -694,6 +736,7 @@
         const nextSrc = ALL_ITEMS[(curIdx + 1) % ALL_ITEMS.length];
         img.src = nextSrc;
         playUiTone([440, 554.37], 0.08, "square", 0.05);
+        checkGrid();
       };
       slotImgs.push(img);
       craftGrid.append(slot);
@@ -701,18 +744,43 @@
 
     function renderCraftCard(rec, crafted) {
       if (!craftCard) return;
+      const n = craftCounts[rec.id] || 0;
       craftCard.innerHTML =
-        `<p class="tt-title">${crafted ? "¡Crafteado! · " : ""}${rec.name}</p>` +
+        `<p class="tt-title">${crafted ? "¡Crafteado! · " : ""}${rec.name}${n > 1 ? ` <span class="tt-count">x${n}</span>` : ""}</p>` +
         `<p class="tt-lore">${rec.lore}</p>` +
         `<p class="tt-desc">${rec.desc}</p>`;
     }
 
+    function setMatched(rec) {
+      matched = !!rec;
+      craftOut.classList.toggle("empty", !matched);
+      if (rec) {
+        curRecipe = rec;
+        floatImg.src = rec.resultIcon;
+        if (craftOutImg) craftOutImg.src = rec.resultIcon;
+        const idx = C.recipes.indexOf(rec);
+        craftTabs.querySelectorAll(".craft-tab").forEach((b, i) => b.classList.toggle("active", i === idx));
+      } else {
+        craftTabs.querySelectorAll(".craft-tab").forEach(b => b.classList.remove("active"));
+      }
+    }
+
+    function checkGrid() {
+      const cur = slotImgs.map(im => im.getAttribute("src"));
+      const rec = C.recipes.find(r => r.grid.every((s, i) => s === cur[i]));
+      setMatched(rec);
+      if (rec) renderCraftCard(rec, false);
+      else if (craftCard) {
+        craftCard.innerHTML =
+          `<p class="tt-title">Receta desconocida</p>` +
+          `<p class="tt-lore">✦ Los ingredientes no forman nada… todavía</p>` +
+          `<p class="tt-desc">Acomódalos como en una de las recetas de arriba o toca una pestaña para llenarla sola ♥</p>`;
+      }
+    }
+
     function selectRecipe(rec, tabBtn) {
-      curRecipe = rec;
-      floatImg.src = rec.resultIcon;
-      craftTabs.querySelectorAll(".craft-tab").forEach(b => b.classList.toggle("active", b === tabBtn));
       rec.grid.forEach((src, i) => { if (slotImgs[i]) slotImgs[i].src = src; });
-      if (craftOutImg) craftOutImg.src = rec.resultIcon;
+      setMatched(rec);
       renderCraftCard(rec, false);
     }
 
@@ -731,6 +799,13 @@
     selectRecipe(C.recipes[0], craftTabs.firstElementChild);
 
     function triggerCraft(targetEl) {
+      if (!matched) {
+        playUiTone([220, 185], 0.12, "square", 0.06);
+        miniToast("Elige una receta arriba o acomoda los ingredientes ♥");
+        return;
+      }
+      craftCounts[curRecipe.id] = (craftCounts[curRecipe.id] || 0) + 1;
+      craftPulse = 1;
       playUiTone([523.25, 659.25, 783.99, 1046.5], 0.15, "triangle", 0.09);
       const r = (targetEl || craftOut).getBoundingClientRect();
       spawnSpriteParticles(r, "mc/xp_orb.png", 7, 14, 8);
@@ -741,29 +816,26 @@
     if (craftIsoBtn) craftIsoBtn.onclick = () => triggerCraft(craftIsoBtn);
 
     if (craftIsoCv) {
-      const cg = craftIsoCv.getContext("2d");
-      cg.imageSmoothingEnabled = false;
-      function animCraftIso(now) {
+      const cg = setupIsoCanvas(craftIsoCv);
+      animateWhenVisible(craftIsoCv, now => {
         const t = (now || 0) * 0.001;
+        craftPulse = Math.max(0, craftPulse - 0.04);
         cg.clearRect(0, 0, 210, 176);
         drawIsoBlock(cg, 105, 160, 3.4, ISO_TEX.crafting_table_top, ISO_TEX.crafting_table_front, ISO_TEX.crafting_table_side);
-        const bob = Math.sin(t * 2.6) * 4;
-        const fy = 40 + bob;
-        // Sombra sobre la mesa
-        cg.fillStyle = "rgba(0,0,0,.32)";
-        cg.beginPath(); cg.ellipse(105, 76, 14 - bob * 0.4, 7 - bob * 0.2, 0, 0, Math.PI * 2); cg.fill();
-        // Objeto flotando sobre la mesa isométrica
-        if (floatImg.complete && floatImg.naturalWidth > 0) {
+        if (matched && floatImg.complete && floatImg.naturalWidth > 0) {
+          const bob = Math.sin(t * 2.6) * 4 - craftPulse * 10;
+          const fy = 40 + bob;
+          cg.fillStyle = "rgba(0,0,0,.32)";
+          cg.beginPath(); cg.ellipse(105, 76, 14 - bob * 0.4, 7 - bob * 0.2, 0, 0, Math.PI * 2); cg.fill();
           const sx = Math.cos(t * 1.8);
+          const sc = 1 + craftPulse * 0.25;
           cg.save();
           cg.translate(105, fy);
-          cg.scale(Math.abs(sx) < 0.18 ? 0.18 : sx, 1);
+          cg.scale((Math.abs(sx) < 0.18 ? 0.18 : sx) * sc, sc);
           cg.drawImage(floatImg, -18, -18, 36, 36);
           cg.restore();
         }
-        requestAnimationFrame(animCraftIso);
-      }
-      requestAnimationFrame(animCraftIso);
+      });
     }
   }
 
@@ -841,13 +913,11 @@
   }
 
   if (jbIsoCv) {
-    const jg = jbIsoCv.getContext("2d");
-    jg.imageSmoothingEnabled = false;
-    function animJukeboxIso(now) {
+    const jg = setupIsoCanvas(jbIsoCv);
+    animateWhenVisible(jbIsoCv, now => {
       const t = (now || 0) * 0.001;
       jg.clearRect(0, 0, 210, 176);
       drawIsoBlock(jg, 105, 160, 3.4, ISO_TEX.jukebox_top, ISO_TEX.jukebox_side, ISO_TEX.jukebox_side);
-      // Disco girando en perspectiva isométrica sobre la ranura del tocadiscos
       if (discImg.complete && discImg.naturalWidth > 0) {
         const bob = Math.sin(t * 3) * 2.5;
         jg.save();
@@ -857,9 +927,7 @@
         jg.drawImage(discImg, -20, -20, 40, 40);
         jg.restore();
       }
-      requestAnimationFrame(animJukeboxIso);
-    }
-    requestAnimationFrame(animJukeboxIso);
+    });
   }
 
   /* 7. Cohete de Fuegos Artificiales de Minecraft */
