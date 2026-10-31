@@ -767,34 +767,7 @@
     }
   }
 
-  /* 4. Soporte de Pociones (Brewing Stand) */
-  const brewSlots = $("#brew-slots"), brewCard = $("#brew-card");
-  if (brewSlots && brewCard && C.potions && C.potions.length) {
-    function selectPotion(pot, btn, withFx) {
-      brewSlots.querySelectorAll(".brew-slot").forEach(b => b.classList.toggle("active", b === btn));
-      brewCard.innerHTML =
-        `<p class="tt-title">${pot.name} (${pot.duration})</p>` +
-        `<p class="tt-lore">✦ ${pot.effect}</p>` +
-        `<p class="tt-desc">${pot.desc}</p>`;
-      if (withFx && btn) {
-        playUiTone([659.25, 880, 987.77], 0.14, "sine", 0.08);
-        const r = btn.getBoundingClientRect();
-        spawnSpriteParticles(r, "mc/particle_heart.png", 6, 14, 8);
-      }
-    }
-    C.potions.forEach((pot, idx) => {
-      const b = document.createElement("button");
-      b.type = "button";
-      b.className = "brew-slot" + (idx === 0 ? " active" : "");
-      b.setAttribute("aria-label", pot.name);
-      b.innerHTML = `<img src="${pot.icon}" alt="">`;
-      b.onclick = () => selectPotion(pot, b, true);
-      brewSlots.append(b);
-    });
-    selectPotion(C.potions[0], brewSlots.firstElementChild, false);
-  }
-
-  /* 5. Tocadiscos (Jukebox en vista isométrica 3D) con Discos Oficiales de Minecraft */
+  /* 4. Tocadiscos (Jukebox en vista isométrica 3D) con Discos Oficiales de Minecraft */
   const jbDiscs = $("#jukebox-discs"), jbNow = $("#jb-now"), jbSub = $("#jb-sub");
   const jbIsoCv = $("#jukebox-iso-cv"), jbIsoBtn = $("#jukebox-iso-btn"), jbNotes = $("#jukebox-notes");
   let noteTimer = 0, curDiscIdx = 0;

@@ -224,8 +224,8 @@ body[data-sky="cherry"] #mc-moon{background:#ffe6f2;border-color:#f29bc2;box-sha
 .iso-block-btn:active{transform:scale(.97)}
 .iso-block-btn canvas{display:block;width:210px;height:176px;image-rendering:pixelated;filter:drop-shadow(0 12px 24px rgba(0,0,0,.6))}
 
-/* Paneles estilo interfaz de Minecraft (Mesa de Trabajo, Pociones y Tocadiscos) */
-.mc-craft-gui,.mc-brew-gui,.mc-jukebox-gui{width:min(28.5rem,94vw);background:#c6c6c6;border:3px solid #000;box-shadow:inset -3px -3px 0 #555,inset 3px 3px 0 #fff,0 14px 36px rgba(0,0,0,.65);padding:.9rem;image-rendering:pixelated;margin-bottom:1.6rem}
+/* Paneles estilo interfaz de Minecraft (Mesa de Trabajo y Tocadiscos) */
+.mc-craft-gui,.mc-jukebox-gui{width:min(28.5rem,94vw);background:#c6c6c6;border:3px solid #000;box-shadow:inset -3px -3px 0 #555,inset 3px 3px 0 #fff,0 14px 36px rgba(0,0,0,.65);padding:.9rem;image-rendering:pixelated;margin-bottom:1.6rem}
 .mc-gui-head{display:flex;align-items:center;gap:.55rem;color:#373737;text-shadow:none;font-size:.9rem;margin-bottom:.75rem;text-align:left}
 .gui-head-ico{width:24px;height:24px;image-rendering:pixelated;flex-shrink:0}
 
@@ -253,20 +253,6 @@ body[data-sky="cherry"] #mc-moon{background:#ffe6f2;border-color:#f29bc2;box-sha
 .mc-tooltip-card .tt-title{color:#55ffff;font-size:.95rem;text-shadow:2px 2px 0 #153f3f;margin-bottom:.15rem}
 .mc-tooltip-card .tt-lore{color:#ff55ff;font-size:.8rem;text-shadow:2px 2px 0 #3f153f;margin-bottom:.3rem}
 .mc-tooltip-card .tt-desc{color:#e0e0e0;font-size:.84rem;text-shadow:1px 1px 0 #000}
-
-/* Soporte de Pociones (Brewing Stand) */
-.brew-top-row{display:flex;flex-direction:column;align-items:center;gap:.25rem;margin-bottom:.4rem}
-.brew-fuel{width:48px;height:48px;background:#8b8b8b url("mc/slot.png") center/100% 100% no-repeat;box-shadow:inset 2px 2px 0 #373737,inset -2px -2px 0 #fff;display:flex;align-items:center;justify-content:center}
-.brew-fuel img{width:28px;height:28px;image-rendering:pixelated}
-.brew-bubbles{display:flex;gap:.8rem;color:#b84dff;text-shadow:1px 1px 0 #2a0845;font-size:.9rem}
-.brew-bubbles span{animation:breathe 1.4s ease-in-out infinite}
-.brew-bubbles span:nth-child(2){animation-delay:.3s}
-.brew-bubbles span:nth-child(3){animation-delay:.6s}
-.brew-slots{display:flex;justify-content:center;gap:.85rem;margin-bottom:.85rem}
-.brew-slot{width:58px;height:58px;background:#8b8b8b url("mc/slot.png") center/100% 100% no-repeat;box-shadow:inset 2px 2px 0 #373737,inset -2px -2px 0 #fff;border:2px solid transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden;transition:transform .15s}
-.brew-slot::after{content:"";position:absolute;inset:-40%;background:linear-gradient(125deg,transparent 35%,rgba(215,120,255,.35) 50%,transparent 65%);animation:glintSlide 2.8s linear infinite;pointer-events:none}
-.brew-slot.active,.brew-slot:hover{border-color:#ffff55;transform:translateY(-3px)}
-.brew-slot img{width:34px;height:34px;image-rendering:pixelated;filter:drop-shadow(2px 2px 0 rgba(0,0,0,.45));z-index:1}
 
 /* Tocadiscos (Jukebox) */
 .jukebox-stage{display:flex;align-items:center;justify-content:center;background:rgba(24,14,22,.88);border:2px solid #000;box-shadow:inset 0 0 0 2px #522040;padding:.65rem .9rem;margin-bottom:.75rem;text-align:center}

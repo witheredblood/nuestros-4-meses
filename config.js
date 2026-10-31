@@ -149,32 +149,7 @@ window.CONFIG = {
     }
   ],
 
-  // 3. Pociones del Soporte de Pociones (Brewing Stand)
-  potions: [
-    {
-      name: "Poción de Amor Infinito",
-      icon: "mc/dragon_breath.png",
-      duration: "∞:∞",
-      effect: "+1000% Ganas de abrazarte y besarte",
-      desc: "Se activa automáticamente cada vez que te veo o pienso en ti."
-    },
-    {
-      name: "Elixir de Calma Instantánea IV",
-      icon: "mc/honey_bottle.png",
-      duration: "Instantáneo",
-      effect: "+100% Paz en el corazón",
-      desc: "Basta escuchar tu voz o tu risa para que todo esté bien."
-    },
-    {
-      name: "Esencia de Cristal de Cerezo",
-      icon: "mc/amethyst_shard.png",
-      duration: "04:00 (y contando)",
-      effect: "Suerte V · Felicidad máxima",
-      desc: "Cuatro meses del efecto más bonito que me ha pasado en la vida."
-    }
-  ],
-
-  // 4. Discos oficiales del Tocadiscos (extraídos de .minecraft)
+  // 3. Discos oficiales del Tocadiscos (extraídos de .minecraft)
   discs: [
     {
       id: "blind_spots",
@@ -199,14 +174,6 @@ window.CONFIG = {
       icon: "mc/music_disc_relic.png",
       src: "sonidos/relic.ogg",
       color: "#ffaa55"
-    },
-    {
-      id: "creator_box",
-      title: "Creator (Caja Musical)",
-      subtitle: "Disco oficial de Minecraft",
-      icon: "mc/music_disc_creator_music_box.png",
-      src: "sonidos/creator_music_box.ogg",
-      color: "#ff99cc"
     },
     {
       id: "cat",
