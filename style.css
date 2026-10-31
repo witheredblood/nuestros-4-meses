@@ -149,8 +149,18 @@ h2{font-size:clamp(1.5rem,5vw,2.3rem);line-height:1.25;margin-bottom:.6rem;color
 #mc-stars{position:absolute;inset:0}
 .mc-star{position:absolute;background:#fff;box-shadow:0 0 4px rgba(255,255,255,.5);animation:twinkle 3.5s ease-in-out infinite alternate}
 @keyframes twinkle{0%{opacity:.2}100%{opacity:.95}}
-#mc-moon{position:absolute;top:calc(5.2rem + env(safe-area-inset-top,0px));right:clamp(1.2rem,6vw,3.8rem);width:48px;height:48px;background:#fff8e7;border:3px solid #d8cfa8;box-shadow:0 0 0 6px rgba(255,245,210,.08),0 0 28px rgba(243,188,203,.38),inset -9px -9px 0 #e5dec0,inset 7px 7px 0 #ffffff;image-rendering:pixelated}
-#mc-moon::before{content:"";position:absolute;left:9px;top:11px;width:9px;height:9px;background:#d8cfa8;box-shadow:14px 16px 0 #d8cfa8,4px 20px 0 #cfc59b}
+#mc-moon{position:absolute;top:calc(5.2rem + env(safe-area-inset-top,0px));right:clamp(1.2rem,6vw,3.8rem);width:48px;height:48px;padding:0;background:#fff8e7;border:3px solid #d8cfa8;box-shadow:0 0 0 6px rgba(255,245,210,.08),0 0 28px rgba(243,188,203,.38),inset -9px -9px 0 #e5dec0,inset 7px 7px 0 #ffffff;image-rendering:pixelated;pointer-events:auto;cursor:pointer;transition:transform .25s,background .6s,border-color .6s,box-shadow .6s}
+#mc-moon:hover{transform:scale(1.1)}
+#mc-moon:active{transform:scale(.95)}
+#mc-moon::before{content:"";position:absolute;left:9px;top:11px;width:9px;height:9px;background:#d8cfa8;box-shadow:14px 16px 0 #d8cfa8,4px 20px 0 #cfc59b;transition:opacity .4s}
+body{transition:background .8s ease}
+body[data-sky="sunset"]{background:linear-gradient(180deg,#1c1136 0%,#4b1d52 30%,#9c354d 64%,#e87a48 100%) fixed}
+body[data-sky="sunset"] #mc-moon{background:#ffd25a;border-color:#e08a24;box-shadow:0 0 0 8px rgba(255,180,60,.18),0 0 38px rgba(255,120,40,.65),inset -9px -9px 0 #f29d35,inset 7px 7px 0 #fff1a8}
+body[data-sky="sunset"] #mc-moon::before{opacity:.2}
+body[data-sky="cherry"]{background:linear-gradient(180deg,#241434 0%,#4e224c 34%,#8a3b68 68%,#c9698e 100%) fixed}
+body[data-sky="cherry"] #mc-moon{background:#ffe6f2;border-color:#f29bc2;box-shadow:0 0 0 8px rgba(247,185,220,.2),0 0 36px rgba(247,185,220,.7),inset -9px -9px 0 #f3b3d2,inset 7px 7px 0 #ffffff}
+.sky-toast{position:fixed;bottom:calc(6.5rem + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);z-index:30;background:rgba(12,6,16,.9);border:2px solid #000;box-shadow:inset 0 0 0 1px #ffff55,0 6px 16px rgba(0,0,0,.6);padding:.35rem .85rem;color:#ffff55;font-size:.82rem;pointer-events:none;white-space:nowrap}
+#mc-fireworks{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:35}
 #mc-clouds{position:absolute;inset:0}
 .mc-cloud{position:absolute;background:rgba(255,235,245,.11);border-bottom:4px solid rgba(190,150,175,.14);box-shadow:22px -8px 0 rgba(255,235,245,.11),-18px 4px 0 rgba(255,235,245,.09);animation:cloudMove linear infinite}
 @keyframes cloudMove{from{transform:translateX(-180px)}to{transform:translateX(calc(100vw + 220px))}}
@@ -198,3 +208,86 @@ h2{font-size:clamp(1.5rem,5vw,2.3rem);line-height:1.25;margin-bottom:.6rem;color
 #ender{position:fixed;left:0;bottom:0;width:100%;z-index:4;pointer-events:none}
 #ender-hit{position:fixed;left:0;bottom:env(safe-area-inset-bottom,0px);z-index:4;border:0;padding:0;background:none;border-radius:8px;will-change:transform;touch-action:manipulation;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
 #ender-hit:focus-visible{outline:2px dashed var(--rose)}
+
+/* Abejita interactiva flotante de Minecraft */
+.mc-bee-wrap{position:fixed;left:0;top:0;z-index:14;pointer-events:none;will-change:transform}
+.mc-bee-btn{pointer-events:auto;background:none;border:0;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent;filter:drop-shadow(0 6px 12px rgba(0,0,0,.55));transition:transform .2s}
+.mc-bee-btn:hover{transform:scale(1.1)}
+.mc-bee-btn.spin{animation:beeSpin .55s ease-out}
+@keyframes beeSpin{0%{transform:scale(1) rotate(0deg)}45%{transform:scale(1.25) rotate(-18deg) translateY(-10px)}100%{transform:scale(1) rotate(360deg)}}
+#mc-bee-cv{display:block;width:56px;height:48px;image-rendering:pixelated}
+.mc-bee-bubble{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);margin-bottom:6px;width:max-content;max-width:min(230px,78vw);background:rgba(16,4,20,.94);border:2px solid #000;box-shadow:inset 0 0 0 2px #f3bccb,0 6px 18px rgba(0,0,0,.6);padding:.45rem .7rem;color:#fff;font-size:.76rem;line-height:1.4;text-align:center;pointer-events:none;animation:pop .25s ease-out}
+
+/* Paneles estilo interfaz de Minecraft (Mesa de Trabajo, Pociones, Tocadiscos y Mapa) */
+.mc-craft-gui,.mc-brew-gui,.mc-jukebox-gui,.mc-map-gui{width:min(28.5rem,94vw);background:#c6c6c6;border:3px solid #000;box-shadow:inset -3px -3px 0 #555,inset 3px 3px 0 #fff,0 14px 36px rgba(0,0,0,.65);padding:.9rem;image-rendering:pixelated;margin-bottom:1.6rem}
+.mc-gui-head{display:flex;align-items:center;gap:.55rem;color:#373737;text-shadow:none;font-size:.9rem;margin-bottom:.75rem;text-align:left}
+.gui-head-ico{width:24px;height:24px;image-rendering:pixelated;flex-shrink:0}
+
+/* Mesa de Trabajo (Crafting Table) */
+.craft-tabs{display:flex;flex-wrap:wrap;gap:.45rem;justify-content:center;margin-bottom:.85rem}
+.craft-tab{display:inline-flex;align-items:center;gap:.4rem;padding:.38rem .65rem;border:2px solid #000;background:#8b8b8b url("mc/button.png") center/100% 100% no-repeat;color:#fff;font-size:.78rem;text-shadow:1px 1px 0 #222;image-rendering:pixelated}
+.craft-tab.active,.craft-tab:hover{background-image:url("mc/button_highlighted.png");color:#ffffa0}
+.craft-tab img{width:18px;height:18px;image-rendering:pixelated}
+.craft-body{display:flex;align-items:center;justify-content:center;gap:clamp(.65rem,3vw,1.35rem);margin-bottom:.85rem}
+.craft-grid{display:grid;grid-template-columns:repeat(3,46px);grid-template-rows:repeat(3,46px);gap:4px;background:#8b8b8b;padding:6px;border:2px solid #373737;box-shadow:inset 2px 2px 0 #222,inset -2px -2px 0 #fff}
+.craft-slot{width:46px;height:46px;background:#8b8b8b url("mc/slot.png") center/100% 100% no-repeat;box-shadow:inset 2px 2px 0 #373737,inset -2px -2px 0 #fff;display:flex;align-items:center;justify-content:center;padding:0;border:0;cursor:pointer;transition:transform .12s}
+.craft-slot:hover{filter:brightness(1.12)}
+.craft-slot:active{transform:scale(.92)}
+.craft-slot img{width:30px;height:30px;image-rendering:pixelated;filter:drop-shadow(2px 2px 0 rgba(0,0,0,.45));animation:pop .25s ease-out}
+.craft-arrow{font-size:1.75rem;color:#373737;text-shadow:1px 1px 0 #fff;user-select:none}
+.craft-out{width:62px;height:62px;background:#8b8b8b url("mc/slot.png") center/100% 100% no-repeat;box-shadow:inset 3px 3px 0 #373737,inset -3px -3px 0 #fff,0 0 18px rgba(180,80,255,.45);border:2px solid #4a156b;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden;transition:transform .15s}
+.craft-out::after{content:"";position:absolute;inset:-40%;background:linear-gradient(125deg,transparent 35%,rgba(200,110,255,.38) 50%,transparent 65%);animation:glintSlide 2.6s linear infinite;pointer-events:none}
+@keyframes glintSlide{from{transform:translateX(-60%)}to{transform:translateX(60%)}}
+.craft-out:hover{transform:scale(1.07)}
+.craft-out:active{transform:scale(.95)}
+.craft-out img{width:38px;height:38px;image-rendering:pixelated;filter:drop-shadow(2px 2px 0 rgba(0,0,0,.5));z-index:1}
+
+/* Tooltip estilo inventario de Minecraft (#100010 con borde morado) */
+.mc-tooltip-card{background:rgba(16,0,16,.94);border:3px solid #080008;box-shadow:inset 0 0 0 2px #5000ff,0 8px 22px rgba(0,0,0,.65);padding:.75rem 1rem;text-align:left;color:#fff;line-height:1.5}
+.mc-tooltip-card .tt-title{color:#55ffff;font-size:.95rem;text-shadow:2px 2px 0 #153f3f;margin-bottom:.15rem}
+.mc-tooltip-card .tt-lore{color:#ff55ff;font-size:.8rem;text-shadow:2px 2px 0 #3f153f;margin-bottom:.3rem}
+.mc-tooltip-card .tt-desc{color:#e0e0e0;font-size:.84rem;text-shadow:1px 1px 0 #000}
+
+/* Soporte de Pociones (Brewing Stand) */
+.brew-top-row{display:flex;flex-direction:column;align-items:center;gap:.25rem;margin-bottom:.4rem}
+.brew-fuel{width:48px;height:48px;background:#8b8b8b url("mc/slot.png") center/100% 100% no-repeat;box-shadow:inset 2px 2px 0 #373737,inset -2px -2px 0 #fff;display:flex;align-items:center;justify-content:center}
+.brew-fuel img{width:28px;height:28px;image-rendering:pixelated}
+.brew-bubbles{display:flex;gap:.8rem;color:#b84dff;text-shadow:1px 1px 0 #2a0845;font-size:.9rem}
+.brew-bubbles span{animation:breathe 1.4s ease-in-out infinite}
+.brew-bubbles span:nth-child(2){animation-delay:.3s}
+.brew-bubbles span:nth-child(3){animation-delay:.6s}
+.brew-slots{display:flex;justify-content:center;gap:.85rem;margin-bottom:.85rem}
+.brew-slot{width:58px;height:58px;background:#8b8b8b url("mc/slot.png") center/100% 100% no-repeat;box-shadow:inset 2px 2px 0 #373737,inset -2px -2px 0 #fff;border:2px solid transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden;transition:transform .15s}
+.brew-slot::after{content:"";position:absolute;inset:-40%;background:linear-gradient(125deg,transparent 35%,rgba(215,120,255,.35) 50%,transparent 65%);animation:glintSlide 2.8s linear infinite;pointer-events:none}
+.brew-slot.active,.brew-slot:hover{border-color:#ffff55;transform:translateY(-3px)}
+.brew-slot img{width:34px;height:34px;image-rendering:pixelated;filter:drop-shadow(2px 2px 0 rgba(0,0,0,.45));z-index:1}
+
+/* Tocadiscos (Jukebox) */
+.jukebox-stage{display:flex;align-items:center;gap:1rem;background:rgba(24,14,22,.88);border:2px solid #000;box-shadow:inset 0 0 0 2px #522040;padding:.75rem .9rem;margin-bottom:.75rem;text-align:left}
+.jukebox-block{position:relative;width:64px;height:64px;flex-shrink:0;border:2px solid #000;box-shadow:0 6px 14px rgba(0,0,0,.5)}
+.jukebox-block img{width:100%;height:100%;display:block;image-rendering:pixelated}
+.jukebox-block.playing{animation:breathe 1.8s ease-in-out infinite}
+.jukebox-notes{position:absolute;inset:0;pointer-events:none}
+.jb-note{position:absolute;left:50%;top:10%;font-size:1.1rem;font-weight:700;text-shadow:2px 2px 0 #000;animation:noteFloat 1.8s ease-out forwards}
+@keyframes noteFloat{0%{opacity:1;transform:translate(-50%,0) scale(.8)}100%{opacity:0;transform:translate(calc(-50% + var(--nx,0px)),-46px) scale(1.2)}}
+.jukebox-info{flex:1;min-width:0}
+.jb-now{color:#55ffff;font-size:.88rem;text-shadow:2px 2px 0 #153f3f;margin-bottom:.2rem}
+.jb-sub{color:#d8c8d2;font-size:.76rem;text-shadow:1px 1px 0 #000}
+.jukebox-discs{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem}
+.disc-btn{display:flex;flex-direction:column;align-items:center;gap:.3rem;padding:.5rem .35rem;background:#8b8b8b url("mc/slot.png") center/100% 100% no-repeat;box-shadow:inset 2px 2px 0 #373737,inset -2px -2px 0 #fff;border:2px solid transparent;color:#fff;font-size:.74rem;text-shadow:1px 1px 0 #000;cursor:pointer;transition:transform .15s}
+.disc-btn:hover,.disc-btn.active{border-color:#ffff55;color:#ffff55;transform:translateY(-2px)}
+.disc-btn img{width:34px;height:34px;image-rendering:pixelated;filter:drop-shadow(2px 2px 0 rgba(0,0,0,.5))}
+.disc-btn.active img{animation:spinDisc 5s steps(12) infinite}
+
+/* Mapa y Coordenadas (F3) */
+.map-meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.4rem;background:rgba(16,8,20,.88);border:2px solid #000;padding:.45rem .7rem;color:#d0d0d0;font-size:.76rem;text-shadow:1px 1px 0 #000;margin-bottom:.65rem}
+.map-meta b{color:#80ff20}
+.mc-map-cv{width:100%;height:auto;display:block;border:3px solid #3d2817;box-shadow:inset 0 0 0 2px #c8ad7f,0 6px 16px rgba(0,0,0,.45);image-rendering:pixelated;margin-bottom:.7rem;background:#d8c49a}
+.map-waypoints{display:flex;flex-direction:column;gap:.45rem}
+.wp-btn{display:flex;flex-direction:column;align-items:flex-start;gap:.15rem;width:100%;text-align:left;background:rgba(20,10,24,.9);border:2px solid #000;box-shadow:inset 0 0 0 1px #5c2848;padding:.55rem .75rem;color:#fff;cursor:pointer;transition:transform .12s,border-color .12s}
+.wp-btn:hover,.wp-btn.active{border-color:#ffff55;transform:translateX(3px)}
+.wp-coords{color:#ffff55;font-size:.75rem;text-shadow:1px 1px 0 #3f3f15}
+.wp-title{color:#f3bccb;font-size:.86rem}
+.wp-desc{color:#d8d0d5;font-size:.78rem;line-height:1.4}
+
+.firework-btn{margin:.2rem 0 1.4rem}

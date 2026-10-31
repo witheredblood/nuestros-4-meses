@@ -96,6 +96,7 @@
       b.onclick = () => {
         const f = $("#final"); f.hidden = false; f.classList.add("show");
         f.scrollIntoView({ behavior: calm ? "auto" : "smooth" }); prog.remove();
+        setTimeout(() => dispatchEvent(new Event("mc-fireworks-burst")), 500);
       };
       prog.replaceChildren(b);
     }, 550);
@@ -502,6 +503,471 @@
         : "¡Ñam! A Luna le encantó su filete y te manda muchos lengüetazos ♥");
     };
   });
+
+  /* Sonidos sintetizados estilo Minecraft para interacciones */
+  function playUiTone(freqs, dur = 0.12, type = "triangle", vol = 0.08) {
+    try {
+      const ac = window.__mcAC = window.__mcAC || new (window.AudioContext || window.webkitAudioContext)();
+      if (ac.state === "suspended") ac.resume();
+      const now = ac.currentTime;
+      freqs.forEach((f, idx) => {
+        const osc = ac.createOscillator(), g = ac.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(f, now + idx * 0.07);
+        g.gain.setValueAtTime(0.001, now + idx * 0.07);
+        g.gain.exponentialRampToValueAtTime(vol, now + idx * 0.07 + 0.015);
+        g.gain.exponentialRampToValueAtTime(0.0008, now + idx * 0.07 + dur);
+        osc.connect(g).connect(ac.destination);
+        osc.start(now + idx * 0.07);
+        osc.stop(now + idx * 0.07 + dur + 0.02);
+      });
+    } catch (_) {}
+  }
+
+  /* 1. Ciclo de cielo al tocar la Luna / Sol */
+  const moonBtn = $("#mc-moon"), skyToast = $("#sky-toast");
+  const SKY_MODES = [
+    { id: "night", label: "Hora cambiada a: Noche estrellada ☾" },
+    { id: "sunset", label: "Hora cambiada a: Atardecer de Minecraft ☀" },
+    { id: "cherry", label: "Hora cambiada a: Amanecer de Cerezos ✿" }
+  ];
+  let skyIdx = 0, skyTimer = 0;
+  if (moonBtn) {
+    moonBtn.onclick = () => {
+      skyIdx = (skyIdx + 1) % SKY_MODES.length;
+      const mode = SKY_MODES[skyIdx];
+      document.body.dataset.sky = mode.id;
+      playUiTone([523.25, 659.25, 783.99], 0.16, "sine", 0.07);
+      const r = moonBtn.getBoundingClientRect();
+      spawnSpriteParticles(r, mode.id === "cherry" ? "mc/cherry_0.png" : "mc/particle_heart.png", 6, 14, 8);
+      if (skyToast) {
+        skyToast.textContent = mode.label;
+        skyToast.hidden = false;
+        clearTimeout(skyTimer);
+        skyTimer = setTimeout(() => { skyToast.hidden = true; }, 2600);
+      }
+    };
+  }
+
+  /* 2. Abejita interactiva flotante de Minecraft */
+  const beeWrap = $("#mc-bee-wrap"), beeBtn = $("#mc-bee-btn"), beeCv = $("#mc-bee-cv"), beeBubble = $("#mc-bee-bubble");
+  if (beeWrap && beeBtn && beeCv) {
+    const bg = beeCv.getContext("2d");
+    bg.imageSmoothingEnabled = false;
+    let beeT = 0, beeNoteIdx = 0, bubbleTimer = 0;
+    let bx = window.innerWidth * 0.18, by = window.innerHeight * 0.28;
+
+    function drawBee(wingUp) {
+      bg.clearRect(0, 0, 56, 48);
+      const px = (x, y, w, h, c) => { bg.fillStyle = c; bg.fillRect(x * 2, y * 2, w * 2, h * 2); };
+      // Alas pixel-art
+      if (wingUp) {
+        px(10, 2, 5, 5, "rgba(235,248,255,0.88)");
+        px(15, 3, 4, 4, "rgba(210,235,255,0.78)");
+      } else {
+        px(10, 6, 5, 4, "rgba(235,248,255,0.88)");
+        px(15, 7, 4, 3, "rgba(210,235,255,0.78)");
+      }
+      // Cuerpo de abejita de Minecraft
+      px(6, 9, 15, 10, "#f6c93e");
+      px(7, 8, 13, 1, "#ffe169");
+      // Franjas oscuras
+      px(11, 8, 2, 11, "#2d211b");
+      px(15, 8, 2, 11, "#2d211b");
+      px(19, 9, 2, 10, "#2d211b");
+      // Sombra inferior
+      px(7, 18, 13, 1, "#c89622");
+      // Ojos y mejilla rosada
+      px(7, 11, 2, 4, "#161219");
+      px(7, 11, 1, 1, "#55ffff");
+      px(8, 15, 2, 1, "#f38baa");
+      // Antenas
+      px(4, 9, 2, 1, "#2d211b");
+      px(4, 8, 1, 1, "#2d211b");
+      // Patitas
+      px(11, 19, 1, 2, "#2d211b");
+      px(14, 19, 1, 2, "#2d211b");
+      px(17, 19, 1, 2, "#2d211b");
+      // Florcita que lleva
+      px(8, 19, 2, 2, "#ff66aa");
+    }
+
+    function stepBee(now) {
+      const t = (now || 0) * 0.001;
+      const dt = Math.min(0.05, t - beeT || 0.016);
+      beeT = t;
+      const vw = Math.max(300, window.innerWidth - 76);
+      const vh = Math.max(300, window.innerHeight - 180);
+      const tx = 20 + (Math.sin(t * 0.42) * 0.5 + 0.5) * (vw - 40);
+      const ty = 72 + (Math.cos(t * 0.65) * 0.5 + 0.5) * Math.min(260, vh * 0.5);
+      const flip = tx >= bx ? -1 : 1;
+      bx += (tx - bx) * Math.min(1, dt * 3);
+      by += (ty - by) * Math.min(1, dt * 3);
+      drawBee(Math.sin(t * 28) > 0);
+      beeWrap.style.transform = `translate3d(${bx.toFixed(1)}px,${by.toFixed(1)}px,0)`;
+      beeCv.style.transform = `scaleX(${flip})`;
+      requestAnimationFrame(stepBee);
+    }
+
+    addEventListener("mc-ready", () => {
+      beeWrap.hidden = false;
+      requestAnimationFrame(stepBee);
+    }, { once: true });
+
+    beeBtn.onclick = () => {
+      beeBtn.classList.remove("spin"); void beeBtn.offsetWidth; beeBtn.classList.add("spin");
+      playUiTone([587.33, 783.99, 987.77], 0.14, "triangle", 0.08);
+      const r = beeBtn.getBoundingClientRect();
+      spawnSpriteParticles(r, "mc/particle_heart.png", 5, 14, 8);
+      spawnSpriteParticles(r, Math.random() < 0.5 ? "mc/pink_tulip.png" : "mc/poppy.png", 3, 18, 6);
+      const notes = C.beeNotes || ["Bzz ♥ Te quiero muchísimo"];
+      if (beeBubble) {
+        beeBubble.textContent = notes[beeNoteIdx % notes.length];
+        beeNoteIdx++;
+        beeBubble.hidden = false;
+        clearTimeout(bubbleTimer);
+        bubbleTimer = setTimeout(() => { beeBubble.hidden = true; }, 4200);
+      }
+    };
+  }
+
+  /* 3. Mesa de Trabajo (Crafting Table 3x3) */
+  const craftTabs = $("#craft-tabs"), craftGrid = $("#craft-grid"), craftOut = $("#craft-out");
+  const craftOutImg = $("#craft-out-img"), craftCard = $("#craft-card");
+  const ALL_ITEMS = [
+    "mc/sugar.png", "mc/pink_petals.png", "mc/diamond.png",
+    "mc/paper.png", "mc/golden_apple.png", "mc/honey_bottle.png",
+    "mc/amethyst_shard.png", "mc/writable_book.png"
+  ];
+  if (craftTabs && craftGrid && craftOut && C.recipes && C.recipes.length) {
+    let curRecipe = C.recipes[0];
+    const slotImgs = [];
+
+    for (let i = 0; i < 9; i++) {
+      const slot = document.createElement("button");
+      slot.type = "button";
+      slot.className = "craft-slot";
+      slot.setAttribute("aria-label", `Casilla de fabricación ${i + 1}`);
+      const img = document.createElement("img");
+      img.alt = "";
+      slot.append(img);
+      slot.onclick = () => {
+        const curIdx = ALL_ITEMS.indexOf(img.getAttribute("src"));
+        const nextSrc = ALL_ITEMS[(curIdx + 1) % ALL_ITEMS.length];
+        img.src = nextSrc;
+        playUiTone([440, 554.37], 0.08, "square", 0.05);
+      };
+      slotImgs.push(img);
+      craftGrid.append(slot);
+    }
+
+    function renderCraftCard(rec, crafted) {
+      if (!craftCard) return;
+      craftCard.innerHTML =
+        `<p class="tt-title">${crafted ? "¡Crafteado! · " : ""}${rec.name}</p>` +
+        `<p class="tt-lore">${rec.lore}</p>` +
+        `<p class="tt-desc">${rec.desc}</p>`;
+    }
+
+    function selectRecipe(rec, tabBtn) {
+      curRecipe = rec;
+      craftTabs.querySelectorAll(".craft-tab").forEach(b => b.classList.toggle("active", b === tabBtn));
+      rec.grid.forEach((src, i) => { if (slotImgs[i]) slotImgs[i].src = src; });
+      if (craftOutImg) craftOutImg.src = rec.resultIcon;
+      renderCraftCard(rec, false);
+    }
+
+    C.recipes.forEach((rec, idx) => {
+      const tb = document.createElement("button");
+      tb.type = "button";
+      tb.className = "craft-tab" + (idx === 0 ? " active" : "");
+      tb.innerHTML = `<img src="${rec.resultIcon}" alt=""><span>${rec.name.replace(/^Cupón:\s*|^Libro Encantado:\s*/i, "")}</span>`;
+      tb.onclick = () => {
+        playUiTone([523.25], 0.08, "triangle", 0.06);
+        selectRecipe(rec, tb);
+      };
+      craftTabs.append(tb);
+    });
+
+    selectRecipe(C.recipes[0], craftTabs.firstElementChild);
+
+    craftOut.onclick = () => {
+      playUiTone([523.25, 659.25, 783.99, 1046.5], 0.15, "triangle", 0.09);
+      const r = craftOut.getBoundingClientRect();
+      spawnSpriteParticles(r, "mc/xp_orb.png", 7, 14, 8);
+      spawnSpriteParticles(r, "mc/particle_heart.png", 6, 16, 8);
+      renderCraftCard(curRecipe, true);
+    };
+  }
+
+  /* 4. Soporte de Pociones (Brewing Stand) */
+  const brewSlots = $("#brew-slots"), brewCard = $("#brew-card");
+  if (brewSlots && brewCard && C.potions && C.potions.length) {
+    function selectPotion(pot, btn, withFx) {
+      brewSlots.querySelectorAll(".brew-slot").forEach(b => b.classList.toggle("active", b === btn));
+      brewCard.innerHTML =
+        `<p class="tt-title">${pot.name} (${pot.duration})</p>` +
+        `<p class="tt-lore">✦ ${pot.effect}</p>` +
+        `<p class="tt-desc">${pot.desc}</p>`;
+      if (withFx && btn) {
+        playUiTone([659.25, 880, 987.77], 0.14, "sine", 0.08);
+        const r = btn.getBoundingClientRect();
+        spawnSpriteParticles(r, "mc/particle_heart.png", 6, 14, 8);
+      }
+    }
+    C.potions.forEach((pot, idx) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "brew-slot" + (idx === 0 ? " active" : "");
+      b.setAttribute("aria-label", pot.name);
+      b.innerHTML = `<img src="${pot.icon}" alt="">`;
+      b.onclick = () => selectPotion(pot, b, true);
+      brewSlots.append(b);
+    });
+    selectPotion(C.potions[0], brewSlots.firstElementChild, false);
+  }
+
+  /* 5. Tocadiscos (Jukebox) con Discos de Música */
+  const jbDiscs = $("#jukebox-discs"), jbNow = $("#jb-now"), jbSub = $("#jb-sub");
+  const jbBlock = $("#jukebox-block"), jbNotes = $("#jukebox-notes");
+  let synthTimer = 0, noteTimer = 0, activeDiscId = "blind_spots";
+
+  function stopSynthDisc() {
+    if (synthTimer) { clearInterval(synthTimer); synthTimer = 0; }
+  }
+
+  function startSynthMelody(kind) {
+    stopSynthDisc();
+    const scale = kind === "cherry"
+      ? [523.25, 659.25, 783.99, 880, 1046.5, 880, 783.99, 659.25]
+      : [440, 554.37, 659.25, 880, 659.25, 987.77, 880, 554.37];
+    let stepIdx = 0;
+    const playStep = () => {
+      const f = scale[stepIdx % scale.length];
+      stepIdx++;
+      playUiTone([f], 0.42, "sine", 0.065);
+    };
+    playStep();
+    synthTimer = setInterval(playStep, 520);
+  }
+
+  function spawnJukeboxNote(col) {
+    if (!jbNotes) return;
+    const n = document.createElement("span");
+    n.className = "jb-note";
+    n.textContent = Math.random() < 0.5 ? "♪" : "♫";
+    n.style.color = col || "#55ffff";
+    n.style.setProperty("--nx", ((Math.random() - 0.5) * 44).toFixed(0) + "px");
+    n.onanimationend = () => n.remove();
+    jbNotes.append(n);
+  }
+
+  if (jbDiscs && C.discs && C.discs.length) {
+    C.discs.forEach((d, idx) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "disc-btn" + (idx === 0 ? " active" : "");
+      btn.innerHTML = `<img src="${d.icon}" alt=""><span>${d.title.replace(/^Melodía\s*-\s*|^C418\s*-\s*/i, "")}</span>`;
+      btn.onclick = () => {
+        activeDiscId = d.id;
+        jbDiscs.querySelectorAll(".disc-btn").forEach(b => b.classList.toggle("active", b === btn));
+        if (jbNow) jbNow.textContent = "Reproduciendo: " + d.title;
+        if (jbSub) jbSub.textContent = d.subtitle;
+        if (jbBlock) jbBlock.classList.add("playing");
+
+        if (d.src) {
+          stopSynthDisc();
+          if (!bgSong) {
+            bgSong = new Audio(d.src);
+            bgSong.loop = true;
+            bgSong.volume = 0.45;
+          }
+          bgSong.muted = false;
+          bgSong.play().catch(() => {});
+        } else if (d.synth) {
+          if (bgSong) bgSong.pause();
+          startSynthMelody(d.synth);
+        }
+
+        spawnJukeboxNote(d.color);
+        if (noteTimer) clearInterval(noteTimer);
+        noteTimer = setInterval(() => spawnJukeboxNote(d.color), 900);
+
+        const mt = $("#mc-music-toast");
+        if (mt) {
+          const songEl = mt.querySelector(".toast-song");
+          const discEl = mt.querySelector(".toast-disc");
+          if (songEl) songEl.textContent = d.title;
+          if (discEl) discEl.src = d.icon;
+          mt.hidden = false;
+          void mt.offsetWidth;
+          mt.classList.add("show");
+          setTimeout(() => mt.classList.remove("show"), 4200);
+        }
+      };
+      jbDiscs.append(btn);
+    });
+  }
+
+  /* 6. Mapa de Nuestro Mundo y Coordenadas (F3) */
+  const mapCv = $("#mc-map-cv"), mapWps = $("#map-waypoints");
+  const mapSeed = $("#map-seed"), mapBiome = $("#map-biome");
+  if (mapCv && C.worldMap) {
+    if (mapSeed) mapSeed.textContent = C.worldMap.seed;
+    if (mapBiome) mapBiome.textContent = C.worldMap.biome;
+    const mg = mapCv.getContext("2d");
+    mg.imageSmoothingEnabled = false;
+    const WP_POS = [[52, 68], [120, 50], [190, 36]];
+    let selWp = 0;
+
+    function drawMap() {
+      // Fondo pergamino / pasto de Cherry Grove
+      mg.fillStyle = "#7ec850"; mg.fillRect(0, 0, 240, 110);
+      // Colinas suaves
+      mg.fillStyle = "#6bb540"; mg.fillRect(0, 0, 240, 34);
+      mg.fillStyle = "#8fd462"; mg.fillRect(20, 62, 200, 48);
+      // Río pixelado
+      mg.fillStyle = "#4fa4e8";
+      for (let x = 0; x < 240; x += 6) {
+        const ry = 52 + Math.round(Math.sin(x * 0.045) * 14);
+        mg.fillRect(x, ry, 6, 12);
+        mg.fillStyle = "#6ec0ff"; mg.fillRect(x, ry + 2, 6, 4);
+        mg.fillStyle = "#4fa4e8";
+      }
+      // Árboles de cerezo (copas rosadas)
+      const trees = [[26,24],[42,82],[78,28],[96,80],[146,22],[164,78],[208,68],[216,22],[118,20]];
+      trees.forEach(([tx, ty]) => {
+        mg.fillStyle = "#462c39"; mg.fillRect(tx + 3, ty + 7, 3, 5);
+        mg.fillStyle = "#eb92c1"; mg.fillRect(tx, ty, 9, 8);
+        mg.fillStyle = "#fccbe7"; mg.fillRect(tx + 2, ty + 1, 5, 4);
+      });
+      // Camino de bloques entre coordenadas
+      mg.fillStyle = "#d9b382";
+      for (let i = 0; i < WP_POS.length - 1; i++) {
+        const [x0, y0] = WP_POS[i], [x1, y1] = WP_POS[i + 1];
+        for (let s = 0; s <= 16; s++) {
+          const px = Math.round(x0 + (x1 - x0) * (s / 16));
+          const py = Math.round(y0 + (y1 - y0) * (s / 16));
+          mg.fillRect(px - 1, py - 1, 3, 3);
+        }
+      }
+      // Marcadores de waypoints y corazón central
+      WP_POS.forEach(([wx, wy], idx) => {
+        const isSel = idx === selWp;
+        mg.fillStyle = isSel ? "#ffff55" : "#ffffff";
+        mg.fillRect(wx - 4, wy - 4, 8, 8);
+        mg.fillStyle = isSel ? "#ff2a6d" : "#8e1d3c";
+        mg.fillRect(wx - 2, wy - 2, 4, 4);
+      });
+    }
+    drawMap();
+
+    if (mapWps && C.worldMap.waypoints) {
+      C.worldMap.waypoints.forEach((wp, idx) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "wp-btn" + (idx === 0 ? " active" : "");
+        b.innerHTML =
+          `<span class="wp-coords">${wp.coords}</span>` +
+          `<strong class="wp-title">${wp.title}</strong>` +
+          `<span class="wp-desc">${wp.desc}</span>`;
+        b.onclick = () => {
+          selWp = idx;
+          mapWps.querySelectorAll(".wp-btn").forEach(el => el.classList.toggle("active", el === b));
+          drawMap();
+          playUiTone([587.33, 880], 0.11, "triangle", 0.06);
+          spawnSpriteParticles(mapCv.getBoundingClientRect(), "mc/particle_heart.png", 5, 14, 6);
+        };
+        mapWps.append(b);
+      });
+    }
+  }
+
+  /* 7. Cohete de Fuegos Artificiales de Minecraft */
+  const fwCv = $("#mc-fireworks"), fwBtn = $("#firework-btn");
+  if (fwCv) {
+    const fg = fwCv.getContext("2d");
+    let rockets = [], sparks = [], fwRaf = 0;
+    const resizeFw = () => {
+      fwCv.width = window.innerWidth;
+      fwCv.height = window.innerHeight;
+    };
+    resizeFw();
+    addEventListener("resize", resizeFw);
+
+    function explodeHeart(x, y, cols) {
+      playUiTone([220, 440, 880, 1318.5], 0.18, "sawtooth", 0.06);
+      for (let i = 0; i < 42; i++) {
+        const t = (i / 42) * Math.PI * 2;
+        const hx = 16 * Math.pow(Math.sin(t), 3);
+        const hy = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+        const spd = 2.1 + Math.random() * 0.45;
+        sparks.push({
+          x, y,
+          vx: hx * spd * 0.15 + (Math.random() - 0.5) * 0.6,
+          vy: hy * spd * 0.15 + (Math.random() - 0.5) * 0.6,
+          life: 0, max: 52 + Math.random() * 22,
+          c: cols[i % cols.length], sz: 4
+        });
+      }
+    }
+
+    function launchFireworkSalvo(count = 3) {
+      for (let i = 0; i < count; i++) {
+        setTimeout(() => {
+          playUiTone([330, 493.88, 659.25], 0.12, "triangle", 0.05);
+          rockets.push({
+            x: window.innerWidth * (0.2 + Math.random() * 0.6),
+            y: window.innerHeight + 10,
+            vy: -(9.5 + Math.random() * 3.5),
+            targetY: window.innerHeight * (0.18 + Math.random() * 0.28),
+            cols: i % 2 === 0
+              ? ["#ff5577", "#ff99bb", "#ffff55", "#ffffff"]
+              : ["#55ffff", "#ff77ff", "#f3bccb", "#80ff20"]
+          });
+          if (!fwRaf) fwRaf = requestAnimationFrame(stepFw);
+        }, i * 320);
+      }
+    }
+
+    function stepFw() {
+      fg.clearRect(0, 0, fwCv.width, fwCv.height);
+      for (let i = rockets.length - 1; i >= 0; i--) {
+        const r = rockets[i];
+        r.y += r.vy;
+        fg.fillStyle = "#ffff55";
+        fg.fillRect(r.x - 2, r.y - 4, 4, 8);
+        sparks.push({
+          x: r.x + (Math.random() - 0.5) * 4, y: r.y + 6,
+          vx: (Math.random() - 0.5) * 0.8, vy: 1.5,
+          life: 0, max: 14, c: "#ffd25a", sz: 3
+        });
+        if (r.y <= r.targetY) {
+          explodeHeart(r.x, r.y, r.cols);
+          rockets.splice(i, 1);
+        }
+      }
+      for (let i = sparks.length - 1; i >= 0; i--) {
+        const p = sparks[i];
+        p.x += p.vx; p.y += p.vy; p.vy += 0.045;
+        p.life++;
+        fg.globalAlpha = Math.max(0, 1 - p.life / p.max);
+        fg.fillStyle = p.c;
+        fg.fillRect(Math.round(p.x), Math.round(p.y), p.sz, p.sz);
+        if (p.life >= p.max) sparks.splice(i, 1);
+      }
+      fg.globalAlpha = 1;
+      if (rockets.length || sparks.length) {
+        fwRaf = requestAnimationFrame(stepFw);
+      } else {
+        fwRaf = 0;
+        fg.clearRect(0, 0, fwCv.width, fwCv.height);
+      }
+    }
+
+    if (fwBtn) fwBtn.onclick = () => launchFireworkSalvo(4);
+    addEventListener("mc-fireworks-burst", () => launchFireworkSalvo(4));
+  }
 
   /* Botón de música opcional */
   if (C.music) {
