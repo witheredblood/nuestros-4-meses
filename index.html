@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.cdnfonts.com/css/minecraft-3" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=36">
+<link rel="stylesheet" href="style.css?v=37">
 </head>
 <body>
 <div id="mc-sky" aria-hidden="true">
@@ -121,10 +121,13 @@
     <p class="box hmsg" id="hmsg" aria-live="polite"></p>
   </section>
 
-  <!-- Mesa de Trabajo (Crafting Table 3x3) -->
+  <!-- Mesa de Trabajo (Crafting Table 3x3 en vista isométrica) -->
   <section id="craft-sec" class="sec">
     <h2>Mesa de Trabajo</h2>
-    <p class="sub">Elige una receta y toca el resultado para craftear un recuerdo especial.</p>
+    <p class="sub">Elige una receta y toca la mesa o el resultado para craftear un recuerdo especial.</p>
+    <button id="craft-iso-btn" class="iso-block-btn" type="button" aria-label="Mesa de trabajo en 3D: toca para craftear">
+      <canvas id="craft-iso-cv" width="210" height="176" aria-hidden="true"></canvas>
+    </button>
     <div class="mc-craft-gui">
       <div class="mc-gui-head">
         <img src="mc/crafting_table_top.png" alt="" class="gui-head-ico" width="24" height="24">
@@ -160,40 +163,28 @@
     </div>
   </section>
 
-  <!-- Tocadiscos (Jukebox) y Mapa de Coordenadas -->
-  <section id="jukebox-map-sec" class="sec">
-    <h2>Nuestro Mundo</h2>
-    <p class="sub">Pon un disco en el tocadiscos o explora las coordenadas de nuestra historia.</p>
+  <!-- Tocadiscos (Jukebox en vista isométrica) -->
+  <section id="jukebox-sec" class="sec">
+    <h2>Tocadiscos</h2>
+    <p class="sub">Elige un disco de Minecraft para ponerlo a sonar en el tocadiscos.</p>
+
+    <button id="jukebox-iso-btn" class="iso-block-btn" type="button" aria-label="Tocadiscos en 3D">
+      <canvas id="jukebox-iso-cv" width="210" height="176" aria-hidden="true"></canvas>
+      <div id="jukebox-notes" class="jukebox-notes" aria-hidden="true"></div>
+    </button>
 
     <div class="mc-jukebox-gui">
       <div class="mc-gui-head">
         <img src="mc/jukebox_top.png" alt="" class="gui-head-ico" width="24" height="24">
-        <span>Tocadiscos · Discos de Música</span>
+        <span>Discos de Minecraft</span>
       </div>
       <div class="jukebox-stage">
-        <div id="jukebox-block" class="jukebox-block">
-          <img src="mc/jukebox_side.png" alt="Tocadiscos de Minecraft" width="64" height="64">
-          <div id="jukebox-notes" class="jukebox-notes" aria-hidden="true"></div>
-        </div>
         <div class="jukebox-info">
-          <p id="jb-now" class="jb-now">Disco actual: C418 - Blind Spots</p>
-          <p id="jb-sub" class="jb-sub">Toca cualquier disco abajo para cambiar la música</p>
+          <p id="jb-now" class="jb-now">Reproduciendo: C418 - Blind Spots</p>
+          <p id="jb-sub" class="jb-sub">Toca cualquier disco abajo para cambiar la canción</p>
         </div>
       </div>
       <div id="jukebox-discs" class="jukebox-discs" role="group" aria-label="Discos de música"></div>
-    </div>
-
-    <div class="mc-map-gui">
-      <div class="mc-gui-head">
-        <img src="mc/filled_map.png" alt="" class="gui-head-ico" width="24" height="24">
-        <span>Mapa y Coordenadas (F3)</span>
-      </div>
-      <div class="map-meta">
-        <span>Semilla (Seed): <b id="map-seed">10072026</b></span>
-        <span>Bioma: <b id="map-biome">Bosque de Cerezos</b></span>
-      </div>
-      <canvas id="mc-map-cv" class="mc-map-cv" width="240" height="110" aria-label="Mapa pixel-art del bosque de cerezos"></canvas>
-      <div id="map-waypoints" class="map-waypoints"></div>
     </div>
   </section>
 
@@ -266,9 +257,9 @@
   </div>
 </dialog>
 
-<script src="config.js?v=36"></script>
-<script src="script.js?v=36"></script>
-<script src="mesa-encantamientos.js?v=36"></script>
-<script src="enderman.js?v=36"></script>
+<script src="config.js?v=37"></script>
+<script src="script.js?v=37"></script>
+<script src="mesa-encantamientos.js?v=37"></script>
+<script src="enderman.js?v=37"></script>
 </body>
 </html>

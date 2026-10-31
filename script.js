@@ -631,9 +631,45 @@
     };
   }
 
-  /* 3. Mesa de Trabajo (Crafting Table 3x3) */
+  /* Texturas 16x16 embebidas para bloques isométricos (Mesa de Trabajo y Tocadiscos) */
+  const ISO_PIX = {
+    crafting_table_top: { p: {"0":"#19140c","1":"#0e0b06","2":"#41230e","3":"#733920","4":"#1a150d","5":"#bc9862","6":"#9e5932","7":"#ae693c","8":"#553824","9":"#4b2b18"}, r: ["0110233333324140","1552677777762551","1527777777777251","0278988899998720","2678678779778762","3778779678678773","3778898898898773","3778778778778773","3778778778778773","3779998998898773","3779679769778773","2678679779678762","4278898888888724","1527777777777251","4552677777762554","0414233333320110"] },
+    crafting_table_front: { p: {"0":"#19140c","1":"#af8f55","2":"#b8945f","3":"#c29d62","4":"#382116","5":"#733920","6":"#4b2b18","7":"#967441","8":"#9f844d","9":"#7e6237","a":"#67502c","b":"#1b160d","c":"#41230e","d":"#281e0b","e":"#b5b5b5","f":"#ffffff","g":"#d8d8d8","h":"#110e08"}, r: ["0123345665433320","0211784664112280","0222121448811220","099779abb9accc90","03833336633d1d80","022c8184411ddd20","081d1114422eee80","0a9d79abba9fgg90","033d1136633fgg20","01ggg2144818gg80","02egf8844111fg20","0a9779ahh9799ga0","0823322663383f30","0122881442212110","0881218442188880","b99aa970b9a9aaab"] },
+    crafting_table_side: { p: {"0":"#19140c","1":"#af8f55","2":"#b8945f","3":"#c29d62","4":"#382116","5":"#733920","6":"#4b2b18","7":"#967441","8":"#9f844d","9":"#262012","a":"#7e6237","b":"#67502c","c":"#1b160d","d":"#41230e","e":"#281e0b","f":"#d8d8d8","g":"#b5b5b5","h":"#110e08"}, r: ["0123345665433320","0211784664112280","0222121998811220","0aa77abccababba0","0383333663321180","022d8d8441122220","081e1e1442211880","0baafabccbaaa7a0","033f1f3663333320","012g2g1448181880","0211888441118820","0ba77abhha7aabb0","0823322663383230","0122881442212110","0881218442188880","caabba70cababbbc"] },
+    jukebox_top: { p: {"0":"#292820","1":"#352f2b","2":"#5a3420","3":"#5a3c29","4":"#7b5039","5":"#945d41","6":"#181514"}, r: ["0011001111101000","0234433333443320","0345554334555431","1354443003444531","1354443063444541","0354443663444541","0354443663444541","1454443663444531","1454443663444531","1454443663444531","1354443663444540","1354443603444540","1354443003444541","1345554334555431","0234433344433320","0001111111101000"] },
+    jukebox_side: { p: {"0":"#292820","1":"#5a3c29","2":"#7b5039","3":"#945d41","4":"#412818","5":"#5a3420"}, r: ["0000000000000000","0123322333323210","0234343434342420","0343545354535430","0334353435342530","0254535453545230","0335343524352420","0243545354535410","0124352435242530","0254535453545220","0325243524352420","0242545254525410","0214252425242420","0144424442444210","0111111111111110","0000000000000000"] }
+  };
+  function makeIsoTex(name) {
+    const c = document.createElement("canvas"); c.width = c.height = 16;
+    const g = c.getContext("2d"), T = ISO_PIX[name];
+    for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) {
+      g.fillStyle = T.p[T.r[y][x]]; g.fillRect(x, y, 1, 1);
+    }
+    return c;
+  }
+  const ISO_TEX = Object.fromEntries(Object.keys(ISO_PIX).map(k => [k, makeIsoTex(k)]));
+  function drawIsoBlock(ctx, cx, fy, K, topTex, leftTex, rightTex, shL = 0.14, shR = 0.32) {
+    const h = 16, oy = fy - 16 * K - h * K;
+    ctx.fillStyle = "rgba(10,2,6,.42)";
+    ctx.beginPath(); ctx.ellipse(cx, fy - 12, 18 * K, 8.5 * K, 0, 0, Math.PI * 2); ctx.fill();
+
+    ctx.setTransform(K, K / 2, 0, K, cx - 16 * K, oy + 8 * K);
+    ctx.drawImage(leftTex, 0, 0, 16, 16, 0, 0, 16, 16);
+    if (shL > 0) { ctx.fillStyle = `rgba(0,0,0,${shL})`; ctx.fillRect(0, 0, 16, 16); }
+
+    ctx.setTransform(K, -K / 2, 0, K, cx, oy + 16 * K);
+    ctx.drawImage(rightTex, 0, 0, 16, 16, 0, 0, 16, 16);
+    if (shR > 0) { ctx.fillStyle = `rgba(0,0,0,${shR})`; ctx.fillRect(0, 0, 16, 16); }
+
+    ctx.setTransform(K, K / 2, -K, K / 2, cx, oy);
+    ctx.drawImage(topTex, 0, 0, 16, 16, 0, 0, 16, 16);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+  }
+
+  /* 3. Mesa de Trabajo (Crafting Table 3x3 + vista isométrica 3D) */
   const craftTabs = $("#craft-tabs"), craftGrid = $("#craft-grid"), craftOut = $("#craft-out");
   const craftOutImg = $("#craft-out-img"), craftCard = $("#craft-card");
+  const craftIsoCv = $("#craft-iso-cv"), craftIsoBtn = $("#craft-iso-btn");
   const ALL_ITEMS = [
     "mc/sugar.png", "mc/pink_petals.png", "mc/diamond.png",
     "mc/paper.png", "mc/golden_apple.png", "mc/honey_bottle.png",
@@ -642,6 +678,8 @@
   if (craftTabs && craftGrid && craftOut && C.recipes && C.recipes.length) {
     let curRecipe = C.recipes[0];
     const slotImgs = [];
+    const floatImg = new Image();
+    floatImg.src = curRecipe.resultIcon;
 
     for (let i = 0; i < 9; i++) {
       const slot = document.createElement("button");
@@ -671,6 +709,7 @@
 
     function selectRecipe(rec, tabBtn) {
       curRecipe = rec;
+      floatImg.src = rec.resultIcon;
       craftTabs.querySelectorAll(".craft-tab").forEach(b => b.classList.toggle("active", b === tabBtn));
       rec.grid.forEach((src, i) => { if (slotImgs[i]) slotImgs[i].src = src; });
       if (craftOutImg) craftOutImg.src = rec.resultIcon;
@@ -691,13 +730,41 @@
 
     selectRecipe(C.recipes[0], craftTabs.firstElementChild);
 
-    craftOut.onclick = () => {
+    function triggerCraft(targetEl) {
       playUiTone([523.25, 659.25, 783.99, 1046.5], 0.15, "triangle", 0.09);
-      const r = craftOut.getBoundingClientRect();
+      const r = (targetEl || craftOut).getBoundingClientRect();
       spawnSpriteParticles(r, "mc/xp_orb.png", 7, 14, 8);
       spawnSpriteParticles(r, "mc/particle_heart.png", 6, 16, 8);
       renderCraftCard(curRecipe, true);
-    };
+    }
+    craftOut.onclick = () => triggerCraft(craftOut);
+    if (craftIsoBtn) craftIsoBtn.onclick = () => triggerCraft(craftIsoBtn);
+
+    if (craftIsoCv) {
+      const cg = craftIsoCv.getContext("2d");
+      cg.imageSmoothingEnabled = false;
+      function animCraftIso(now) {
+        const t = (now || 0) * 0.001;
+        cg.clearRect(0, 0, 210, 176);
+        drawIsoBlock(cg, 105, 160, 3.4, ISO_TEX.crafting_table_top, ISO_TEX.crafting_table_front, ISO_TEX.crafting_table_side);
+        const bob = Math.sin(t * 2.6) * 4;
+        const fy = 40 + bob;
+        // Sombra sobre la mesa
+        cg.fillStyle = "rgba(0,0,0,.32)";
+        cg.beginPath(); cg.ellipse(105, 76, 14 - bob * 0.4, 7 - bob * 0.2, 0, 0, Math.PI * 2); cg.fill();
+        // Objeto flotando sobre la mesa isométrica
+        if (floatImg.complete && floatImg.naturalWidth > 0) {
+          const sx = Math.cos(t * 1.8);
+          cg.save();
+          cg.translate(105, fy);
+          cg.scale(Math.abs(sx) < 0.18 ? 0.18 : sx, 1);
+          cg.drawImage(floatImg, -18, -18, 36, 36);
+          cg.restore();
+        }
+        requestAnimationFrame(animCraftIso);
+      }
+      requestAnimationFrame(animCraftIso);
+    }
   }
 
   /* 4. Soporte de Pociones (Brewing Stand) */
@@ -727,29 +794,12 @@
     selectPotion(C.potions[0], brewSlots.firstElementChild, false);
   }
 
-  /* 5. Tocadiscos (Jukebox) con Discos de Música */
+  /* 5. Tocadiscos (Jukebox en vista isométrica 3D) con Discos Oficiales de Minecraft */
   const jbDiscs = $("#jukebox-discs"), jbNow = $("#jb-now"), jbSub = $("#jb-sub");
-  const jbBlock = $("#jukebox-block"), jbNotes = $("#jukebox-notes");
-  let synthTimer = 0, noteTimer = 0, activeDiscId = "blind_spots";
-
-  function stopSynthDisc() {
-    if (synthTimer) { clearInterval(synthTimer); synthTimer = 0; }
-  }
-
-  function startSynthMelody(kind) {
-    stopSynthDisc();
-    const scale = kind === "cherry"
-      ? [523.25, 659.25, 783.99, 880, 1046.5, 880, 783.99, 659.25]
-      : [440, 554.37, 659.25, 880, 659.25, 987.77, 880, 554.37];
-    let stepIdx = 0;
-    const playStep = () => {
-      const f = scale[stepIdx % scale.length];
-      stepIdx++;
-      playUiTone([f], 0.42, "sine", 0.065);
-    };
-    playStep();
-    synthTimer = setInterval(playStep, 520);
-  }
+  const jbIsoCv = $("#jukebox-iso-cv"), jbIsoBtn = $("#jukebox-iso-btn"), jbNotes = $("#jukebox-notes");
+  let noteTimer = 0, curDiscIdx = 0;
+  const discImg = new Image();
+  if (C.discs && C.discs.length) discImg.src = C.discs[0].icon;
 
   function spawnJukeboxNote(col) {
     if (!jbNotes) return;
@@ -757,9 +807,46 @@
     n.className = "jb-note";
     n.textContent = Math.random() < 0.5 ? "♪" : "♫";
     n.style.color = col || "#55ffff";
-    n.style.setProperty("--nx", ((Math.random() - 0.5) * 44).toFixed(0) + "px");
+    n.style.setProperty("--nx", ((Math.random() - 0.5) * 60).toFixed(0) + "px");
     n.onanimationend = () => n.remove();
     jbNotes.append(n);
+  }
+
+  function playDisc(d, idx, btn) {
+    curDiscIdx = idx;
+    discImg.src = d.icon;
+    if (jbDiscs) jbDiscs.querySelectorAll(".disc-btn").forEach(b => b.classList.toggle("active", b === btn));
+    if (jbNow) jbNow.textContent = "Reproduciendo: " + d.title;
+    if (jbSub) jbSub.textContent = d.subtitle;
+
+    if (d.src) {
+      if (bgSong) {
+        bgSong.pause();
+        bgSong.src = d.src;
+      } else {
+        bgSong = new Audio(d.src);
+      }
+      bgSong.loop = true;
+      bgSong.volume = 0.45;
+      bgSong.muted = false;
+      bgSong.play().catch(() => {});
+    }
+
+    spawnJukeboxNote(d.color);
+    if (noteTimer) clearInterval(noteTimer);
+    noteTimer = setInterval(() => spawnJukeboxNote(d.color), 850);
+
+    const mt = $("#mc-music-toast");
+    if (mt) {
+      const songEl = mt.querySelector(".toast-song");
+      const discEl = mt.querySelector(".toast-disc");
+      if (songEl) songEl.textContent = d.title;
+      if (discEl) discEl.src = d.icon;
+      mt.hidden = false;
+      void mt.offsetWidth;
+      mt.classList.add("show");
+      setTimeout(() => mt.classList.remove("show"), 4200);
+    }
   }
 
   if (jbDiscs && C.discs && C.discs.length) {
@@ -767,120 +854,39 @@
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = "disc-btn" + (idx === 0 ? " active" : "");
-      btn.innerHTML = `<img src="${d.icon}" alt=""><span>${d.title.replace(/^Melodía\s*-\s*|^C418\s*-\s*/i, "")}</span>`;
-      btn.onclick = () => {
-        activeDiscId = d.id;
-        jbDiscs.querySelectorAll(".disc-btn").forEach(b => b.classList.toggle("active", b === btn));
-        if (jbNow) jbNow.textContent = "Reproduciendo: " + d.title;
-        if (jbSub) jbSub.textContent = d.subtitle;
-        if (jbBlock) jbBlock.classList.add("playing");
-
-        if (d.src) {
-          stopSynthDisc();
-          if (!bgSong) {
-            bgSong = new Audio(d.src);
-            bgSong.loop = true;
-            bgSong.volume = 0.45;
-          }
-          bgSong.muted = false;
-          bgSong.play().catch(() => {});
-        } else if (d.synth) {
-          if (bgSong) bgSong.pause();
-          startSynthMelody(d.synth);
-        }
-
-        spawnJukeboxNote(d.color);
-        if (noteTimer) clearInterval(noteTimer);
-        noteTimer = setInterval(() => spawnJukeboxNote(d.color), 900);
-
-        const mt = $("#mc-music-toast");
-        if (mt) {
-          const songEl = mt.querySelector(".toast-song");
-          const discEl = mt.querySelector(".toast-disc");
-          if (songEl) songEl.textContent = d.title;
-          if (discEl) discEl.src = d.icon;
-          mt.hidden = false;
-          void mt.offsetWidth;
-          mt.classList.add("show");
-          setTimeout(() => mt.classList.remove("show"), 4200);
-        }
-      };
+      btn.innerHTML = `<img src="${d.icon}" alt=""><span>${d.title.replace(/^Lena Raine\s*-\s*|^Aaron Cherof\s*-\s*|^C418\s*-\s*/i, "")}</span>`;
+      btn.onclick = () => playDisc(d, idx, btn);
       jbDiscs.append(btn);
     });
+    if (jbIsoBtn) {
+      jbIsoBtn.onclick = () => {
+        const nextIdx = (curDiscIdx + 1) % C.discs.length;
+        const nextBtn = jbDiscs.children[nextIdx];
+        playDisc(C.discs[nextIdx], nextIdx, nextBtn);
+      };
+    }
   }
 
-  /* 6. Mapa de Nuestro Mundo y Coordenadas (F3) */
-  const mapCv = $("#mc-map-cv"), mapWps = $("#map-waypoints");
-  const mapSeed = $("#map-seed"), mapBiome = $("#map-biome");
-  if (mapCv && C.worldMap) {
-    if (mapSeed) mapSeed.textContent = C.worldMap.seed;
-    if (mapBiome) mapBiome.textContent = C.worldMap.biome;
-    const mg = mapCv.getContext("2d");
-    mg.imageSmoothingEnabled = false;
-    const WP_POS = [[52, 68], [120, 50], [190, 36]];
-    let selWp = 0;
-
-    function drawMap() {
-      // Fondo pergamino / pasto de Cherry Grove
-      mg.fillStyle = "#7ec850"; mg.fillRect(0, 0, 240, 110);
-      // Colinas suaves
-      mg.fillStyle = "#6bb540"; mg.fillRect(0, 0, 240, 34);
-      mg.fillStyle = "#8fd462"; mg.fillRect(20, 62, 200, 48);
-      // Río pixelado
-      mg.fillStyle = "#4fa4e8";
-      for (let x = 0; x < 240; x += 6) {
-        const ry = 52 + Math.round(Math.sin(x * 0.045) * 14);
-        mg.fillRect(x, ry, 6, 12);
-        mg.fillStyle = "#6ec0ff"; mg.fillRect(x, ry + 2, 6, 4);
-        mg.fillStyle = "#4fa4e8";
+  if (jbIsoCv) {
+    const jg = jbIsoCv.getContext("2d");
+    jg.imageSmoothingEnabled = false;
+    function animJukeboxIso(now) {
+      const t = (now || 0) * 0.001;
+      jg.clearRect(0, 0, 210, 176);
+      drawIsoBlock(jg, 105, 160, 3.4, ISO_TEX.jukebox_top, ISO_TEX.jukebox_side, ISO_TEX.jukebox_side);
+      // Disco girando en perspectiva isométrica sobre la ranura del tocadiscos
+      if (discImg.complete && discImg.naturalWidth > 0) {
+        const bob = Math.sin(t * 3) * 2.5;
+        jg.save();
+        jg.translate(105, 62 + bob);
+        jg.scale(1, 0.55);
+        jg.rotate(t * 2.2);
+        jg.drawImage(discImg, -20, -20, 40, 40);
+        jg.restore();
       }
-      // Árboles de cerezo (copas rosadas)
-      const trees = [[26,24],[42,82],[78,28],[96,80],[146,22],[164,78],[208,68],[216,22],[118,20]];
-      trees.forEach(([tx, ty]) => {
-        mg.fillStyle = "#462c39"; mg.fillRect(tx + 3, ty + 7, 3, 5);
-        mg.fillStyle = "#eb92c1"; mg.fillRect(tx, ty, 9, 8);
-        mg.fillStyle = "#fccbe7"; mg.fillRect(tx + 2, ty + 1, 5, 4);
-      });
-      // Camino de bloques entre coordenadas
-      mg.fillStyle = "#d9b382";
-      for (let i = 0; i < WP_POS.length - 1; i++) {
-        const [x0, y0] = WP_POS[i], [x1, y1] = WP_POS[i + 1];
-        for (let s = 0; s <= 16; s++) {
-          const px = Math.round(x0 + (x1 - x0) * (s / 16));
-          const py = Math.round(y0 + (y1 - y0) * (s / 16));
-          mg.fillRect(px - 1, py - 1, 3, 3);
-        }
-      }
-      // Marcadores de waypoints y corazón central
-      WP_POS.forEach(([wx, wy], idx) => {
-        const isSel = idx === selWp;
-        mg.fillStyle = isSel ? "#ffff55" : "#ffffff";
-        mg.fillRect(wx - 4, wy - 4, 8, 8);
-        mg.fillStyle = isSel ? "#ff2a6d" : "#8e1d3c";
-        mg.fillRect(wx - 2, wy - 2, 4, 4);
-      });
+      requestAnimationFrame(animJukeboxIso);
     }
-    drawMap();
-
-    if (mapWps && C.worldMap.waypoints) {
-      C.worldMap.waypoints.forEach((wp, idx) => {
-        const b = document.createElement("button");
-        b.type = "button";
-        b.className = "wp-btn" + (idx === 0 ? " active" : "");
-        b.innerHTML =
-          `<span class="wp-coords">${wp.coords}</span>` +
-          `<strong class="wp-title">${wp.title}</strong>` +
-          `<span class="wp-desc">${wp.desc}</span>`;
-        b.onclick = () => {
-          selWp = idx;
-          mapWps.querySelectorAll(".wp-btn").forEach(el => el.classList.toggle("active", el === b));
-          drawMap();
-          playUiTone([587.33, 880], 0.11, "triangle", 0.06);
-          spawnSpriteParticles(mapCv.getBoundingClientRect(), "mc/particle_heart.png", 5, 14, 6);
-        };
-        mapWps.append(b);
-      });
-    }
+    requestAnimationFrame(animJukeboxIso);
   }
 
   /* 7. Cohete de Fuegos Artificiales de Minecraft */

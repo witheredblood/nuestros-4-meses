@@ -174,56 +174,49 @@ window.CONFIG = {
     }
   ],
 
-  // 4. Discos del Tocadiscos (Jukebox)
+  // 4. Discos oficiales del Tocadiscos (extraídos de .minecraft)
   discs: [
     {
       id: "blind_spots",
       title: "C418 - Blind Spots",
       subtitle: "Nuestra canción principal ♥",
-      icon: "mc/music_disc_cat.png",
+      icon: "mc/music_disc.png",
       src: "sonidos/blind_spots.mp3",
-      color: "#55ff55"
+      color: "#80ff20"
     },
     {
-      id: "cherry_lullaby",
-      title: "Melodía - Cerezos al Atardecer",
-      subtitle: "Caja musical de cristal (Síntesis)",
+      id: "otherside",
+      title: "Lena Raine - otherside",
+      subtitle: "Disco oficial de Minecraft",
       icon: "mc/music_disc_otherside.png",
-      synth: "cherry",
+      src: "sonidos/otherside.ogg",
       color: "#55ffff"
     },
     {
-      id: "starlight_duet",
-      title: "Melodía - Bajo las Estrellas",
-      subtitle: "Notas dulces de medianoche (Síntesis)",
+      id: "relic",
+      title: "Aaron Cherof - Relic",
+      subtitle: "Disco oficial de Minecraft",
       icon: "mc/music_disc_relic.png",
-      synth: "stars",
+      src: "sonidos/relic.ogg",
+      color: "#ffaa55"
+    },
+    {
+      id: "creator_box",
+      title: "Creator (Caja Musical)",
+      subtitle: "Disco oficial de Minecraft",
+      icon: "mc/music_disc_creator_music_box.png",
+      src: "sonidos/creator_music_box.ogg",
       color: "#ff99cc"
+    },
+    {
+      id: "cat",
+      title: "C418 - cat",
+      subtitle: "Disco clásico de Minecraft",
+      icon: "mc/music_disc_cat.png",
+      src: "sonidos/cat.ogg",
+      color: "#55ff55"
     }
-  ],
-
-  // 5. Mapa y Coordenadas de Nuestro Mundo
-  worldMap: {
-    seed: "10072026",
-    biome: "Bosque de Cerezos (Cherry Grove)",
-    waypoints: [
-      {
-        coords: "X: 10 · Y: 07 · Z: 2026",
-        title: "El Primer Bloque",
-        desc: "Donde comenzó nuestra aventura juntos el 10 de julio de 2026."
-      },
-      {
-        coords: "X: 04 · Y: 120 · Z: 1011",
-        title: "Mirador de los 4 Meses",
-        desc: "Cuatro meses llenos de risas, cariño y momentos inolvidables."
-      },
-      {
-        coords: "X: ∞ · Y: 256 · Z: ∞",
-        title: "Nuestro Horizonte",
-        desc: "Todo el mapa que nos falta explorar siempre de la mano."
-      }
-    ]
-  }
+  ]
 };
 
 // Mesa de encantamientos

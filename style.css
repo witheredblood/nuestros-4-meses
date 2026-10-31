@@ -218,8 +218,14 @@ body[data-sky="cherry"] #mc-moon{background:#ffe6f2;border-color:#f29bc2;box-sha
 #mc-bee-cv{display:block;width:56px;height:48px;image-rendering:pixelated}
 .mc-bee-bubble{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);margin-bottom:6px;width:max-content;max-width:min(230px,78vw);background:rgba(16,4,20,.94);border:2px solid #000;box-shadow:inset 0 0 0 2px #f3bccb,0 6px 18px rgba(0,0,0,.6);padding:.45rem .7rem;color:#fff;font-size:.76rem;line-height:1.4;text-align:center;pointer-events:none;animation:pop .25s ease-out}
 
-/* Paneles estilo interfaz de Minecraft (Mesa de Trabajo, Pociones, Tocadiscos y Mapa) */
-.mc-craft-gui,.mc-brew-gui,.mc-jukebox-gui,.mc-map-gui{width:min(28.5rem,94vw);background:#c6c6c6;border:3px solid #000;box-shadow:inset -3px -3px 0 #555,inset 3px 3px 0 #fff,0 14px 36px rgba(0,0,0,.65);padding:.9rem;image-rendering:pixelated;margin-bottom:1.6rem}
+/* Bloques en vista isométrica 3D (Mesa de Trabajo y Tocadiscos) */
+.iso-block-btn{position:relative;background:none;border:0;padding:0;margin-bottom:.75rem;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .2s}
+.iso-block-btn:hover{transform:translateY(-3px) scale(1.03)}
+.iso-block-btn:active{transform:scale(.97)}
+.iso-block-btn canvas{display:block;width:210px;height:176px;image-rendering:pixelated;filter:drop-shadow(0 12px 24px rgba(0,0,0,.6))}
+
+/* Paneles estilo interfaz de Minecraft (Mesa de Trabajo, Pociones y Tocadiscos) */
+.mc-craft-gui,.mc-brew-gui,.mc-jukebox-gui{width:min(28.5rem,94vw);background:#c6c6c6;border:3px solid #000;box-shadow:inset -3px -3px 0 #555,inset 3px 3px 0 #fff,0 14px 36px rgba(0,0,0,.65);padding:.9rem;image-rendering:pixelated;margin-bottom:1.6rem}
 .mc-gui-head{display:flex;align-items:center;gap:.55rem;color:#373737;text-shadow:none;font-size:.9rem;margin-bottom:.75rem;text-align:left}
 .gui-head-ico{width:24px;height:24px;image-rendering:pixelated;flex-shrink:0}
 
@@ -263,31 +269,17 @@ body[data-sky="cherry"] #mc-moon{background:#ffe6f2;border-color:#f29bc2;box-sha
 .brew-slot img{width:34px;height:34px;image-rendering:pixelated;filter:drop-shadow(2px 2px 0 rgba(0,0,0,.45));z-index:1}
 
 /* Tocadiscos (Jukebox) */
-.jukebox-stage{display:flex;align-items:center;gap:1rem;background:rgba(24,14,22,.88);border:2px solid #000;box-shadow:inset 0 0 0 2px #522040;padding:.75rem .9rem;margin-bottom:.75rem;text-align:left}
-.jukebox-block{position:relative;width:64px;height:64px;flex-shrink:0;border:2px solid #000;box-shadow:0 6px 14px rgba(0,0,0,.5)}
-.jukebox-block img{width:100%;height:100%;display:block;image-rendering:pixelated}
-.jukebox-block.playing{animation:breathe 1.8s ease-in-out infinite}
+.jukebox-stage{display:flex;align-items:center;justify-content:center;background:rgba(24,14,22,.88);border:2px solid #000;box-shadow:inset 0 0 0 2px #522040;padding:.65rem .9rem;margin-bottom:.75rem;text-align:center}
 .jukebox-notes{position:absolute;inset:0;pointer-events:none}
-.jb-note{position:absolute;left:50%;top:10%;font-size:1.1rem;font-weight:700;text-shadow:2px 2px 0 #000;animation:noteFloat 1.8s ease-out forwards}
-@keyframes noteFloat{0%{opacity:1;transform:translate(-50%,0) scale(.8)}100%{opacity:0;transform:translate(calc(-50% + var(--nx,0px)),-46px) scale(1.2)}}
+.jb-note{position:absolute;left:50%;top:22%;font-size:1.3rem;font-weight:700;text-shadow:2px 2px 0 #000;animation:noteFloat 1.8s ease-out forwards}
+@keyframes noteFloat{0%{opacity:1;transform:translate(-50%,0) scale(.85)}100%{opacity:0;transform:translate(calc(-50% + var(--nx,0px)),-58px) scale(1.25)}}
 .jukebox-info{flex:1;min-width:0}
-.jb-now{color:#55ffff;font-size:.88rem;text-shadow:2px 2px 0 #153f3f;margin-bottom:.2rem}
+.jb-now{color:#55ffff;font-size:.9rem;text-shadow:2px 2px 0 #153f3f;margin-bottom:.2rem}
 .jb-sub{color:#d8c8d2;font-size:.76rem;text-shadow:1px 1px 0 #000}
-.jukebox-discs{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem}
-.disc-btn{display:flex;flex-direction:column;align-items:center;gap:.3rem;padding:.5rem .35rem;background:#8b8b8b url("mc/slot.png") center/100% 100% no-repeat;box-shadow:inset 2px 2px 0 #373737,inset -2px -2px 0 #fff;border:2px solid transparent;color:#fff;font-size:.74rem;text-shadow:1px 1px 0 #000;cursor:pointer;transition:transform .15s}
+.jukebox-discs{display:grid;grid-template-columns:repeat(auto-fit,minmax(82px,1fr));gap:.45rem}
+.disc-btn{display:flex;flex-direction:column;align-items:center;gap:.3rem;padding:.5rem .35rem;background:#8b8b8b url("mc/slot.png") center/100% 100% no-repeat;box-shadow:inset 2px 2px 0 #373737,inset -2px -2px 0 #fff;border:2px solid transparent;color:#fff;font-size:.72rem;text-shadow:1px 1px 0 #000;cursor:pointer;transition:transform .15s}
 .disc-btn:hover,.disc-btn.active{border-color:#ffff55;color:#ffff55;transform:translateY(-2px)}
 .disc-btn img{width:34px;height:34px;image-rendering:pixelated;filter:drop-shadow(2px 2px 0 rgba(0,0,0,.5))}
 .disc-btn.active img{animation:spinDisc 5s steps(12) infinite}
-
-/* Mapa y Coordenadas (F3) */
-.map-meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.4rem;background:rgba(16,8,20,.88);border:2px solid #000;padding:.45rem .7rem;color:#d0d0d0;font-size:.76rem;text-shadow:1px 1px 0 #000;margin-bottom:.65rem}
-.map-meta b{color:#80ff20}
-.mc-map-cv{width:100%;height:auto;display:block;border:3px solid #3d2817;box-shadow:inset 0 0 0 2px #c8ad7f,0 6px 16px rgba(0,0,0,.45);image-rendering:pixelated;margin-bottom:.7rem;background:#d8c49a}
-.map-waypoints{display:flex;flex-direction:column;gap:.45rem}
-.wp-btn{display:flex;flex-direction:column;align-items:flex-start;gap:.15rem;width:100%;text-align:left;background:rgba(20,10,24,.9);border:2px solid #000;box-shadow:inset 0 0 0 1px #5c2848;padding:.55rem .75rem;color:#fff;cursor:pointer;transition:transform .12s,border-color .12s}
-.wp-btn:hover,.wp-btn.active{border-color:#ffff55;transform:translateX(3px)}
-.wp-coords{color:#ffff55;font-size:.75rem;text-shadow:1px 1px 0 #3f3f15}
-.wp-title{color:#f3bccb;font-size:.86rem}
-.wp-desc{color:#d8d0d5;font-size:.78rem;line-height:1.4}
 
 .firework-btn{margin:.2rem 0 1.4rem}
